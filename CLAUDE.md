@@ -36,3 +36,4 @@ SHORT_COURSEWORK
 - You will be completing tasks from the lab handout. Each task should be labelled with `>` in markdown inside the `ipynb` file. There should be a one-to-one correspondence between tasks in the lab handout, tasks specified in the latex document, and tasks specified with `>` in the `ipynb` file
 - When you read an `ipynb`, because notebooks often have very large image files and metadeta, we should always clear outputs before feeding the ipynb to you
   - In VSCode, this should be very easy to do as there should already be a default `clear all outputs` button. If you see a very large `ipynb` file with alot of unneccessary data, please stop the session and prompt the user
+- ALWAYS write simple, clear and concise code with appropriate documentation (don't overdo)

@@ -1,0 +1,157 @@
+\documentclass[12pt]{article}
+\textwidth 15.5cm \oddsidemargin 0cm \topmargin -2cm \textheight
+24cm \footskip 1.5cm \usepackage{epsfig}
+\usepackage{amsmath,graphicx,psfrag,pstcol}
+\def\n{\noindent}
+\def\u{\underline}
+\def\hs{\hspace}
+\newcommand{\thrfor}{.^{\displaystyle .} .}
+\newcommand{\bvec}[1]{{\bf #1}}
+
+\begin{document}
+
+\noindent
+\rule{15.7cm}{0.5mm}
+
+
+\begin{center}
+    {\bf ENGINEERING TRIPOS PART II A}
+\end{center}
+\vspace{0.5cm} {\bf EIETL \hfill MODULE EXPERIMENT 3F3}
+\vspace{0.5cm}
+\begin{center}
+    {\bf RANDOM VARIABLES and RANDOM NUMBER GENERATION
+        \\\hfill \\Name: Liu Zihe \\\hfill\\
+        College: Homerton College\\\hfill
+        \\
+        Lab Group Number: Wednesday 5th November, CRSID: zl559
+    }
+\end{center}
+\rule{15.7cm}{0.5mm}
+
+\section{Uniform and normal random variables}
+
+\subsection{Histogram of Gaussian random numbers}
+Histogram of Gaussian random numbers overlaid on exact Gaussian curve (scaled):
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Histogram of Uniform random numbers}
+Histogram of Uniform random numbers overlaid on exact Uniform curve (scaled):
+
+test
+
+    {\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Kernel density estimate for Gaussian random numbers}
+Kernel density estimate for Gaussian random numbers overlaid on exact Gaussian curve:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Kernel density estimate for Uniform random numbers}
+Kernel density estimate for Uniform random numbers overlaid on exact Gaussian curve:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Comparison of kernel density and histogram methods}
+Comment on the advantages and disadvantages of the kernel density method compared with the histogram method for estimation of a probability density from random samples:
+
+{\em Text answer  here}
+\vspace{3in}
+
+\subsection{Theoretical analysis of uniform density}
+Theoretical mean and standard deviation calculation for uniform density as a function of $N$:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+Explain behaviour as $N$ becomes large:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+\subsection{Histograms for varying $N$}
+Plot of histograms for $N=100$, $N=1000$ and $N=10000$ with theoretical mean and $\pm 3$ standard deviation lines:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Consistency with multinomial distribution theory}
+Are your histogram results consistent with the multinomial distribution theory?
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+\section{Functions of random variables}
+
+\subsection{Linear transformation of normal variables}
+For normally distributed ${\cal N}(x|0,1)$ random variables, take $y=f(x)=ax+b$. Calculate $p(y)$ using the Jacobian formula:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+Explain how this is linked to the general normal density with non-zero mean and non-unity variance:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+\subsection{Verification of linear transformation}
+Verify this formula by transforming a large collection of random samples $x^{(i)}$ to give $y^{(i)}=f(x^{(i)})$, histogramming the resulting $y$ samples, and overlaying a plot of your formula calculated using the Jacobian:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\subsection{Quadratic transformation of normal variables}
+Now take $p(x)={\cal N}(x|0,1)$ and $f(x)=x^2$. Calculate $p(y)$ using the Jacobian formula:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+\subsection{Verification of quadratic transformation}
+Verify your result by histogramming of transformed random samples:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\section{Inverse CDF method}
+
+\subsection{CDF and inverse CDF for exponential distribution}
+Calculate the CDF and the inverse CDF for the exponential distribution:
+
+{\em Text/maths answer  here}
+\vspace{3in}
+
+\subsection{Implementation of inverse CDF method}
+Matlab/Python code for inverse CDF method for generating samples from the exponential distribution:
+
+{\em Matlab/Python code  here}
+\vspace{3in}
+
+\subsection{Verification with histograms}
+Plot histograms/ kernel density estimates and overlay them on the desired exponential density:
+
+{\em Include your graphic here}
+\vspace{3in}
+
+\section{Simulation from a non-standard density}
+
+\subsection{Random number generation code}
+Matlab/Python code to generate $N$ random numbers drawn from the distribution of $X$:
+\vspace{3in}
+
+\subsection{Histogram density estimates}
+Plot some histogram density estimates with $\alpha=0.5,\,1.5$ and several values of $\beta$.
+
+\vspace{3in}
+
+\subsection{Interpretation of parameters}
+Hence comment on the interpretation of the parameters $\alpha$ and $\beta$.
+
+
+
+\end{document}
+
