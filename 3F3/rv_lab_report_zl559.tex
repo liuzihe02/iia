@@ -2,6 +2,7 @@
 \textwidth 15.5cm \oddsidemargin 0cm \topmargin -2cm \textheight
 24cm \footskip 1.5cm \usepackage{epsfig}
 \usepackage{amsmath,graphicx,psfrag,pstcol}
+\usepackage{hyperref}
 \def\n{\noindent}
 \def\u{\underline}
 \def\hs{\hspace}
@@ -12,7 +13,6 @@
 
 \noindent
 \rule{15.7cm}{0.5mm}
-
 
 \begin{center}
     {\bf ENGINEERING TRIPOS PART II A}
@@ -29,129 +29,285 @@
 \end{center}
 \rule{15.7cm}{0.5mm}
 
-\section{Uniform and normal random variables}
+This report explores random number generation and density estimation techniques, including histogram and KDE methods, probability transformations, inverse CDF sampling, and alpha-stable distributions.
 
-\subsection{Histogram of Gaussian random numbers}
-Histogram of Gaussian random numbers overlaid on exact Gaussian curve (scaled):
+\section{Uniform and Normal Random Variables}
 
-{\em Include your graphic here}
-\vspace{3in}
+\subsection{Kernel Density Estimation (KDE)}
 
-\subsection{Histogram of Uniform random numbers}
-Histogram of Uniform random numbers overlaid on exact Uniform curve (scaled):
+The kernel density function (or kernel density estimator) is defined as:
 
-test
+$$\hat{p}(x) = \frac{1}{N}\sum_{i=1}^{N} \frac{1}{\sigma}\mathcal{K}\left(\frac{x - x^{(i)}}{\sigma}\right)$$
 
-    {\em Include your graphic here}
-\vspace{3in}
+where $N$ is the number of samples, $x^{(i)}$ are the observed data points, $\mathcal{K}(u)$ is the kernel function (commonly Gaussian), and $\sigma$ is the bandwidth (smoothing parameter). The Gaussian kernel is:
+$$\mathcal{K}_{\text{Gauss}}(u) = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{u^2}{2}\right)$$
 
-\subsection{Kernel density estimate for Gaussian random numbers}
-Kernel density estimate for Gaussian random numbers overlaid on exact Gaussian curve:
+resulting in the KDE:
+$$\hat{p}(x) = \frac{1}{N\sigma}\sum_{i=1}^{N}\exp\left(-\frac{(x - x^{(i)})^2}{2\sigma^2}\right)$$
 
-{\em Include your graphic here}
-\vspace{3in}
+\subsection{Histogram and KDE of Gaussian random numbers}
 
-\subsection{Kernel density estimate for Uniform random numbers}
-Kernel density estimate for Uniform random numbers overlaid on exact Gaussian curve:
+\begin{center}
+    \includegraphics[width=1\textwidth]{img/normal_histogram_kde.png}
+\end{center}
 
-{\em Include your graphic here}
-\vspace{3in}
+The histogram (blue bars) and KDE (blue curve) both capture the bell-shaped Gaussian profile well. The histogram exhibits discontinuities at bin boundaries while the KDE (with $\sigma=0.2$) produces a smooth estimate that closely follows the theoretical PDF (red curve).
+
+
+\subsection{Histogram and KDE of Uniform random numbers}
+
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/uniform_histogram_kde.png}
+\end{center}
+
+The histogram (blue bars) shows approximately equal heights across bins, consistent with uniform density. The KDE (blue curve, $\sigma=0.05$) is smoother but extends beyond $[0,1]$ due to boundary effects, while the theoretical PDF (red curve) shows the expected flat density over the support.
 
 \subsection{Comparison of kernel density and histogram methods}
-Comment on the advantages and disadvantages of the kernel density method compared with the histogram method for estimation of a probability density from random samples:
 
-{\em Text answer  here}
-\vspace{3in}
+Both methods have similar bias-variance structure (the Mean-Squared-Error have the same form), but differ significantly in asymptotic convergence with sample size. These theoretical properties are taken from University of Washington STAT 425 course materials on density estimation\cite{UW_STAT425}.
+
+For the histogram with optimal bin width $h = 1/M$:
+$$\text{MSE} = O(h^4) + O(1/(Nh)) \quad \Rightarrow \quad \text{Optimal convergence rate: } O(N^{-2/3})$$
+
+For KDE with optimal bandwidth $h \propto N^{-1/5}$:
+$$\text{MSE} = O(h^4) + O(1/(Nh)) \quad \Rightarrow \quad \text{Optimal convergence rate: } O(N^{-4/5}) \text{ (faster)}$$
+
+\begin{center}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Aspect}       & \textbf{Histogram}            & \textbf{KDE}                  \\
+        \hline
+        Visual Form           & Bars (discrete)               & Smooth curve                  \\
+        Interpretation        & Exact bin counts (intuitive)  & Smoothed estimate             \\
+        Parameter Sensitivity & High (bin width/position)     & Lower (bandwidth choice)      \\
+        Boundary Effects      & Respects finite support       & May smooth beyond boundaries  \\
+        Convergence Rate      & $O(N^{-2/3})$                 & $O(N^{-4/5})$                 \\
+        Computational Cost    & Trivial                       & $O(N)$ kernel evaluations     \\
+        Multimodal Detection  & Difficult with wrong bin size & Better at revealing structure \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\textbf{Histogram Advantages:} The histogram directly represents actual sample counts per bin, making it intuitive and interpretable. It respects the finite support of distributions (e.g., $[0,1]$ for uniform), avoiding boundary effects. Computationally, histograms are simple and efficient to construct.
+
+\textbf{Histogram Disadvantages:} The visual appearance is highly sensitive to bin width $\delta$ and bin position, potentially misleading with poor parameter choices. The method exhibits artificial discontinuities between bins that do not reflect the true continuous density.
+
+\textbf{KDE Advantages:} The KDE produces a smooth, continuous density estimate that better reveals underlying density structure without artificial bin artifacts. It achieves asymptotically superior convergence rate $O(N^{-4/5})$ compared to histogram's $O(N^{-2/3})$. The method is less sensitive to bandwidth selection compared to histogram's bin width effects. The smooth curve is better for visual comparison of multiple distributions.
+
+\textbf{KDE Disadvantages:} The KDE is less intuitive because it does not directly correspond to observable sample counts. It exhibits boundary effects for distributions with finite support, producing inaccuracies near domain boundaries. Bandwidth parameter selection, while less critical than histogram bin width, still requires careful consideration. The method is more computationally expensive than histograms, requiring kernel evaluations at many points.
 
 \subsection{Theoretical analysis of uniform density}
-Theoretical mean and standard deviation calculation for uniform density as a function of $N$:
 
-{\em Text/maths answer  here}
-\vspace{3in}
+When histogramming $N$ independent samples from U(0,1) into $J$ bins, each bin has width $\delta = 1/J$ and probability $p_j = \int_{c_j - \delta/2}^{c_j + \delta/2} p(x)\,dx = 1/J$ for each bin center $c_j$. The bin counts $(n_1, \ldots, n_J)$ satisfy $\sum_j n_j = N$ and follow the multinomial distribution. Each marginal count $n_j$ is:
+$$n_j \sim \text{Binomial}\left(N, p_j = \frac{1}{J}\right)$$
 
-Explain behaviour as $N$ becomes large:
+Therefore,
+\begin{align*}
+    E[n_j]          & = N \cdot p_j = \frac{N}{J}                                                         \\
+    \text{Var}(n_j) & = N \cdot p_j(1-p_j) = \frac{N}{J}\left(1 - \frac{1}{J}\right) = \frac{N(J-1)}{J^2} \\
+    \sigma_{n_j}    & = \frac{\sqrt{N(J-1)}}{J}
+\end{align*}
 
-{\em Text/maths answer  here}
-\vspace{3in}
+For $99.7\%$ confidence intervals ($\pm 3\sigma$):
+$$E[n_j] \pm 3\sigma_{n_j} = \frac{N}{J} \pm 3\sqrt{\frac{N(J-1)}{J^2}}$$
+
+\subsection{Asymptotic Behavior as $N \to \infty$:}
+
+The relative uncertainty (coefficient of variation) is:
+$$\text{CV} = \frac{\sigma_{n_j}}{E[n_j]} = \frac{\sqrt{N(J-1)}/J}{N/J} = \sqrt{\frac{J-1}{N}} \approx \sqrt{\frac{J}{N}}$$
+
+As $N \to \infty$ with $J$ fixed, the coefficient of variation decreases as $\text{CV} \sim 1/\sqrt{N} \to 0$, meaning histogram estimates become increasingly reliable with higher precision as sample size grows. The Law of Large Numbers ensures convergence: observed bin counts $n_j$ converge to their theoretical expectation $N/J$. By the Central Limit Theorem, the counts become approximately normally distributed around their mean, providing the theoretical justification for the confidence interval bounds observed in practice.
 
 \subsection{Histograms for varying $N$}
 Plot of histograms for $N=100$, $N=1000$ and $N=10000$ with theoretical mean and $\pm 3$ standard deviation lines:
 
-{\em Include your graphic here}
-\vspace{3in}
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/multinomial_bounds.png}
+\end{center}
 
 \subsection{Consistency with multinomial distribution theory}
-Are your histogram results consistent with the multinomial distribution theory?
 
-{\em Text/maths answer  here}
-\vspace{3in}
+The histogram results demonstrate good agreement with theory:
+
+\begin{enumerate}
+    \item \textbf{Bin Count Distribution:} The expected mean $E[n_j] = N/J$ is closely matched by observed counts across all $N$ values (5, 50, 500 for $N = 100, 1000, 10000$ respectively with $J=20$ bins).
+
+    \item \textbf{Confidence Bounds:} Approximately 95-100\% of bins fall within the $\pm 3\sigma$ bounds, consistent with the $\sim 99.7\%$ theoretical expectation from the Central Limit Theorem. Minor discrepancies arise from finite sample effects and discrete bin counts.
+
+    \item \textbf{Increasing Reliability:} As $N$ increases, the relative scatter in bin counts decreases
+\end{enumerate}
 
 \section{Functions of random variables}
 
 \subsection{Linear transformation of normal variables}
-For normally distributed ${\cal N}(x|0,1)$ random variables, take $y=f(x)=ax+b$. Calculate $p(y)$ using the Jacobian formula:
 
-{\em Text/maths answer  here}
-\vspace{3in}
+For $x \sim \mathcal{N}(0,1)$ and $y = ax + b$, we solve for the inverse: $x = \frac{y-b}{a}$. The Jacobian is $\left|\frac{dx}{dy}\right| = \frac{1}{|a|}$. Applying the transformation formula:
 
-Explain how this is linked to the general normal density with non-zero mean and non-unity variance:
+\begin{align*}
+    p(y) & = p(x)\left|\frac{dx}{dy}\right| = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{1}{2}\left(\frac{y-b}{a}\right)^2\right) \cdot \frac{1}{|a|} \\
+         & = \frac{1}{|a|\sqrt{2\pi}}\exp\left(-\frac{(y-b)^2}{2a^2}\right)                                                                      \\
+         & = \frac{1}{\sqrt{2\pi a^2}}\exp\left(-\frac{(y-b)^2}{2a^2}\right)                                                                     \\
+         & = \mathcal{N}(y|b, a^2)
+\end{align*}
 
-{\em Text/maths answer  here}
-\vspace{3in}
+This demonstrates that a linear transformation of a standard normal produces a general normal distribution $\mathcal{N}(\mu, \sigma^2)$ with mean $\mu = b$ and variance $\sigma^2 = a^2$.
+
+\subsection{General Normal Distribution}
+
+The derived PDF can be rewritten as:
+$$p(y) = \frac{1}{\sqrt{2\pi a^2}}\exp\left(-\frac{(y-b)^2}{2a^2}\right) = \mathcal{N}(y|b, a^2)$$
+
+The general normal distribution $\mathcal{N}(\mu, \sigma^2)$ has PDF:
+$$\mathcal{N}(y|\mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)$$
+
+Hence $\mu = b$ (location/mean) and $\sigma^2 = a^2$ (scale/variance, with $\sigma = |a|$). Any normal distribution $\mathcal{N}(\mu, \sigma^2)$ can be generated from the standard normal $\mathcal{N}(0,1)$ using:
+$$Y = \sigma X + \mu$$
+
+where $X \sim \mathcal{N}(0,1)$. This is the standardization technique and explains why random number generators only need to implement $\mathcal{N}(0,1)$; all other normal distributions follow by linear transformation. The parameter $a$ scales the spread by factor $|a|$, while $b$ translates the location.
 
 \subsection{Verification of linear transformation}
-Verify this formula by transforming a large collection of random samples $x^{(i)}$ to give $y^{(i)}=f(x^{(i)})$, histogramming the resulting $y$ samples, and overlaying a plot of your formula calculated using the Jacobian:
 
-{\em Include your graphic here}
-\vspace{3in}
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/linear_transform_verification.png}
+\end{center}
+
+The histogram of transformed samples with parameters $a=3$ and $b=5$ shows excellent agreement with both the theoretical PDF $\mathcal{N}(y|5, 9)$ derived from the Jacobian formula (red curve) and the KDE estimate (green dashed curve). This confirms that the linear transformation of a standard normal variable $Y = 3X + 5$ produces $Y \sim \mathcal{N}(5, 9)$, with sample mean $\approx 5$ and sample variance $\approx 9$, exactly as predicted by theory. The three curves overlap nearly perfectly, validating the Jacobian approach to probability transformations.
 
 \subsection{Quadratic transformation of normal variables}
-Now take $p(x)={\cal N}(x|0,1)$ and $f(x)=x^2$. Calculate $p(y)$ using the Jacobian formula:
 
-{\em Text/maths answer  here}
-\vspace{3in}
+For $x \sim \mathcal{N}(0,1)$ and $y = x^2$ (with $y \geq 0$), there are two inverse solutions: $x_1(y) = \sqrt{y}$ and $x_2(y) = -\sqrt{y}$. The Jacobian is $\frac{dy}{dx} = 2x$, so $\left|\frac{dx}{dy}\right| = \frac{1}{2|x|} = \frac{1}{2\sqrt{y}}$. Applying the transformation formula with both branches:
+\begin{align*}
+    p(y) & = \sum_{k=1}^{2} \frac{p(x_k(y))}{\left|\frac{dy}{dx}\right|_{x=x_k(y)}}               \\
+         & = 2 \cdot \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{y}{2}\right) \cdot \frac{1}{2\sqrt{y}} \\
+         & = \frac{1}{\sqrt{2\pi y}}\exp\left(-\frac{y}{2}\right), \quad y \geq 0
+\end{align*}
 
 \subsection{Verification of quadratic transformation}
-Verify your result by histogramming of transformed random samples:
 
-{\em Include your graphic here}
-\vspace{3in}
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/quadratic_transform_verification.png}
+\end{center}
+
+The histogram of $Y = X^2$ where $X \sim \mathcal{N}(0,1)$ exhibits excellent agreement with the theoretical distribution (red curve) and KDE estimate (green dashed curve).
+
+Statistical validation confirms the Jacobian formula:
+\begin{itemize}
+    \item Sample mean: $\approx 1.0034$ vs theoretical expectation: $1.0$ (mean of $\chi^2_1$)
+    \item Sample variance: $\approx 2.0041$ vs theoretical expectation: $2.0$ (variance of $\chi^2_1$)
+\end{itemize}
 
 \section{Inverse CDF method}
 
-\subsection{CDF and inverse CDF for exponential distribution}
-Calculate the CDF and the inverse CDF for the exponential distribution:
+\subsection{CDF and inverse CDF for exponential distribution}. For the exponential distribution with PDF $p(y) = \exp(-y)$ for $y \geq 0$:
 
-{\em Text/maths answer  here}
-\vspace{3in}
+\textbf{CDF:}
+$$F(y) = \int_{0}^{y} \exp(-t)\, dt = 1 - \exp(-y), \quad y \geq 0$$
+
+\textbf{Inverse CDF:}
+
+Solving $u = F(y)$ for $y$:
+\begin{align*}
+    u        & = 1 - \exp(-y) \\
+    \exp(-y) & = 1 - u        \\
+    y        & = -\ln(1 - u)  \\
+             & = F^{-1}(u)
+\end{align*}
+
+Since $u \sim \mathcal{U}(0,1)$ implies $(1-u) \sim \mathcal{U}(0,1)$, we can equivalently use the simpler form: $F^{-1}(u) = -\ln(u)$. For the general exponential distribution with mean $\mu$: $F^{-1}(u) = -\mu \ln(u)$.
 
 \subsection{Implementation of inverse CDF method}
-Matlab/Python code for inverse CDF method for generating samples from the exponential distribution:
 
-{\em Matlab/Python code  here}
-\vspace{3in}
+Generate uniform random variables and apply the inverse CDF transformation:
+
+\begin{verbatim}
+def generate_exponential_inverse_cdf(n_samples, mean=1.0):
+    """Generate exponential random variates using inverse CDF method."""
+    # Generate uniform random variables U(0,1)
+    u = np.random.rand(n_samples)
+
+    # Apply inverse CDF transformation: F^(-1)(u) = -mu * ln(u)
+    y = -mean * np.log(u)
+
+    return y
+\end{verbatim}
+
+This implementation is computationally efficient, requiring only logarithmic operations per sample. The method works for any distribution with a known, analytically invertible CDF.
 
 \subsection{Verification with histograms}
-Plot histograms/ kernel density estimates and overlay them on the desired exponential density:
 
-{\em Include your graphic here}
-\vspace{3in}
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/exponential_inverse_cdf.png}
+\end{center}
+
+The histogram (left) shows excellent agreement with the theoretical exponential density. The KDE (right) exhibits significant boundary effects: the peak is underestimated ($\approx 0.65$ vs theoretical $1.0$) because Gaussian kernels extend into negative values where the distribution is undefined, causing density mass to leak outside the valid support $[0,\infty)$.
 
 \section{Simulation from a non-standard density}
 
 \subsection{Random number generation code}
-Matlab/Python code to generate $N$ random numbers drawn from the distribution of $X$:
-\vspace{3in}
+
+This distribution is the $\alpha$-stable distribution. Unlike the Gaussian assumption, $\alpha$-stable distributions allow for infinite variance and heavy tails. To generate from the $\alpha$-stable distribution with parameters $\alpha \in (0,2), \alpha \neq 1$ and $\beta \in [-1,+1]$:
+
+\begin{enumerate}
+    \item Calculate auxiliary parameters:
+          $$b = \frac{1}{\alpha}\arctan\left(\beta\tan\frac{\pi\alpha}{2}\right)$$
+          $$s = \left(1 + \beta^2\tan^2\frac{\pi\alpha}{2}\right)^{1/(2\alpha)}$$
+
+    \item Generate $U \sim \mathcal{U}(-\pi/2, +\pi/2)$ and $V \sim \mathcal{E}(1)$ (exponential)
+
+    \item Calculate:
+          $$X = s \frac{\sin(\alpha(U + b))}{(\cos(U))^{1/\alpha}}\left(\frac{\cos(U - \alpha(U + b))}{V}\right)^{(1-\alpha)/\alpha}$$
+\end{enumerate}
+
+Then $X$ follows the $\alpha$-stable distribution. The Python implementation is:
+
+\begin{verbatim}
+def generate_stable(alpha, beta, n_samples):
+    """Generate random samples from alpha-stable distribution."""
+    # Calculate auxiliary parameters
+    b = (1.0 / alpha) * np.arctan(beta * np.tan(np.pi * alpha / 2.0))
+    s = (1.0 + beta**2 * np.tan(np.pi * alpha / 2.0) ** 2) ** (1.0 / (2.0 * alpha))
+
+    # Generate uniform and exponential random variables
+    U = np.random.uniform(-np.pi / 2.0, np.pi / 2.0, n_samples)
+    V = np.random.exponential(scale=1.0, size=n_samples)
+
+    # Apply transformation
+    numerator = np.sin(alpha * (U + b)) / (np.cos(U) ** (1.0 / alpha))
+    denominator = (np.cos(U - alpha * (U + b)) / V) ** ((1.0 - alpha) / alpha)
+
+    X = s * numerator * denominator
+
+    return X
+\end{verbatim}
 
 \subsection{Histogram density estimates}
-Plot some histogram density estimates with $\alpha=0.5,\,1.5$ and several values of $\beta$.
 
-\vspace{3in}
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{img/stable_distribution_grid.png}
+\end{center}
 
+The $2 \times 5$ grid displays histograms and KDE estimates for $\alpha$-stable distributions as functions of both $\alpha$ and $\beta$:
+
+\textbf{Top Row ($\alpha = 0.5$ --- Heavy Tails):} All five distributions in the top row exhibit extremely heavy tails with occasional massive outliers that dominate the sample. Samples extend far from the center, with the spread and range increasing as $|\beta|$ increases from the center at $\beta=0$ to the extremes at $\beta=\pm 1.0$. Both histogram and KDE methods struggle to capture the full density structure due to these extreme values, and we clip the figure.
+
+\textbf{Bottom Row ($\alpha = 1.5$ --- Lighter Tails):} Distributions in the bottom row are substantially tighter with smaller maximum outliers compared to the $\alpha = 0.5$ case. The density is more concentrated near the center, exhibiting a more Gaussian-like appearance. Skewness effects from varying $\beta$ values are more visible here because outliers no longer overwhelm the visualization.
+
+The horizontal progression across columns (varying $\beta$) reveals asymmetry effects: distributions shift rightward for $\beta > 0$ and leftward for $\beta < 0$. The vertical progression between rows (varying $\alpha$) demonstrates the dramatic impact of tail heaviness: $\alpha = 0.5$ produces a broadly spread distribution while $\alpha = 1.5$ produces a compact, concentrated distribution.
 \subsection{Interpretation of parameters}
-Hence comment on the interpretation of the parameters $\alpha$ and $\beta$.
 
+The stability parameter $\alpha \in (0,2)$ controls tail heaviness. At $\alpha = 0.5$, tails are extremely heavy with large variance, exhibiting massive outliers that dominate sample statistics. At $\alpha = 1.5$, tails are lighter though still heavier than Gaussian, with smaller variance and less extreme outliers. Higher $\alpha$ values produce lighter, more Gaussian-like behavior suitable for well-behaved data, while lower $\alpha$ values produce heavier tails needed for impulsive phenomena.
 
+The skewness parameter $\beta $ controls the direction and degree of asymmetry. At $\beta = 0$, the distribution is symmetric about its center. Positive $\beta$ values ($\beta = +0.5, +1.0$) produce right skewness with heavier right tails; negative $\beta$ values ($\beta = -0.5, -1.0$) produce left skewness with heavier left tails. The extremes $\beta = \pm 1.0$ represent maximum asymmetry in each direction.
+
+\section{Conclusion}
+
+We have explored fundamental random number generation and density estimation techniques. Histogram and KDE methods offer complementary trade-offs between insights and efficiency. Jacobian transformations, inverse CDF sampling, and alpha-stable distributions enable flexible modeling of complex distributions essential for scientific and engineering applications.
+
+\section{References}
+
+\begin{thebibliography}{9}
+    \bibitem{UW_STAT425} University of Washington, STAT 425 (2018). Course lecture notes on density estimation methods covering histogram and kernel density estimation. Available at: \url{https://faculty.washington.edu/yenchic/18W_425/Lec6_hist_KDE.pdf}
+\end{thebibliography}
 
 \end{document}
 

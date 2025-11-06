@@ -3,6 +3,6 @@
   //latex autosave
   "latex-workshop.latex.autoBuild.run": "onSave",
   //latex linting
-  "latex-workshop.linting.chktex.enabled": true,
+  // "latex-workshop.linting.chktex.enabled": true,
   "latex-workshop.formatting.latex": "latexindent"
 }
