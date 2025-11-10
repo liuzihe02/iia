@@ -1,0 +1,140 @@
+Free-Roving Subsea Cable Inspection Drone :
+A Technical Feasibility Study
+Jerry Liu (yhl63), Zihe Liu (zl559)
+
+The Problem - Subsea Cable Inspection
+Backbone of the modern internet infrastructure, carrying 97-99% of all intercontinental data traffic.
+500+ cables worldwide , a total of 14 million kilometers
+Around 2-5 cm in diameter, 
+Before we dive into our design and feasibility assessment, let’s give some context to the problem we’re tackling : Subsea cables. Your internet connection, whether that be for online banking or video calls, 97-99% of that data goes through a dense network of over 500+ undersea cables, spanning a total of 14 million kilometers over the seafloor making it THE largest and possible greatest man-made infrastructure ever. This is the backbone of the internet, and when they fail, the consequences are severe. Despite the significance of these cables, these cables are no thicker than your average garden-hose around 2-5 cm in diameter, with hair-thin strands of optical fibre embedded within, designed to remain undisturbed across the seabed.
+
+The Problem - Subsea Cable Inspection
+Averages 200 faults a year, particularly in shallow waters (~200m)
+Shetland Islands cutoff in 2022
+Traditional inspection methods use tethered ROVs, which can limit motion and increase cost
+In shallow waters  however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year. In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, couldn't use card payments, couldn't access online banking. Businesses lost thousands. Emergency services were disrupted. These aren’t rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would be able to identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable. Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintainence costs for dedicated vessels.
+
+
+Problem Definition
+
+“A free-roving (no umbilical cable) submarine inspection drone is required for undersea cables: operating down to 250 m depth. It should have an endurance of 2 hours continuously powered operation, carrying video and ultrasound imaging equipment drawing a 30 W electrical load, and have suitable propulsion to travel up to 4 m/s peak speed with 1 m/s cruise. Total mass is to be < 25 kg, to allow easy handling on board the mothership. “
+Operating Environment
+⍴gh gives ~25 bar pressure, ~4 °C seawater, insulation for electronics and waterproofing
+
+Saltwater corrosion & biofouling, limited to plastic materials
+
+Far below the surface, limited visibility. Not affected by surface wave currents driven by wind
+
+High signal attenuation
+Problem Definition
+“At 250 m, pressure is roughly 25 bar and temperatures are low. Materials must resist corrosion, sensors must work in turbid water, and communications are limited to acoustic modems — no radio or GPS below the surface.”
+
+Problem Definition
+Power Consumption 
+
+Identify energy storage limits to define mission duration and vehicle size within constraints.
+2 hours continuous operation
+Support 30W load as well as communications and mechanical systems
+3
+Mechanical Design
+
+Develop the mechanical system ensuring all components fit within the 25kg weight limit. 
+Buoyancy system
+Structural integrity
+
+
+4
+Communication and Control
+
+Assess feasibility of underwater wireless communication methods for control and data transfer.
+Attenuation in seawater
+Navigation and mapping
+
+1
+Hydrodynamics
+
+Analyze underwater drag forces to estimate thrust needed for efficient movement. 
+Degrees of freedom and stability control
+Drag and resistive forces
+
+
+2
+
+Existing Solutions
+Iver3 by L3Harris 
+Rated at 200m
+27-40kg depending on configuration
+8-14-hour endurance by 784 WHr of rechargeable lithium-ion batteries
+Single thruster, fins for pitch/yaw control
+ecoSUB
+Rated at 500m
+4kg depending on configuration
+10-hour endurance by alkaline batteries
+Single thruster, fins for pitch/yaw control
+
+Boxfish AUV
+Rated up to 600m
+25kg with Salt water ballast
+Up to 10 hours by 600Whr Lithium Polymer batteries
+8 3D-vectored thrusters allowing 6 DoF 
+
+
+
+
+Many consumer solutions already exist, however they vary in their degree of satisfying the requirements as stated previously. Commercial designs such as the Iver3 and the ecoSub opt for a fully autonomous solution through mission planning and programmable actions, whereas others such as the Boxfish use a hybrid of tethered and untethered communication to get the best of both worlds. 
+
+Technical Approach
+
+System Design
+Autonomous/programmable solution to remove the need for high-quality real-time data transmission which limits untethered ROVs
+8-thruster design for stability and hovering capabilities for detailed inspection
+Reinforced acrylic casing for 
+Autonomous vs controlled : As per most consumer designs, we opted for an autonomous control system with simple programmable commands to eliminate the need for high-bandwidth data transmission such as live-video feedback underwater, which is technically difficult to achiev
+Number of thruster choice : Initially, the most obvious choice was to use a single thruster with fins to control direction, however given the specific context of wire inspection, and with the slenderness of the wires in mind it became clear that we needed a more agile and controllable thruster layout. As such, a symmetrical 4 thrusters in to planes 
+of motion are selected (x and y planes) to control pitch and yaw.
+This slide gives a high-level overview of our system design.
+At the core of the vehicle is a modular architecture that integrates five key subsystems: power, propulsion, navigation, payload, communication, and computing.
+We selected lithium-ion batteries for their high energy density and proven safety in marine environments — this allows over two hours of continuous operation at 30 watts average load.
+The propulsion system uses four thrusters, giving stable control in pitch and yaw while maintaining low-speed precision for cable inspection.
+For navigation, the Teledyne RDI Doppler Velocity Log provides bottom-lock velocity measurements up to 81 meters from the seabed — crucial since GPS isn’t available underwater. A depth sensor and compass complement this for full-state estimation.
+The payload includes both video and ultrasonic imaging sensors to capture visual and subsurface views of the cable.
+Communication is handled via 802.11n Wi-Fi at the surface for high-rate data transfer, and optionally an acoustic modem for low-bandwidth command or telemetry while submerged.
+Finally, all subsystems are coordinated by an onboard embedded computer, which manages mission control and autonomy.
+This architecture gives us a balance between endurance, maneuverability, and data fidelity — all within the 25 kg system mass limit.”
+
+Communications and Control
+Underwater Communication :
+
+
+Communications and Control
+Autonomous control with on-board IMU and DVL for real-time navigation and mapping
+Surface : 
+RF transmitter : WiFi 802.11n Ethernet standard (possibly needs a base station / emitter on the boat) 
+Satellite : Iridium SBD for retrieval and 
+Underwater :
+Signal attenuation due to water : 
+Received power = Transmitted power - Transmission loss + Array gain
+Transmission Loss (TL) = 20log₁₀(R) + αR × 10⁻³ Where: R = range (m) 
+α = absorption coefficient ≈ 3 dB/km at 25 kHz 
+For R = 500m: TL = 20log₁₀(500) + 3 × 0.5 = 54 + 1.5 = 55.5 dB
+Source level: 180 dB re 1 μPa at 1m 
+Noise level: 60 dB (sea state 3) 
+Array gain: 10 dB 
+Required SNR: 10 dB 
+Received level = 180 - 55.5 + 10 = 134.5 dB 
+Margin = 134.5 - 60 - 10 = 64.5 dB ✓
+
+
+Hydrodynamics
+Thruster profiling : 
+To keep control and power consumption low, we opted for a single thruster design with fins for pitch and yaw control
+
+Power Consumption
+
+Mechanical Design
+Ballast design : 
+
+
+Cost and Feasibility
+
+Conclusion
