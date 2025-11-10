@@ -1,0 +1,393 @@
+\documentclass[10pt]{beamer}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage{xcolor}
+
+\usetheme{Boadilla}
+
+\title{Free-Roving Subsea Cable Inspection Drone}
+\subtitle{A Technical Feasibility Study}
+\author{Jerry Liu (yhl63) \\ Zihe Liu (zl559)}
+\institute{University of Cambridge}
+\date{\today}
+
+% Custom footnote settings
+\setbeamercolor{footline}{use=structure,bg=structure.fg, fg=white}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1ex]{footline}%
+    \hfill
+    \insertshorttitle
+    \hfill
+    \insertframenumber/\inserttotalframenumber
+    \hspace{1em}
+  \end{beamercolorbox}%
+}
+
+% Add section divider slides
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\begin{document}
+
+% Title slide
+\frame{\titlepage}
+
+% Outline slide
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Problem - Subsea Cable Inspection}
+
+\begin{frame}{The Problem - Subsea Cable Inspection}
+    \begin{itemize}
+        \item Backbone of the modern internet infrastructure, carrying 97-99\% of all intercontinental data traffic
+        \item 500+ cables worldwide, a total of 14 million kilometers
+        \item Around 2-5 cm in diameter
+    \end{itemize}
+
+    \vspace{1em}
+
+    Before we dive into our design and feasibility assessment, let's give some context to the problem we're tackling: Subsea cables. Your internet connection, whether that be for online banking or video calls, 97-99\% of that data goes through a dense network of over 500+ undersea cables, spanning a total of 14 million kilometers over the seafloor making it THE largest and possibly greatest man-made infrastructure ever.
+
+    \vspace{0.5em}
+
+    This is the backbone of the internet, and when they fail, the consequences are severe. Despite the significance of these cables, they are no thicker than your average garden-hose around 2-5 cm in diameter, with hair-thin strands of optical fibre embedded within, designed to remain undisturbed across the seabed.
+\end{frame}
+
+\begin{frame}{The Problem - Subsea Cable Inspection}
+    \begin{itemize}
+        \item Averages 200 faults a year, particularly in shallow waters ($\sim$200m)
+        \item Shetland Islands cutoff in 2022
+        \item Traditional inspection methods use tethered ROVs, which can limit motion and increase cost
+    \end{itemize}
+
+    \vspace{1em}
+
+    In shallow waters however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year.
+
+    \vspace{0.5em}
+
+    In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, couldn't use card payments, couldn't access online banking. Businesses lost thousands. Emergency services were disrupted.
+
+    \vspace{0.5em}
+
+    These aren't rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would be able to identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable.
+
+    \vspace{0.5em}
+
+    Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintenance costs for dedicated vessels.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Definition}
+
+\begin{frame}{Problem Definition}
+    \textit{``A free-roving (no umbilical cable) submarine inspection drone is required for undersea cables: operating down to 250 m depth. It should have an endurance of 2 hours continuously powered operation, carrying video and ultrasound imaging equipment drawing a 30 W electrical load, and have suitable propulsion to travel up to 4 m/s peak speed with 1 m/s cruise. Total mass is to be < 25 kg, to allow easy handling on board the mothership.''}
+
+    \vspace{1em}
+
+    \textbf{Operating Environment}
+    \begin{itemize}
+        \item $\rho gh$ gives $\sim$25 bar pressure, $\sim$4 °C seawater, insulation for electronics and waterproofing
+        \item Saltwater corrosion \& biofouling, limited to plastic materials
+        \item Far below the surface, limited visibility. Not affected by surface wave currents driven by wind
+        \item High signal attenuation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Definition}
+    At 250 m, pressure is roughly 25 bar and temperatures are low. Materials must resist corrosion, sensors must work in turbid water, and communications are limited to acoustic modems -- no radio or GPS below the surface.
+\end{frame}
+
+\begin{frame}{Problem Definition - Technical Challenges}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{1. Hydrodynamics}
+
+            Analyze underwater drag forces to estimate thrust needed for efficient movement.
+            \begin{itemize}
+                \item Degrees of freedom
+            \end{itemize}
+
+            \vspace{1em}
+
+            \textbf{2. Mechanical Design}
+
+            Develop the mechanical system ensuring all components fit within the 25kg weight limit.
+            \begin{itemize}
+                \item Buoyancy system
+                \item Structural integrity
+            \end{itemize}
+        \end{column}
+
+        \begin{column}{0.48\textwidth}
+            \textbf{3. Power Consumption}
+
+            Identify energy storage limits to define mission duration and vehicle size within constraints.
+            \begin{itemize}
+                \item 2 hours continuous operation
+                \item Support 30W load as well as communications and mechanical systems
+            \end{itemize}
+
+            \vspace{1em}
+
+            \textbf{4. Communication and Control}
+
+            Assess feasibility of underwater wireless communication methods for control and data transfer.
+            \begin{itemize}
+                \item Attenuation in seawater
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Existing Solutions}
+
+\begin{frame}{Existing Solutions}
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \textbf{Iver3 by L3Harris}
+            \begin{itemize}
+                \item Rated at 200m
+                \item 27-40kg depending on configuration
+                \item 8-14-hour endurance by 784 WHr of rechargeable lithium-ion batteries
+                \item Single thruster, fins for pitch/yaw control
+            \end{itemize}
+        \end{column}
+
+        \begin{column}{0.32\textwidth}
+            \textbf{ecoSUB}
+            \begin{itemize}
+                \item Rated at 500m
+                \item 4kg depending on configuration
+                \item 10-hour endurance by alkaline batteries
+                \item Single thruster, fins for pitch/yaw control
+            \end{itemize}
+        \end{column}
+
+        \begin{column}{0.32\textwidth}
+            \textbf{Boxfish AUV}
+            \begin{itemize}
+                \item Rated up to 600m
+                \item 25kg with Salt water ballast
+                \item Up to 10 hours by 600Whr Lithium Polymer batteries
+                \item 8 3D-vectored thrusters allowing 6 DoF
+            \end{itemize}
+        \end{column}
+    \end{columns}
+
+    \vspace{1em}
+
+    Many consumer solutions already exist, however they vary in their degree of satisfying the requirements as stated previously. Commercial designs such as the Iver3 and the ecoSub opt for a fully autonomous solution through mission planning and programmable actions, whereas others such as the Boxfish use a hybrid of tethered and untethered communication to get the best of both worlds.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Technical Approach}
+
+\begin{frame}{System Design}
+    \begin{itemize}
+        \item Autonomous/programmable solution to remove the need for high-quality real-time data transmission which limits untethered ROVs
+        \item 8-thruster design for stability and hovering capabilities for detailed inspection
+        \item Reinforced acrylic casing for pressure resistance
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Communications and Control}
+
+\begin{frame}{Communications and Control}
+    \textbf{Autonomous control with on-board IMU and DVL for real-time navigation and mapping}
+
+    \vspace{1em}
+
+    \textbf{Surface Communication:}
+    \begin{itemize}
+        \item RF transmitter: WiFi 802.11n Ethernet standard (possibly needs a base station / emitter on the boat)
+        \item Satellite: Iridium SBD for retrieval
+    \end{itemize}
+
+    \vspace{1em}
+
+    \textbf{Underwater Communication:}
+    \begin{itemize}
+        \item Signal attenuation due to water
+        \item Acoustic modems required (no radio or GPS underwater)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Communications and Control - Link Budget Analysis}
+    \textbf{Signal attenuation due to water:}
+
+    Received power = Transmitted power - Transmission loss + Array gain
+
+    \vspace{0.5em}
+
+    Transmission Loss (TL) = $20\log_{10}(R) + \alpha R \times 10^{-3}$
+
+    Where: $R$ = range (m), $\alpha$ = absorption coefficient $\approx$ 3 dB/km at 25 kHz
+
+    \vspace{0.5em}
+
+    For $R = 500$m: TL = $20\log_{10}(500) + 3 \times 0.5 = 54 + 1.5 = 55.5$ dB
+
+    \vspace{1em}
+
+    \textbf{Link Budget Calculation:}
+    \begin{itemize}
+        \item Source level: 180 dB re 1 $\mu$Pa at 1m
+        \item Noise level: 60 dB (sea state 3)
+        \item Array gain: 10 dB
+        \item Required SNR: 10 dB
+        \item Received level = 180 - 55.5 + 10 = 134.5 dB
+        \item \textbf{Margin = 134.5 - 60 - 10 = 64.5 dB} \checkmark
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hydrodynamics}
+
+\begin{frame}{Hydrodynamics}
+    \textbf{Thruster profiling:}
+
+    \vspace{1em}
+
+    To keep control and power consumption low, we opted for a single thruster design with fins for pitch and yaw control.
+
+    \vspace{1em}
+
+    \textbf{Key considerations:}
+    \begin{itemize}
+        \item Drag force analysis for 1 m/s cruise speed and 4 m/s peak speed
+        \item Required thrust estimation based on vehicle geometry
+        \item Degrees of freedom: 6 DoF control using 8 thrusters
+        \item Efficient propulsion system design
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Power Consumption}
+
+\begin{frame}{Power Consumption}
+    \textbf{Power Budget Analysis:}
+
+    \vspace{1em}
+
+    \textbf{Requirements:}
+    \begin{itemize}
+        \item 2 hours continuous operation
+        \item 30W for video and ultrasound imaging equipment
+        \item Additional power for:
+              \begin{itemize}
+                  \item Thrusters and propulsion
+                  \item Communication systems
+                  \item Navigation sensors (IMU, DVL)
+                  \item Control electronics
+              \end{itemize}
+    \end{itemize}
+
+    \vspace{1em}
+
+    \textbf{Energy Storage:}
+    \begin{itemize}
+        \item Lithium-ion or Lithium Polymer batteries
+        \item Must fit within 25kg total mass constraint
+        \item Battery mass vs. energy density tradeoff
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mechanical Design}
+
+\begin{frame}{Mechanical Design}
+    \textbf{Ballast Design:}
+
+    \vspace{1em}
+
+    \textbf{Key Design Considerations:}
+    \begin{itemize}
+        \item Pressure housing: Reinforced acrylic casing rated to 25 bar (250m depth)
+        \item Buoyancy control system
+        \item Structural integrity under pressure
+        \item Material selection:
+              \begin{itemize}
+                  \item Corrosion-resistant plastics for external components
+                  \item Pressure-resistant materials for housing
+                  \item Minimal biofouling surfaces
+              \end{itemize}
+        \item Total mass constraint: < 25 kg
+        \item Weight distribution for stability
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cost and Feasibility}
+
+\begin{frame}{Cost and Feasibility}
+    \textbf{Technical Feasibility:}
+    \begin{itemize}
+        \item Communication systems: Feasible with acoustic modems (64.5 dB margin)
+        \item Power requirements: Achievable with modern Li-ion/LiPo batteries
+        \item Mechanical design: Within established engineering practices
+        \item Control systems: Standard IMU and DVL navigation proven in similar AUVs
+    \end{itemize}
+
+    \vspace{1em}
+
+    \textbf{Cost Considerations:}
+    \begin{itemize}
+        \item Component costs: Thrusters, sensors, batteries, housing
+        \item Manufacturing and assembly
+        \item Testing and certification for 250m depth rating
+        \item Comparable to existing solutions (Iver3, ecoSUB, Boxfish AUV)
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+    \textbf{Summary:}
+    \begin{itemize}
+        \item A free-roving subsea cable inspection drone is technically feasible within the specified constraints
+        \item Key design decisions:
+              \begin{itemize}
+                  \item Autonomous operation to reduce communication bandwidth requirements
+                  \item 8-thruster design for 6 DoF control and hovering stability
+                  \item Acoustic communication with sufficient link budget margin
+                  \item Lithium battery technology for 2-hour endurance
+              \end{itemize}
+        \item Trade-offs balanced between:
+              \begin{itemize}
+                  \item Maneuverability vs. power consumption
+                  \item Communication capability vs. autonomy
+                  \item Component weight vs. functionality
+              \end{itemize}
+    \end{itemize}
+
+    \vspace{1em}
+
+    \textbf{Next Steps:}
+    \begin{itemize}
+        \item Detailed component selection and integration
+        \item Hydrodynamic modeling and simulation
+        \item Prototype development and testing
+    \end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,8 +1,61 @@
 {
   "markdown.validate.enabled": true,
-  //latex autosave
+  // LaTeX Workshop - Auto compile on file save
   "latex-workshop.latex.autoBuild.run": "onSave",
-  //latex linting
-  // "latex-workshop.linting.chktex.enabled": true,
-  "latex-workshop.formatting.latex": "latexindent"
+  // LaTeX Workshop - Clean auxiliary files after successful build
+  "latex-workshop.latex.autoClean.run": "onBuilt",
+  // LaTeX Workshop - Use glob pattern matching for cleanup
+  "latex-workshop.latex.clean.method": "glob",
+  // LaTeX Workshop - File types to clean up on build
+  "latex-workshop.latex.clean.fileTypes": [
+    "*.aux",
+    "*.bbl",
+    "*.blg",
+    "*.idx",
+    "*.ind",
+    "*.lof",
+    "*.lot",
+    "*.out",
+    "*.toc",
+    "*.acn",
+    "*.acr",
+    "*.alg",
+    "*.glg",
+    "*.glo",
+    "*.gls",
+    "*.fls",
+    "*.fdb_latexmk",
+    "*.dpth",
+    "*.md5",
+    "*.auxlock",
+    "*.nav",
+    "*.snm",
+    "*.gz",
+    "*.log"
+  ],
+  // LaTeX Workshop - View PDF in VS Code tab
+  "latex-workshop.view.pdf.viewer": "tab",
+  // LaTeX Workshop - Format with latexindent
+  "latex-workshop.formatting.latex": "latexindent",
+  // LaTeX Workshop - Build recipes
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk",
+      "tools": ["latexmk"]
+    }
+  ],
+  // LaTeX Workshop - Build tools configuration
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-pdf",
+        "%DOC%"
+      ]
+    }
+  ]
 }
