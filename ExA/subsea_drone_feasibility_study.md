@@ -6,19 +6,19 @@
 
 ## Executive Summary
 
-Your target specifications present an achievable but challenging design problem that requires careful trade-offs between speed, endurance, and mass constraints. The 4 m/s peak speed requirement drives power consumption to 1-1.2 kW, necessitating a ~500-660 Wh battery system that consumes 20-30% of your 25 kg mass budget[5][6]. Commercial components exist for all subsystems, with complete build costs estimated at $15,000-25,000 versus $50,000-80,000 for comparable commercial AUVs (ecoSUB m-Power+, Iver3 Standard)[1][2][50]. The U.S. Department of Energy's "Powering the Blue Economy" report identifies underwater vehicle power systems as a critical technology area, confirming the engineering challenges in this domain[2].
+Your target specifications present an achievable but challenging design problem that requires careful trade-offs between speed, endurance, and mass constraints. The 4 m/s peak speed requirement drives power consumption to 1.2 kW, necessitating a 799 Wh battery system that consumes 16% of your 25 kg mass budget[5][6]. Commercial components exist for all subsystems, with complete build costs estimated at $15,000-25,000 versus $50,000-80,000 for comparable commercial AUVs (ecoSUB m-Power+, Iver3 Standard)[1][2][50]. The U.S. Department of Energy's "Powering the Blue Economy" report identifies underwater vehicle power systems as a critical technology area, confirming the engineering challenges in this domain[2].
 
-Critical finding: achieving 4 m/s in this weight class requires 4× Blue Robotics T200 thrusters[7][8] and accepts reduced endurance to 1.5-2 hours under peak operation. Analysis of existing commercial platforms (ecoSUB at 17 kg/500m depth, Iver3 at 27-39 kg/100m depth, Boxfish at 25 kg/300m depth) reveals that no commercial AUV in the <25 kg class achieves sustained 4 m/s speed[1][49][50], making your specification ambitious but technically feasible with proper design optimization[3][4].
+Critical finding: achieving 4 m/s in this weight class requires 4× Blue Robotics T200 thrusters[7][8] and provides 2.5 hours endurance with an 80/20 mission profile (80% cruise at 1 m/s, 20% peak at 4 m/s). Analysis of existing commercial platforms (ecoSUB at 17 kg/500m depth, Iver3 at 27-39 kg/100m depth, Boxfish at 25 kg/300m depth) reveals that no commercial AUV in the <25 kg class achieves sustained 4 m/s speed[1][49][50], making your specification ambitious but technically feasible with proper design optimization[3][4].
 
 ---
 
 ## 1. Power Budget Analysis Reveals Fundamental Constraints
 
-The hydrodynamics dominate your design. For a streamlined torpedo hull with 0.324m diameter and 0.082 m² frontal area, drag coefficients range from 0.29-0.35 based on CFD studies of similar AUV geometries[3][4]. At 1 m/s cruise speed with Cd=0.32, you need only 13.5 N thrust requiring 19.3W. But at 4 m/s peak with Cd=0.28, drag jumps to 188 N demanding 1,074W of propulsion power[3]. Adding your 30W payload, the total system requires 130-330W at cruise and peaks at 1,104W during sprint operations.
+The hydrodynamics dominate your design. For a streamlined torpedo hull with 0.3m diameter and 0.0707 m² frontal area, drag coefficients range from 0.28-0.32 based on CFD studies of similar AUV geometries[3][4]. At 1 m/s cruise speed with Cd=0.32, you need 11.6 N thrust requiring 39W electrical power. But at 4 m/s peak with Cd=0.28, drag jumps to 162 N demanding 1,178W of propulsion power[3]. Adding payload and control systems, the total system requires 86W at cruise and peaks at 1,225W during sprint operations.
 
 ### Battery Sizing - Critical Decision Point
 
-For 2-hour endurance at medium power (215W average), you need 430 Wh plus 20% margin, totaling 516 Wh. The Blue Robotics dual 18Ah battery configuration provides 532 Wh at 14.8V, weighing 2.7 kg (batteries only), at a cost of $720-800[5][6]. However, to support 4 m/s peak speeds, you need excess capacity to deliver 1.1 kW burst power.
+For 2-hour endurance with 80/20 mission profile (80% cruise at 86W, 20% peak at 1,225W), you need 314W average power requiring 628 Wh. The Blue Robotics triple 18Ah battery configuration provides 799 Wh at 14.8V, weighing 4.1 kg, at a cost of $1,200[5][6]. This provides 2.5 hours endurance with 25% margin and adequate burst capability to deliver 1.2 kW peak power.
 
 Options include:
 - **Three 18Ah batteries**: 799 Wh, 4.1 kg, $1,200 - provides adequate burst capability[5][6]
@@ -39,7 +39,7 @@ The 22.2V system offers superior weight efficiency but adds complexity requiring
 - **Cost**: $259 each[7][9]
 - **Design**: Flooded brushless motor, proven in thousands of ROV deployments[7][8]
 
-For your 25 kg vehicle achieving 4 m/s, you need approximately 188 N total thrust[3][4]. **Four T200 thrusters in horizontal configuration provide 200 N combined capability** with appropriate safety margin[7][8].
+For your 25 kg vehicle achieving 4 m/s, you need approximately 162 N total thrust[3][4]. **Four T200 thrusters in horizontal configuration provide 200 N combined capability** with 23% safety margin[7][8].
 
 ### Alternative Thruster Comparisons
 
@@ -455,9 +455,9 @@ Where:
 
 Based on torpedo-shaped AUV with optimized hydrodynamics[3][4]:
 - **Length**: 1.2m
-- **Diameter**: 0.32m (suitable for 3" pressure housings with external cowling)
-- **Length/Diameter Ratio**: 3.75:1 (good for streamlined flow)[3]
-- **Frontal Area**: A = π × (0.16m)² = 0.0804 m²
+- **Diameter**: 0.3m (Blue Robotics 3" housing at 89mm OD + 100mm streamlined cowling)
+- **Length/Diameter Ratio**: 4:1 (good for streamlined flow)[3]
+- **Frontal Area**: A = π × (0.15m)² = 0.0707 m²
 
 ### Drag Coefficient Literature Review
 
@@ -476,14 +476,14 @@ Torpedo-shaped AUV drag coefficients from CFD studies and experimental data[3][4
 ### Drag Calculations
 
 **At 1 m/s Cruise:**[3][4][53]
-- F_drag = 0.5 × 1,027 × 1² × 0.0804 × 0.32
-- F_drag = **13.2 N**
-- Power = F × V = 13.2 N × 1 m/s = **13.2 W** (thrust power only)
+- F_drag = 0.5 × 1,027 × 1² × 0.0707 × 0.32
+- F_drag = **11.6 N**
+- Power = F × V = 11.6 N × 1 m/s = **11.6 W** (thrust power only)
 
 **At 4 m/s Peak:**[3][4][53]
-- F_drag = 0.5 × 1,027 × 4² × 0.0804 × 0.28
-- F_drag = **184 N**
-- Power = F × V = 184 N × 4 m/s = **736 W** (thrust power only)
+- F_drag = 0.5 × 1,027 × 4² × 0.0707 × 0.28
+- F_drag = **162 N**
+- Power = F × V = 162 N × 4 m/s = **648 W** (thrust power only)
 
 ### Accounting for Thruster Efficiency
 
@@ -495,18 +495,18 @@ Blue Robotics T200 thruster efficiency varies with load[7][8]:
 **Electrical Power Requirements:**
 
 **At 1 m/s:**[7][8]
-- Thrust power required: 13.2 W
+- Thrust power required: 11.6 W
 - Thruster efficiency: ~30% (light load)[7][8]
-- Electrical power: 13.2 / 0.30 = **44 W** (for propulsion)
+- Electrical power: 11.6 / 0.30 = **39 W** (for propulsion)
 
 **At 4 m/s:**[7][8]
-- Thrust power required: 736 W
+- Thrust power required: 648 W
 - Thruster efficiency: ~55% (heavy load)[7][8]
-- Electrical power: 736 / 0.55 = **1,338 W** (for propulsion)
+- Electrical power: 648 / 0.55 = **1,178 W** (for propulsion)
 
 **Validation Check:**
 
-Four T200 thrusters at 350W each maximum = 1,400W total capability[7][8]. At 4 m/s requiring 1,338W, you're operating at 96% maximum power - technically feasible but with minimal margin[7][8].
+Four T200 thrusters at 350W each maximum = 1,400W total capability[7][8]. At 4 m/s requiring 1,178W, you're operating at 84% maximum power - technically feasible with comfortable 16% power margin[7][8].
 
 ### Reynolds Number Analysis[3][4][53]
 
@@ -531,50 +531,41 @@ Comprehensive system-level power consumption determines battery sizing and missi
 
 ### Power Consumption by Subsystem
 
-| Subsystem | Cruise (1 m/s) | Medium (2 m/s) | Peak (4 m/s) | Notes |
-|-----------|----------------|----------------|--------------|-------|
-| **Propulsion** | 44W | 175W | 1,338W | 4× T200 thrusters[7] |
-| **Control Computer** | 10W | 10W | 10W | Navigator + RPi4[14] |
-| **Payload (sensors)** | 7.5W | 7.5W | 7.5W | Camera + sonar[35][40] |
-| **Lighting** | 10W | 15W | 20W | 1-2 Lumen lights (adjustable)[42] |
-| **Navigation** | 5W | 5W | 5W | Depth, IMU, GPS[14][16] |
-| **Communications** | 2W | 2W | 2W | Idle mode (WiFi/Iridium)[31][34] |
-| **TOTAL** | **78.5W** | **214.5W** | **1,382.5W** | System total |
+| Subsystem | Cruise (1 m/s) | Peak (4 m/s) | Notes |
+|-----------|----------------|--------------|-------|
+| **Propulsion** | 39W | 1,178W | 4× T200 thrusters[7] |
+| **Control Computer** | 10W | 10W | Navigator + RPi4[14] |
+| **Payload (sensors)** | 30W | 30W | Camera + sonar + lighting[35][40][42] |
+| **Navigation** | 5W | 5W | Depth, IMU, GPS[14][16] |
+| **Communications** | 2W | 2W | Idle mode (WiFi/Iridium)[31][34] |
+| **TOTAL** | **86W** | **1,225W** | System total |
 
 ### Battery Capacity Requirements
 
 **For 2-Hour Endurance at Various Power Levels:**[5][6]
 
-**Cruise Mission (78.5W average):**
-- Energy required: 78.5W × 2h = 157 Wh
-- With 25% margin: 157 × 1.25 = **196 Wh minimum**
-- **Battery Option**: Single 18Ah battery (266 Wh) provides 3.4 hour endurance[5][6]
+**Cruise Mission (86W average):**
+- Energy required: 86W × 2h = 172 Wh
+- **Battery Option**: Single 18Ah battery (266 Wh) provides 3.1 hour endurance[5][6]
 
-**Mixed Mission (214.5W average - 70% cruise, 30% medium):**
-- Energy required: 214.5W × 2h = 429 Wh
-- With 20% margin: 429 × 1.20 = **515 Wh minimum**
-- **Battery Option**: Dual 18Ah batteries (532 Wh) provides 2.1 hour endurance[5][6]
-
-**Peak Operations (1,382.5W sustained):**
-- Energy required: 1,382.5W × 2h = 2,765 Wh
+**Peak Operations (1,225W sustained):**
+- Energy required: 1,225W × 2h = 2,450 Wh
 - **Not Feasible** within weight constraints
-- At 1,382.5W, dual 18Ah (532 Wh) provides only **23 minutes**[5][6]
-- At 1,382.5W, triple 18Ah (799 Wh) provides only **35 minutes**[5][6]
+- At 1,225W, dual 18Ah (532 Wh) provides only **26 minutes**[5][6]
+- At 1,225W, triple 18Ah (799 Wh) provides only **39 minutes**[5][6]
 
 ### Realistic Mission Profile
 
-Your 2-hour, 4 m/s requirement needs reinterpretation:
-- **Option A**: 4 m/s peak speed capability, but mission mostly at 2-3 m/s cruise
-- **Option B**: Brief 4 m/s sprints (5-10 minutes) within longer 2-hour mission
-- **Option C**: Relax endurance to 1.5 hours for sustained high-speed operation
+The 2-hour endurance requirement with 4 m/s peak speed is achievable using a mixed-speed mission profile:
 
 **Recommended Battery Configuration:**
 
 **Triple 18Ah Batteries (799 Wh total, 4.1 kg)**[5][6]
-- Mission profile: 60% cruise (1 m/s, 78.5W), 30% medium (2 m/s, 175W), 10% peak (4 m/s, 1,338W)
-- Average power: 0.6×78.5 + 0.3×175 + 0.1×1,338 = 47.1 + 52.5 + 133.8 = **233.4W**
-- Endurance: 799 Wh / 233.4W = **3.4 hours**
-- Provides comfortable 2+ hour missions with 4 m/s capability
+- Mission profile: 80% cruise (1 m/s, 86W), 20% peak (4 m/s, 1,225W)
+- Average power: 0.8×86 + 0.2×1,225 = 69 + 245 = **314W**
+- Energy required: 314W × 2h = **628 Wh**
+- Endurance with 799 Wh: 799 / 314 = **2.5 hours**
+- Provides 2-hour missions with 25% margin for 4 m/s sprint capability
 
 ---
 
@@ -698,13 +689,13 @@ Component-by-component pricing enables budget planning and identifies cost-savin
 - **Fallback**: Negotiate requirement to 3 m/s peak if justified by physics
 
 **Risk 2: Battery Insufficient for 2-Hour Endurance**
-- **Probability**: Medium (50% with 4 m/s sustained operation)
+- **Probability**: Low (with 80/20 mission profile)
 - **Impact**: Medium (reduced mission capability)
 - **Mitigation**:
-  - Use three 18Ah batteries (799 Wh) not two (532 Wh)
-  - Design mission profile with sprints, not sustained peak speed
+  - Use three 18Ah batteries (799 Wh) providing 2.5-hour endurance
+  - Design mission profile with 80% cruise, 20% peak speed
   - Implement power management (dim lights during high-speed)
-- **Fallback**: Accept 1.5-hour endurance or reduce peak speed requirement
+- **Fallback**: Reduce peak sprint duration or lower cruise speed slightly
 
 **Risk 3: Weight Exceeds 25 kg Budget**
 - **Probability**: Medium-High (60%)
@@ -823,11 +814,11 @@ Your subsea cable inspection drone is **technically feasible** with the followin
 ### Recommended Specification Interpretation
 
 Your vehicle should be capable of:
-- **Sustained cruise**: 1-2 m/s for 3+ hours on 799 Wh battery
-- **Peak sprint**: 4 m/s for 10-15 minutes (cable tracking, maneuvering)
-- **Mixed mission**: 2-hour duration with 10% peak, 30% medium, 60% cruise operation
+- **Sustained cruise**: 1 m/s for 9+ hours on 799 Wh battery
+- **Peak sprint**: 4 m/s for 30-40 minutes burst capability
+- **Mixed mission**: 2.5-hour duration with 20% peak, 80% cruise operation
 
-This provides the operational flexibility for cable inspection (follow cable at 2 m/s, sprint to 4 m/s to avoid obstacles or catch up to ship) while maintaining 2-hour endurance.
+This provides the operational flexibility for cable inspection (cruise at 1 m/s, sprint to 4 m/s to avoid obstacles or catch up to ship) while exceeding 2-hour endurance requirements with 25% margin.
 
 ### Cost Feasibility: Excellent Value
 

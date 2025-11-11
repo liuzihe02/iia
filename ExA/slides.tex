@@ -236,7 +236,7 @@
   \end{center}
 
   \vspace{0.5em}
-  \textbf{Our Solution:} \textit{Mission profile with 80\% cruise (1-2 m/s) + 20\% sprint (4 m/s)}
+  \textbf{Our Solution:} \textit{Mission profile with 80\% cruise (1 m/s) + 20\% sprint (4 m/s)}
 \end{frame}
 
 
@@ -432,8 +432,8 @@
 \begin{frame}{Hydrodynamic Drag}
   \textbf{Vehicle Geometry (Torpedo Hull):}
   \begin{itemize}
-    \item Diameter: $D \approx 0.3$ m, Length: $L \approx 1.2$ m
-    \item Frontal area: $A = \frac{\pi D^2}{4} = 0.0824 m^2$
+    \item Diameter: $D = 0.3$ m, Length: $L = 1.2$ m
+    \item Frontal area: $A = \frac{\pi D^2}{4} = 0.0707 m^2$
     \item Drag coefficient: $C_D = 0.28$-$0.32$
   \end{itemize}
 
@@ -447,11 +447,11 @@
   \vspace{0.5em}
 
   \begin{itemize}
-    \item \textbf{At 1 m/s cruise} $C_D = 0.32$: $F_D = 13.5$ N
-    \item \textbf{At 4 m/s peak} $C_D = 0.28$: $F_D = 188$ N
+    \item \textbf{At 1 m/s cruise} $C_D = 0.32$: $F_D = 11.6$ N
+    \item \textbf{At 4 m/s peak} $C_D = 0.28$: $F_D = 162$ N
   \end{itemize}
 
-  \note{The drag force is calculated using the standard hydrodynamic equation. We assume a torpedo-shaped hull with length 1.2m and diameter 0.324m, giving a streamlined L/D ratio of 3.7. The frontal area is calculated from the circular cross-section. Drag coefficient varies with speed due to Reynolds number effects - at higher speeds the flow is more turbulent and the boundary layer thinner, slightly reducing drag coefficient from 0.32 to 0.28. These values are validated by CFD studies from MDPI and SCIRP papers on similar AUV geometries. At 1 m/s, drag is only 13.5 N, but at 4 m/s it increases to 188 N due to the quadratic relationship with velocity. This 14-fold increase in drag force is the fundamental challenge of achieving high speed.}
+  \note{The drag force is calculated using the standard hydrodynamic equation. We assume a torpedo-shaped hull with length 1.2m and diameter 0.3m (based on Blue Robotics 3" housing with streamlined cowling), giving a streamlined L/D ratio of 4:1. The frontal area is 0.0707 m² from the circular cross-section. Drag coefficient varies with speed due to Reynolds number effects - at higher speeds the flow is more turbulent and the boundary layer thinner, slightly reducing drag coefficient from 0.32 to 0.28. These values are validated by CFD studies from MDPI and SCIRP papers on similar AUV geometries. At 1 m/s, drag is 11.6 N, but at 4 m/s it increases to 162 N due to the quadratic relationship with velocity. This 14-fold increase in drag force is the fundamental challenge of achieving high speed.}
 \end{frame}
 
 \begin{frame}{Power Requirements and Thruster Efficiency}
@@ -466,17 +466,17 @@
       \toprule
       \textbf{Speed} & $F_D$ (N) & $P_{mech}$ (W) & $\eta$ & $P_{elec}$ (W) & \textbf{Notes}  \\
       \midrule
-      1 m/s cruise   & 13.5      & 13.5           & 0.30   & 45             & Low efficiency  \\
-      4 m/s peak     & 188       & 752            & 0.55   & 1,367          & High efficiency \\
+      1 m/s cruise   & 11.6      & 11.6           & 0.30   & 39             & Low efficiency  \\
+      4 m/s peak     & 162       & 648            & 0.55   & 1,178          & High efficiency \\
       \bottomrule
     \end{tabular}
   \end{table}
 
   \vspace{0.5em}
 
-  \textit{4 m/s requires 1.4 kW propulsion power (30× cruise power)}
+  \textit{4 m/s requires 1.2 kW propulsion power (30× cruise power)}
 
-  \note{The mechanical power required is simply force times velocity (P = F × v). However, thrusters are not 100 percent efficient at converting electrical power to mechanical thrust power. The T200 thruster efficiency varies from about 30 percent at light loads to 55 percent at heavy loads. At 1 m/s cruise with only 13.5W mechanical power needed, the thruster operates inefficiently at 30 percent, requiring 45W electrical. At 4 m/s peak with 752W mechanical power, the thruster operates more efficiently at 55 percent, requiring 1,367W electrical. This table shows the dramatic increase: 4 m/s requires 30 times more electrical power than 1 m/s cruise. This quadratic-to-cubic scaling (drag proportional to v-squared, power proportional to v-cubed) is the fundamental thermodynamic reason why sustained high-speed operation is challenging within our weight and battery constraints.}
+  \note{The mechanical power required is simply force times velocity (P = F × v). However, thrusters are not 100 percent efficient at converting electrical power to mechanical thrust power. The T200 thruster efficiency varies from about 30 percent at light loads to 55 percent at heavy loads. At 1 m/s cruise with only 11.6W mechanical power needed, the thruster operates inefficiently at 30 percent, requiring 39W electrical. At 4 m/s peak with 648W mechanical power, the thruster operates more efficiently at 55 percent, requiring 1,178W electrical. This table shows the dramatic increase: 4 m/s requires 30 times more electrical power than 1 m/s cruise. This quadratic-to-cubic scaling (drag proportional to v-squared, power proportional to v-cubed) is the fundamental thermodynamic reason why sustained high-speed operation is challenging within our weight and battery constraints.}
 \end{frame}
 \begin{frame}{Thruster Selection - T200}
   \begin{table}
@@ -504,7 +504,7 @@
         \setlength{\itemsep}{0pt}
         \setlength{\parskip}{0pt}
         \item Total thrust: \textbf{200 N}
-        \item Required: 188 N
+        \item Required: 162 N
         \item Propulsion cost: \$520
         \item ESCs (4× 30A): \$145
       \end{itemize}
@@ -525,7 +525,7 @@
     \end{column}
   \end{columns}
 
-  \note{We compared four thruster options. The SeaBotix BTD150 has good efficiency but insufficient thrust (28N vs 50N for T200). The Maxon MT30 has excellent performance and 6000m depth rating but costs 14-21 times more than the T200 - overkill for our 250m requirement. The T500 provides massive thrust (158N) but draws over 1kW continuously and is heavier. The T200 offers the best thrust-to-cost ratio at 0.36-0.42 N per dollar. Four T200 thrusters provide 200N total thrust for 188N required - only 6 percent margin which is tight. This means we must achieve our assumed drag coefficient through careful hull design. The flooded brushless motor design is naturally pressure-tolerant, proven to 3000m at Woods Hole testing.}
+  \note{We compared four thruster options. The SeaBotix BTD150 has good efficiency but insufficient thrust (28N vs 50N for T200). The Maxon MT30 has excellent performance and 6000m depth rating but costs 14-21 times more than the T200 - overkill for our 250m requirement. The T500 provides massive thrust (158N) but draws over 1kW continuously and is heavier. The T200 offers the best thrust-to-cost ratio at 0.36-0.42 N per dollar. Four T200 thrusters provide 200N total thrust for 162N required - 23 percent safety margin which is comfortable. This allows for some variation in drag coefficient from hull imperfections. The flooded brushless motor design is naturally pressure-tolerant, proven to 3000m at Woods Hole testing.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -538,13 +538,13 @@
       \toprule
       \textbf{Subsystem}                   & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}   \\
       \midrule
-      Propulsion (4× T200)                 & 45                  & 1,367             & Dominant at peak \\
+      Propulsion (4× T200)                 & 39                  & 1,178             & Dominant at peak \\
       Payload (camera, lighting and sonar) & 30                  & 30                & Low-light USB    \\
       Navigation sensors                   & 5                   & 5                 & IMU, depth, GPS  \\
       Control (RPi4+Nav)                   & 10                  & 10                & ArduSub firmware \\
       Comms (WiFi/Iridium)                 & 2                   & 2                 & Surface only     \\
       \midrule
-      \textbf{TOTAL}                       & \textbf{92 W}       & \textbf{1,414 W}  &                  \\
+      \textbf{TOTAL}                       & \textbf{86 W}       & \textbf{1,225 W}  &                  \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -552,14 +552,14 @@
   \vspace{0.3em}
 
   \centering
-  $P_{avg} = 356 \text{ W}$ (Accounting for mission profile)
+  $P_{avg} = 314 \text{ W}$ (Accounting for mission profile)
 
-  \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,415W total, of which 1,367W is propulsion). The mission profile assumes 80 percent of time at cruise, 20 percent at peak for sprints. This gives an average power of 356W which determines our battery requirements.}
+  \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,225W total, of which 1,178W is propulsion). The mission profile assumes 80 percent of time at cruise, 20 percent at peak for sprints. This gives an average power of 314W which determines our battery requirements.}
 \end{frame}
 
 \begin{frame}{Battery Sizing}
   \textbf{Energy Requirements:}
-  $$E = P_{avg} \times t = 356 \text{ W} \times 2 \text{ h} = 712 \text{ Wh required}$$
+  $$E = P_{avg} \times t = 314 \text{ W} \times 2 \text{ h} = 628 \text{ Wh required}$$
 
   \begin{table}
     \scriptsize
@@ -582,7 +582,7 @@
       \textbf{Selected: 3× Blue Robotics 18Ah}
       \begin{itemize}
         \item Energy: 799 Wh
-        \item Endurance: 3.2 hrs @ 251W
+        \item Endurance: 2.5 hrs @ 314W
         \item Proven platform (BlueROV2)
         \item Integrated BMS
       \end{itemize}
@@ -598,7 +598,7 @@
     \end{column}
   \end{columns}
 
-  \note{The energy requirement is calculated from our mixed mission profile power of 251W times 2 hours, giving 502 Wh, plus 25 percent safety margin for battery aging and cold water performance, totaling 628 Wh minimum. We compared four options: Two Blue Robotics 18Ah batteries give only 532 Wh which is insufficient for our 628 Wh requirement. Custom Samsung 35E pack (4S6P configuration, 24 cells) provides 311 Wh at lower cost but requires DIY assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000m depth rating but costs 2.5 to 8 times more. Three Blue Robotics 18Ah batteries provide 799 Wh (27 percent margin), enabling 3.2 hour missions at average power. This is the proven BlueROV2 platform configuration with integrated BMS. The depth rating depends on our aluminum enclosure design, not the batteries themselves.}
+  \note{The energy requirement is calculated from our mixed mission profile power of 314W times 2 hours, giving 628 Wh minimum. We compared four options: Two Blue Robotics 18Ah batteries give only 532 Wh which is insufficient for our 628 Wh requirement. Custom Samsung 35E pack (4S6P configuration, 24 cells) provides 311 Wh at lower cost but requires DIY assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000m depth rating but costs 2.5 to 8 times more. Three Blue Robotics 18Ah batteries provide 799 Wh (27 percent margin), enabling 2.5 hour missions at average power. This is the proven BlueROV2 platform configuration with integrated BMS. The depth rating depends on our aluminum enclosure design, not the batteries themselves.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,10 +779,10 @@
       \textbf{Requirement}         & \textbf{Specification} & \textbf{Achieved} & \textbf{Status} \\
       \midrule
       Mass constraint              & $<$25 kg               & 15.7 kg           & Met             \\
-      Endurance                    & 2 hours                & 3.4 hrs (mixed)   & Met             \\
+      Endurance                    & 2 hours                & 2.5 hrs (mixed)   & Met             \\
       Cruise speed                 & 1 m/s                  & 1 m/s             & Met             \\
       Peak speed                   & 4 m/s                  & 4 m/s             & Met             \\
-      Payload power                & 30W                    & 26W peak (all)    & Met             \\
+      Payload power                & 30W                    & 30W (all)         & Met             \\
       \midrule
       \textbf{Overall Feasibility} &                        &                   & \textbf{Viable} \\
       \bottomrule
@@ -797,8 +797,8 @@
 
   \textbf{Critical Engineering Insights:}
   \begin{enumerate}
-    \item \textbf{Power scales as $v^3$:} 4 m/s requires 18× more power than 1 m/s
-    \item \textbf{Mission profile approach:} Mixed speed profile (60\% cruise) enables 2-hour endurance
+    \item \textbf{Power scales as $v^3$:} 4 m/s requires 30× more power than 1 m/s
+    \item \textbf{Mission profile approach:} Mixed speed profile (80\% cruise) enables 2-hour endurance
     \item \textbf{Hydrodynamic optimization critical:} Low $C_D$ (0.28-0.32) essential for achieving 4 m/s
     \item \textbf{Component selection:} T200 thrusters offer best thrust-to-cost ratio (0.36-0.42)
   \end{enumerate}
@@ -811,7 +811,7 @@
       \begin{itemize}
         \item COTS components (proven)
         \item 37\% mass margin
-        \item 70\% endurance margin
+        \item 25\% endurance margin
         \item Modular design
       \end{itemize}
     \end{column}
@@ -819,7 +819,7 @@
     \begin{column}{0.48\textwidth}
       \textbf{Constraints:}
       \begin{itemize}
-        \item Tight thrust margin (6\%)
+        \item 23\% thrust margin
         \item Low-drag hull required
         \item IMU drift without DVL
         \item Acoustic comms \$12K
@@ -828,7 +828,7 @@
   \end{columns}
 
   \note{
-    The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 18× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a $<$25 kg weight constraint. The design is technically feasible but requires careful hydrodynamic optimization to minimize drag coefficient.
+    The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 30× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a $<$25 kg weight constraint. The design is technically feasible with 23 percent thrust margin allowing for some variation in drag coefficient from hull design.
   }
 \end{frame}
 
