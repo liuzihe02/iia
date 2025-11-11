@@ -237,6 +237,16 @@
 
   \vspace{0.5em}
   \textbf{Our Solution:} \textit{Mission profile with 80\% cruise (1 m/s) + 20\% sprint (4 m/s)}
+
+  \note{
+    The design is constrained by three competing requirements forming a trade-off triangle. Capabilities - speed, sensors, and mission functionality - drive both power consumption and weight. Better capabilities mean higher speed requiring more thrust power, and more sensor equipment adding weight.
+
+    Endurance requires either reducing power draw or installing larger batteries. Reducing power limits capabilities. Larger batteries add weight, conflicting with the mass constraint.
+
+    Mass under 25 kilograms limits battery capacity to 4 to 5 kilograms maximum. This restricts available energy, which directly limits either endurance or capabilities.
+
+    The solution is a mission profile approach: 80 percent time at 1 meter per second cruise consuming 86 watts, 20 percent time at 4 meters per second sprint consuming 1,225 watts. Average power becomes 314 watts, enabling 2 hour endurance with 799 watt-hour battery weighing 4 kilograms. This satisfies all three constraints simultaneously. Sustained 4 meters per second operation would require 2,450 watt-hours, exceeding weight limits.
+  }
 \end{frame}
 
 
@@ -263,6 +273,14 @@
             \end{itemize}
     \end{itemize}
   \end{center}
+
+  \note{
+    The design uses an autonomous approach instead of tethered ROV operation. Tethered ROVs require continuous high-bandwidth communication for real-time control, which is only possible with a physical cable limiting range and adding complexity. Autonomous operation enables self-contained missions with onboard power, navigation, and data storage.
+
+    The 6-thruster configuration provides full 6-degree-of-freedom control. Four horizontal thrusters control surge, sway, and yaw. Two vertical thrusters control heave, pitch, and roll. This enables precise hovering at fixed positions for detailed cable inspection, and lateral motion without changing heading. Redundancy allows safe recovery if one thruster fails. The configuration is efficient for low-speed maneuvering typical of inspection tasks.
+
+    The cylindrical pill-shaped hull minimizes drag and simplifies hydrodynamics. At 4 meters per second, drag force is 0.5 times density times velocity squared times drag coefficient times frontal area. A streamlined torpedo shape achieves drag coefficient 0.28 to 0.32, significantly lower than spherical hulls at 0.47. The cylindrical geometry also simplifies internal component layout and pressure vessel calculations using standard ASME formulas.
+  }
 \end{frame}
 
 \begin{frame}{System Architecture - Simplified Block Diagram}
@@ -335,6 +353,16 @@
   \vspace{0.5em}
 
   \textbf{Result:} Minimise communication — majority of data stored on the vehicle, only allowing small and simple commands to be communicated.
+
+  \note{
+    Radio frequency signals attenuate extremely rapidly in seawater due to conductivity. Skin depth at WiFi frequencies is less than 10 centimeters. Effective RF range underwater is only a few meters maximum, making it useless for cable inspection missions.
+
+    Optical communication uses laser or LED light transmission. Water absorbs and scatters light, with attenuation increasing significantly in turbid or murky conditions. Optical systems require direct line-of-sight and operate at ranges under 100 meters in clear water, much shorter in realistic ocean environments with sediment and particulates.
+
+    Acoustic communication is the only viable long-range option. Sound propagates well in water with ranges exceeding several kilometers. However, acoustic modems have severe limitations: data rates around 1 to 10 kilobits per second, latency of seconds due to slow sound speed (1500 meters per second), and multipath interference from reflections off the surface and seafloor. Cost is also prohibitive - acoustic modems cost 12,000 dollars versus 310 dollars for WiFi plus Iridium satellite.
+
+    The design solution stores all sensor data onboard during the mission. High-resolution camera video and sonar scans are recorded to the Raspberry Pi storage. At the surface, WiFi provides high-bandwidth data transfer at 50 megabits per second. Iridium satellite enables position reporting and mission status updates when beyond WiFi range. This approach avoids expensive acoustic hardware while maintaining operational capability.
+  }
 \end{frame}
 
 
@@ -954,257 +982,153 @@
 % APPENDIX: COMPONENT DATASHEETS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Appendix: Core Component Datasheets}
+\begin{frame}{Appendix: Datasheets}
   \centering
-  \Large Component Specifications
+  \Large Selected Component Specifications
 
   \vspace{1em}
   \normalsize
   \begin{itemize}
-    \item Blue Robotics T200 Thruster
-    \item Blue Robotics Navigator Flight Controller
-    \item Blue Robotics Bar30 Depth Sensor
-    \item Blue Robotics 18Ah Lithium-ion Battery
-    \item RockBLOCK 9603N Iridium Modem
-    \item Blue Robotics Ping360 Sonar
-    \item Blue Robotics 3" Watertight Enclosure
+    \item T200 Thruster
+    \item Navigator Flight Controller \& Bar30 Depth Sensor
+    \item 18Ah Battery \& 3" Enclosure
+    \item Ping360 Sonar \& RockBLOCK Iridium
   \end{itemize}
 \end{frame}
 
-\begin{frame}{T200 Thruster Specifications}
+\begin{frame}{T200 Thruster}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Performance:}
+      \textbf{Key Specifications:}
       \begin{itemize}
-        \item Max thrust (fwd): 5.1 kgf (50 N) @ 16V
-        \item Max thrust (rev): 4.1 kgf (40 N) @ 16V
-        \item Voltage range: 6-20V (12-16V nominal)
-        \item Max current: 25A
+        \item Thrust: 50 N fwd @ 16V
         \item Max power: 350W
-        \item Efficiency: ~55\% @ high load
+        \item Efficiency: 30\% @ light load, 55\% @ heavy load
+        \item Depth rating: 300m
+        \item Mass: 156g in water
+        \item Cost: \$130
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{Physical:}
+      \textbf{Design Rationale:}
       \begin{itemize}
-        \item Depth rating: 300m (tested 3000m)
-        \item Dimensions: 113mm L × 100mm dia.
-        \item Mass: 344g (air), 156g (water)
-        \item Propeller: 76mm diameter, CW/CCW
-        \item Motor: Flooded brushless DC
-        \item Materials: PC body, 316 SS fasteners
-        \item Cost: \$119-139
+        \item 4× thrusters = 200N total
+        \item Flooded brushless motor (pressure-tolerant)
+        \item Thrust/cost: 0.38 N/\$
+        \item 6-20× cheaper than alternatives
       \end{itemize}
     \end{column}
   \end{columns}
   \vspace{0.5em}
-  \tiny Source: Blue Robotics T200 Datasheet, bluerobotics.com
+  \tiny Source: bluerobotics.com/store/thrusters/t200-thruster-r2-rp/
 \end{frame}
 
-\begin{frame}{Navigator Flight Controller Specifications}
+\begin{frame}{Navigator \& Bar30}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Sensors:}
+      \textbf{Navigator Flight Controller:}
       \begin{itemize}
-        \item IMU 1: ICM-20602 (6-axis)
-        \item IMU 2: ICM-42688-P (high precision)
-        \item Magnetometer: 2× BMM150 (dual)
-        \item Barometer: BMP388
-        \item Gyro noise: 2.8 mdps/Hz (ICM-42688-P)
-        \item Accel noise: 70 µg/Hz
+        \item Dual IMUs: ICM-42688-P + ICM-20602
+        \item Dual magnetometers
+        \item 16 PWM, 4 UART
+        \item RPi4 direct mount, ArduSub
+        \item Power: 10W, Cost: \$125
       \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{I/O \& Integration:}
-      \begin{itemize}
-        \item PWM outputs: 16 channels
-        \item Serial ports: 4× UART
-        \item I2C ports: 2×
-        \item ADC: 2× 16-bit
-        \item Platform: Raspberry Pi 4 (direct mount)
-        \item Software: ArduSub, BlueOS
-        \item Power: 8-10W typical
-        \item Cost: \$125-181
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \vspace{0.5em}
-  \tiny Source: Blue Robotics Navigator Datasheet, bluerobotics.com
-\end{frame}
-
-\begin{frame}{Bar30 Depth Sensor \& 18Ah Battery Specifications}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
+      \vspace{0.5em}
       \textbf{Bar30 Depth Sensor:}
       \begin{itemize}
-        \item Sensor: MS5837-30BA
-        \item Pressure range: 0-30 bar (0-300m)
-        \item Resolution: 0.2 mbar (2mm depth)
-        \item Accuracy: ±200 mbar (±2m) @ 0-40°C
-        \item Interface: I2C, JST GH 4-pin
-        \item Power: <1mA @ 3.3V
-        \item Maintenance: Daily drying recommended
-        \item Cost: \$68-85
+        \item Range: 0-300m
+        \item Resolution: 2mm
+        \item Cost: \$68
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{18Ah Lithium-ion Battery:}
+      \textbf{18Ah Li-ion Battery:}
       \begin{itemize}
-        \item Voltage: 14.8V nominal (4S configuration)
-        \item Capacity: 18Ah (266 Wh)
-        \item Energy density: ~195 Wh/kg
-        \item Mass: ~1.35 kg per battery
-        \item Chemistry: Li-ion 18650 cells
-        \item BMS: Integrated, 30A continuous
-        \item Depth: Enclosure-dependent (300-500m)
-        \item Cost: \$357-400 each
+        \item Voltage: 14.8V (4S)
+        \item Capacity: 266 Wh each
+        \item 3× = 799 Wh total
+        \item Mass: 1.35 kg each
+        \item Cost: \$400 each
+      \end{itemize}
+      \vspace{0.5em}
+      \textbf{3" Al Enclosure:}
+      \begin{itemize}
+        \item Wall: 6.35mm Al 6061-T6
+        \item Depth: 500m rated
+        \item Cost: \$250
       \end{itemize}
     \end{column}
   \end{columns}
   \vspace{0.5em}
-  \tiny Sources: Blue Robotics Bar30 \& Battery Datasheets, bluerobotics.com
+  \tiny Sources: bluerobotics.com
 \end{frame}
 
-\begin{frame}{RockBLOCK 9603N \& Ping360 Sonar Specifications}
+\begin{frame}{Ping360 \& RockBLOCK}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{RockBLOCK 9603N Iridium Modem:}
-      \begin{itemize}
-        \item Network: Iridium Short Burst Data
-        \item Message size: 340B uplink, 270B downlink
-        \item Latency: 10-60s average
-        \item Coverage: Global (pole-to-pole)
-        \item Power: 0.8W avg, 6.5W peak transmit
-        \item Dimensions: 45×45×15.5mm, 45g
-        \item Cost: \$260 + \$15/month service
-      \end{itemize}
-    \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Ping360 Scanning Sonar:}
       \begin{itemize}
-        \item Configuration: Mechanical scanning, 360°
         \item Frequency: 750 kHz
-        \item Range: 2-50m (adjustable)
-        \item Resolution: 400 points/scan, 1-2° angular
-        \item Update rate: 10-20 Hz (2-5s per 360°)
-        \item Power: 5W max, 2W typical
-        \item Depth rating: 300m
-        \item Interface: Serial UART
+        \item Range: 2-50m
+        \item Resolution: 1-2° angular
+        \item Power: 2-5W
+        \item Depth: 300m
         \item Cost: \$2,750
       \end{itemize}
+      \vspace{0.5em}
+      \small Cable detection in zero-visibility
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{RockBLOCK 9603N:}
+      \begin{itemize}
+        \item Network: Iridium SBD
+        \item Message: 340B uplink
+        \item Coverage: Global
+        \item Power: 0.8W avg
+        \item Cost: \$260 + \$15/mo
+      \end{itemize}
+      \vspace{0.5em}
+      \small GPS position reporting
     \end{column}
   \end{columns}
   \vspace{0.5em}
-  \tiny Sources: RockBLOCK 9603N Datasheet (SparkFun); Ping360 Datasheet (Blue Robotics)
-\end{frame}
-
-\begin{frame}{3" Watertight Enclosure Specifications}
-  \textbf{Blue Robotics 3" Aluminum Watertight Enclosure:}
-
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Physical:}
-      \begin{itemize}
-        \item Material: Aluminum 6061-T6
-        \item Surface: Type III hard anodized
-        \item Inner diameter: 74.7mm (2.94")
-        \item Outer diameter: ~89mm (3.5")
-        \item Wall thickness: 6.35mm (0.25")
-        \item Lengths: 150, 240, 300, 400mm
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Performance:}
-      \begin{itemize}
-        \item Depth rating: 500m (Gen 2)
-        \item Sealing: Double O-rings per flange
-        \item Penetrators: WetLink compatible
-        \item Test: Vacuum testable (10 inHg)
-        \item Proven: 1000s deployed (BlueROV2)
-        \item Cost: \$200-300 complete
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \vspace{0.5em}
-  \textbf{WetLink Penetrators:} \$12-17 each, 1000m rated, tool-free installation
-
-  \vspace{0.5em}
-  \tiny Source: Blue Robotics Watertight Enclosures Catalog, bluerobotics.com
+  \tiny Sources: bluerobotics.com; sparkfun.com
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % REFERENCES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[allowframebreaks]{References}
+\begin{frame}{References}
   \tiny
-  \textbf{Thrusters \& Propulsion:}
+  \textbf{Selected Components (Blue Robotics):}
   \begin{itemize}
-    \item T200 Thruster: \url{https://bluerobotics.com/store/thrusters/t100-t200-thrusters/t200-thruster-r2-rp/}
-    \item T200 Performance Data: \url{https://cad.bluerobotics.com/T200-Public-Performance-Data-10-20-V-September-2019.xlsx}
-    \item Basic ESC 30A: \url{https://bluerobotics.com/store/thrusters/speed-controllers/besc30-r3/}
-  \end{itemize}
-
-  \textbf{Power Systems:}
-  \begin{itemize}
-    \item Blue Robotics 18Ah Battery: \url{https://bluerobotics.com/store/comm-control-power/powersupplies-batteries/battery-li-4s-15-6ah/}
-    \item Samsung INR18650-35E Datasheet: \url{https://www.orbtronic.com/content/samsung-35e-datasheet-inr18650-35e.pdf}
-    \item SubCtech PowerPack: \url{https://subctech.com/ocean-power/subsea-batteries/}
-  \end{itemize}
-
-  \textbf{Navigation \& Control:}
-  \begin{itemize}
+    \item T200 Thruster: \url{https://bluerobotics.com/store/thrusters/t200-thruster-r2-rp/}
     \item Navigator Flight Controller: \url{https://bluerobotics.com/store/comm-control-power/control/navigator/}
     \item Bar30 Depth Sensor: \url{https://bluerobotics.com/store/sensors-cameras/sensors/bar30-sensor-r1/}
-    \item MS5837-30BA Sensor: \url{https://www.te.com/commerce/DocumentDelivery/DDEController?Action=showdoc&DocId=Data+Sheet\%7FMS5837-30BA\%7FB1\%7Fpdf}
-    \item VectorNav VN-100: \url{https://www.navtechgps.com/wp-content/uploads/VN100_ProductBrief_DS.pdf}
-    \item Nortek DVL1000-300m: \url{https://www.nortekgroup.com/products/dvl-1000-300m}
-    \item Water Linked DVL A50: \url{https://waterlinked.com/datasheets/dvl-a50}
+    \item 18Ah Li-ion Battery: \url{https://bluerobotics.com/store/comm-control-power/powersupplies-batteries/battery-li-4s-15-6ah/}
+    \item Ping360 Sonar: \url{https://bluerobotics.com/store/sonars/imaging-sonars/ping360-sonar-r1-rp/}
+    \item 3" Watertight Enclosures: \url{https://bluerobotics.com/store/watertight-enclosures/wte-vp/}
+    \item WetLink Penetrators: \url{https://bluerobotics.com/store/cables-connectors/penetrators/wlp-vp/}
   \end{itemize}
-
-  \framebreak
 
   \textbf{Communications:}
   \begin{itemize}
-    \item RockBLOCK 9603N: \url{https://cdn.sparkfun.com/assets/4/d/2/1/1/DS_Iridium_9603_Datasheet_031720_2_.pdf}
-    \item RockBLOCK Developer Guide: \url{https://cdn.sparkfun.com/assets/6/d/4/c/a/RockBLOCK-9603-Developers-Guide_1.pdf}
-    \item EvoLogics S2C Acoustic Modems: \url{https://www.subsea2020.com/evologics}
-    \item LinkQuest UWM2000H: \url{https://www.oceanscan.net/p-LinkQuest-UWM2000H-Underwater-Modem}
+    \item RockBLOCK 9603N Datasheet: \url{https://cdn.sparkfun.com/assets/4/d/2/1/1/DS_Iridium_9603_Datasheet_031720_2_.pdf}
   \end{itemize}
 
-  \textbf{Imaging \& Sensors:}
-  \begin{itemize}
-    \item Low-Light HD Camera: \url{https://bluerobotics.com/store/sensors-cameras/cameras/cam-usb-low-light-r1/}
-    \item Ping360 Sonar: \url{https://bluerobotics.com/store/sonars/imaging-sonars/ping360-sonar-r1-rp/}
-    \item SubC Rayfin Micro: \url{https://www.outlandtech.com/product-page/subc-imaging-rayfin-micro-camera-500m}
-    \item Lumen Light: \url{https://bluerobotics.com/store/thrusters/lights/lumen-r2-rp/}
-  \end{itemize}
-
-  \textbf{Mechanical Components:}
-  \begin{itemize}
-    \item 3" Watertight Enclosures: \url{https://bluerobotics.com/store/watertight-enclosures/wte-vp/}
-    \item WetLink Penetrators: \url{https://bluerobotics.com/store/cables-connectors/penetrators/wlp-vp/}
-    \item Aluminum Tubes Design: \url{https://bluerobotics.com/new-products-aluminum-tubes/}
-  \end{itemize}
-
-  \framebreak
-
-  \textbf{Commercial AUV Platforms:}
+  \textbf{Commercial AUV Comparisons:}
   \begin{itemize}
     \item BlueROV2: \url{https://bluerobotics.com/store/rov/bluerov2/}
-    \item ecoSUB m-Power+: \url{https://www.ecosub.uk/ecosubm5---500-m-rated-small-auv.html}
     \item ecoSUB Datasheet: \url{https://www.unmannedsystemstechnology.com/wp-content/uploads/2024/05/240305-ecoSUBm-P-datasheet.pdf}
-    \item L3Harris Iver3: \url{https://www.l3harris.com/sites/default/files/2022-11/ims-maritime-Iver3-Spec-Sheet.pdf}
-    \item Boxfish AUV: \url{https://www.boxfishrobotics.com/products/boxfish-auv/}
+    \item L3Harris Iver3 Spec Sheet: \url{https://www.l3harris.com/sites/default/files/2022-11/ims-maritime-Iver3-Spec-Sheet.pdf}
   \end{itemize}
 
   \textbf{Hydrodynamics \& Engineering:}
   \begin{itemize}
     \item MDPI - CFD Study Torpedo AUV: \url{https://www.mdpi.com/2311-5521/6/7/252}
-    \item SCIRP - AUV Drag Analysis: \url{https://www.scirp.org/html/2-2320148_49513.htm}
-    \item Pressure Vessel Design: \url{https://philipmcgaw.com/pressure-vessel/}
-    \item DOE - Powering the Blue Economy: \url{https://www.energy.gov/sites/prod/files/2019/03/f61/Chapter\%203.pdf}
+    \item SCIRP - AUV Drag Coefficient Analysis: \url{https://www.scirp.org/html/2-2320148_49513.htm}
   \end{itemize}
 \end{frame}
 
