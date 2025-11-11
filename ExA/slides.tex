@@ -62,9 +62,9 @@
 \frame{\titlepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{The Problem - Subsea Cable Inspection}
+\section{Problem - Subsea Cable Inspection}
 
-\begin{frame}{The Problem - Why Subsea Cables Matter}
+\begin{frame}{Problem - Why Subsea Cables Matter}
   \begin{columns}[T]
     \begin{column}{0.45\textwidth}
       \textbf{Backbone of the Internet:}
@@ -83,7 +83,7 @@
   \note{Before we dive into our design and feasibility assessment, let's give some context to the problem we're tackling: Subsea cables. Your internet connection, whether that be for online banking or video calls, 97-99\% of that data goes through a dense network of over 500+ undersea cables, spanning a total of 14 million kilometers over the seafloor making it THE largest and possibly greatest man-made infrastructure ever. This is the backbone of the internet, and when they fail, the consequences are severe. Despite the significance of these cables, these cables are no thicker than your average garden-hose around 2-5 cm in diameter, with hair-thin strands of optical fiber embedded within, designed to remain undisturbed across the seabed.}
 \end{frame}
 
-\begin{frame}{The Problem - Current Limitations}
+\begin{frame}{Problem - Current Limitations}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
       \includegraphics[width=\textwidth]{img/ship.png}
@@ -109,9 +109,9 @@
     \end{column}
   \end{columns}
 
-  \vspace{0.5em}
+  \vspace{1em}
   \centering
-  \colorbox{yellow!30}{\textbf{Solution: Free-roving Autonomous Underwater Vehicle}}
+  \textit{Solution: Free-roving Autonomous Underwater Vehicle}
 
   \note{In shallow waters however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year. In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, could not use card payments, could not access online banking. Businesses lost thousands. Emergency services were disrupted. These are not rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable. Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintenance costs for dedicated vessels. Therefore we propose the use of an untethered AUV}
 \end{frame}
@@ -157,7 +157,7 @@
 
 \begin{frame}{Existing Commercial Solutions}
   \begin{table}
-    \tiny
+    \scriptsize
     \begin{tabular}{lcccccc}
       \toprule
       \textbf{Model}      & \textbf{Type} & \textbf{Mass} & \textbf{Depth} & \textbf{Speed} & \textbf{Endurance} & \textbf{Cost} \\
@@ -373,20 +373,17 @@
     \footnotesize
     \begin{tabular}{llll}
       \toprule
-      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}      & \textbf{Cost}       \\
+      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}      & \textbf{Cost}  \\
       \midrule
-      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps          & \textbf{\$50}       \\
-                            & (Raspberry Pi built-in)  & 50-100m range in air         &                     \\
+      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps          & \textbf{\$50}  \\
+                            & (Raspberry Pi built-in)  & 50-100m range in air         &                \\
 
       \midrule
-      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data     & \textbf{\$260}      \\
-                            &                          & 340 byte messages            &                     \\
-                            &                          & Global coverage (open ocean) &                     \\
-                            &                          & GPS position reporting       &                     \\
-      \midrule
-      \textbf{Acoustic}     & \textbf{EvoLogics S2C M} & 18-34 kHz, 2 km range        & \textbf{\$12K}      \\
-      \textit{(Optional)}   & \textit{18/34}           & 13.9 kbps (in water)         & \textit{(Optional)} \\
-                            &                          & 500m operational depth       &                     \\
+      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data     & \textbf{\$260} \\
+                            &                          & 340 byte messages            &                \\
+                            &                          & Global coverage (open ocean) &                \\
+                            &                          & GPS position reporting       &                \\
+
       \bottomrule
     \end{tabular}
   \end{table}
@@ -397,11 +394,10 @@
   \begin{itemize}
     \item \textbf{At surface:} WiFi for high-bandwidth video/data + GPS fix
     \item \textbf{Open ocean:} RockBLOCK for GPS position reporting every 10 min
-    \item \textbf{Underwater (optional):} Acoustic modem for short messaging, real-time monitoring during critical phases
   \end{itemize}
 
   \note{
-    WiFi provides high-bandwidth communication when surfaced, enabling video download and mission updates. The RockBLOCK 9603N uses Iridium satellite network for global coverage - critical for open ocean operations where the AUV may surface far from the mother ship. It can transmit GPS coordinates and status messages (340 bytes). The optional EvoLogics acoustic modem enables underwater communication at up to 2 km range, useful for real-time monitoring during critical inspection phases. However, for cable-following missions with periodic surfacing, the acoustic modem is not essential, saving \$12K.
+    WiFi provides high-bandwidth communication when surfaced, enabling video download and mission updates. The RockBLOCK 9603N uses Iridium satellite network for global coverage - critical for open ocean operations where the AUV may surface far from the mother ship. It can transmit GPS coordinates and status messages (340 bytes).
   }
 \end{frame}
 
@@ -433,11 +429,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Hydrodynamics and Propulsion Analysis}
 
-\begin{frame}{Hydrodynamic Drag - The Physics}
+\begin{frame}{Hydrodynamic Drag}
   \textbf{Vehicle Geometry (Torpedo Hull):}
   \begin{itemize}
     \item Diameter: $D \approx 0.3$ m, Length: $L \approx 1.2$ m
-    \item Frontal area: $A = \frac{\pi D^2}{4} = 0.0824$ m$^2$
+    \item Frontal area: $A = \frac{\pi D^2}{4} = 0.0824 m^2$
     \item Drag coefficient: $C_D = 0.28$-$0.32$
   \end{itemize}
 
@@ -450,12 +446,9 @@
 
   \vspace{0.5em}
 
-  \textbf{Calculations:}
   \begin{itemize}
-    \item \textbf{At 1 m/s cruise} ($C_D = 0.32$):
-          $$F_D = \frac{1}{2} \times 1027 \times 1^2 \times 0.32 \times 0.0824 = \textbf{13.5 N}$$
-    \item \textbf{At 4 m/s peak} ($C_D = 0.28$):
-          $$F_D = \frac{1}{2} \times 1027 \times 16 \times 0.28 \times 0.0824 = \textbf{188 N}$$
+    \item \textbf{At 1 m/s cruise} $C_D = 0.32$: $F_D = 13.5$ N
+    \item \textbf{At 4 m/s peak} $C_D = 0.28$: $F_D = 188$ N
   \end{itemize}
 
   \note{The drag force is calculated using the standard hydrodynamic equation. We assume a torpedo-shaped hull with length 1.2m and diameter 0.324m, giving a streamlined L/D ratio of 3.7. The frontal area is calculated from the circular cross-section. Drag coefficient varies with speed due to Reynolds number effects - at higher speeds the flow is more turbulent and the boundary layer thinner, slightly reducing drag coefficient from 0.32 to 0.28. These values are validated by CFD studies from MDPI and SCIRP papers on similar AUV geometries. At 1 m/s, drag is only 13.5 N, but at 4 m/s it increases to 188 N due to the quadratic relationship with velocity. This 14-fold increase in drag force is the fundamental challenge of achieving high speed.}
@@ -471,56 +464,59 @@
   \begin{table}
     \begin{tabular}{lccccc}
       \toprule
-      \textbf{Speed} & $F_D$ (N) & $P_{mech}$ (W) & $\eta$ & $P_{elec}$ (W) & \textbf{Comment} \\
+      \textbf{Speed} & $F_D$ (N) & $P_{mech}$ (W) & $\eta$ & $P_{elec}$ (W) & \textbf{Notes}  \\
       \midrule
-      1 m/s cruise   & 13.5      & 13.5           & 0.30   & 45             & Low efficiency   \\
-      2 m/s medium   & 54        & 108            & 0.50   & 216            & Medium           \\
-      4 m/s peak     & 188       & 752            & 0.55   & 1,367          & High efficiency  \\
+      1 m/s cruise   & 13.5      & 13.5           & 0.30   & 45             & Low efficiency  \\
+      4 m/s peak     & 188       & 752            & 0.55   & 1,367          & High efficiency \\
       \bottomrule
     \end{tabular}
   \end{table}
 
   \vspace{0.5em}
 
-  \textcolor{red}{\textbf{Key finding:}} 4 m/s requires 1.4 kW propulsion power (30× cruise power!)
+  \textit{4 m/s requires 1.4 kW propulsion power (30× cruise power)}
 
   \note{The mechanical power required is simply force times velocity (P = F × v). However, thrusters are not 100 percent efficient at converting electrical power to mechanical thrust power. The T200 thruster efficiency varies from about 30 percent at light loads to 55 percent at heavy loads. At 1 m/s cruise with only 13.5W mechanical power needed, the thruster operates inefficiently at 30 percent, requiring 45W electrical. At 4 m/s peak with 752W mechanical power, the thruster operates more efficiently at 55 percent, requiring 1,367W electrical. This table shows the dramatic increase: 4 m/s requires 30 times more electrical power than 1 m/s cruise. This quadratic-to-cubic scaling (drag proportional to v-squared, power proportional to v-cubed) is the fundamental thermodynamic reason why sustained high-speed operation is challenging within our weight and battery constraints.}
 \end{frame}
-
-\begin{frame}{Thruster Selection - T200 vs Alternatives}
-  \textbf{Comparison Table:}
+\begin{frame}{Thruster Selection - T200}
   \begin{table}
-    \footnotesize
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
     \begin{tabular}{lcccccc}
       \toprule
       \textbf{Model}  & \textbf{Thrust (N)} & \textbf{Power (W)} & \textbf{Depth (m)} & \textbf{Mass (kg)} & \textbf{Cost (\$)} & \textbf{Thrust/Cost} \\
       \midrule
-      \textbf{T200}   & \textbf{50 fwd}     & \textbf{350 max}   & \textbf{300}       & \textbf{0.34}      & \textbf{119-139}   & \textbf{0.36-0.42}   \\
-      SeaBotix BTD150 & 28                  & 80                 & 150                & 0.5                & 695-950            & 0.03-0.04            \\
-      Maxon MT30      & 49                  & 180                & 6000               & 0.45               & 2,000-3,000        & 0.016-0.025          \\
+      \textbf{T200}   & \textbf{50 fwd}     & \textbf{350 max}   & \textbf{300}       & \textbf{0.34}      & \textbf{130}       & \textbf{0.38}        \\
+      SeaBotix BTD150 & 28                  & 80                 & 150                & 0.5                & 800                & 0.035                \\
+      Maxon MT30      & 49                  & 180                & 6000               & 0.45               & 2,500              & 0.020                \\
       T500            & 158                 & 1000+              & 300                & 1.1                & 690                & 0.23                 \\
       \bottomrule
     \end{tabular}
   \end{table}
 
-  \vspace{0.5em}
+  \vspace{0.3em}
 
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.49\textwidth}
+      \small
       \textbf{4× T200 Configuration:}
       \begin{itemize}
+        \setlength{\itemsep}{0pt}
+        \setlength{\parskip}{0pt}
         \item Total thrust: \textbf{200 N}
         \item Required: 188 N
-        \item \textcolor{red}{\textbf{Margin: 6\% (TIGHT)}}
-        \item Propulsion cost: \$476-556
-        \item ESCs (4× 30A): \$140-152
+        \item Propulsion cost: \$520
+        \item ESCs (4× 30A): \$145
       \end{itemize}
     \end{column}
 
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.49\textwidth}
+      \small
       \textbf{Justification:}
       \begin{itemize}
-        \item 6-22× lower cost than alternatives
+        \setlength{\itemsep}{0pt}
+        \setlength{\parskip}{0pt}
+        \item 6-20× lower cost than alternatives
         \item Adequate thrust at 16V
         \item 300m depth rating (vs 250m spec)
         \item Proven reliability
@@ -528,10 +524,6 @@
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \vspace{0.5em}
-  \centering
-  \colorbox{yellow!30}{\small\textbf{Tight margin requires hydrodynamic optimization (streamlined hull, C$_D$ $<$ 0.30)}}
 
   \note{We compared four thruster options. The SeaBotix BTD150 has good efficiency but insufficient thrust (28N vs 50N for T200). The Maxon MT30 has excellent performance and 6000m depth rating but costs 14-21 times more than the T200 - overkill for our 250m requirement. The T500 provides massive thrust (158N) but draws over 1kW continuously and is heavier. The T200 offers the best thrust-to-cost ratio at 0.36-0.42 N per dollar. Four T200 thrusters provide 200N total thrust for 188N required - only 6 percent margin which is tight. This means we must achieve our assumed drag coefficient through careful hull design. The flooded brushless motor design is naturally pressure-tolerant, proven to 3000m at Woods Hole testing.}
 \end{frame}
@@ -541,49 +533,45 @@
 
 \begin{frame}{Complete System Power Budget}
   \begin{table}
-    \small
+    \footnotesize
     \begin{tabular}{lccc}
       \toprule
-      \textbf{Subsystem}                    & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}   \\
+      \textbf{Subsystem}                   & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}   \\
       \midrule
-      Propulsion (4× T200)                  & 45                  & 1,367             & Dominant at peak \\
-      Paylodad (camera, lighting and sonar) & 30                  & 30                & Low-light USB    \\
-      Navigation sensors                    & 5                   & 5                 & IMU, depth, GPS  \\
-      Control (RPi4+Nav)                    & 10                  & 10                & ArduSub firmware \\
-      Comms (WiFi/Iridium)                  & 2                   & 2                 & Surface only     \\
+      Propulsion (4× T200)                 & 45                  & 1,367             & Dominant at peak \\
+      Payload (camera, lighting and sonar) & 30                  & 30                & Low-light USB    \\
+      Navigation sensors                   & 5                   & 5                 & IMU, depth, GPS  \\
+      Control (RPi4+Nav)                   & 10                  & 10                & ArduSub firmware \\
+      Comms (WiFi/Iridium)                 & 2                   & 2                 & Surface only     \\
       \midrule
-      \textbf{TOTAL}                        & \textbf{92 W}       & \textbf{1,414 W}  &                  \\
+      \textbf{TOTAL}                       & \textbf{92 W}       & \textbf{1,414 W}  &                  \\
       \bottomrule
     \end{tabular}
   \end{table}
 
   \vspace{0.3em}
 
-  $$P_{avg} = 744 \text{ W}$$
+  \centering
+  $P_{avg} = 356 \text{ W}$ (Accounting for mission profile)
 
-  \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,415W total, of which 1,367W is propulsion). The mission profile assumes 60 percent of time at cruise, 30 percent at medium speed for active cable following, and 10 percent at peak for sprints. This gives an average power of 251W which determines our battery requirements.}
+  \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,415W total, of which 1,367W is propulsion). The mission profile assumes 80 percent of time at cruise, 20 percent at peak for sprints. This gives an average power of 356W which determines our battery requirements.}
 \end{frame}
 
-\begin{frame}{Battery Sizing and Alternatives}
+\begin{frame}{Battery Sizing}
   \textbf{Energy Requirements:}
-  $$E = P_{avg} \times t = 251 \text{ W} \times 2 \text{ h} = 502 \text{ Wh}$$
-  With 25\% margin: $502 \times 1.25 = \textbf{628 Wh required}$
+  $$E = P_{avg} \times t = 356 \text{ W} \times 2 \text{ h} = 712 \text{ Wh required}$$
 
-  \vspace{0.5em}
-
-  \textbf{Alternative Comparison:}
   \begin{table}
-    \tiny
-    \begin{tabular}{lcccccc}
+    \scriptsize
+    \begin{tabular}{lccccc}
       \toprule
-      \textbf{Option}               & \textbf{Voltage} & \textbf{Capacity} & \textbf{Energy} & \textbf{Mass}    & \textbf{Cost}    & \textbf{Depth} \\
+      \textbf{Option}               & \textbf{Voltage} & \textbf{Capacity} & \textbf{Energy} & \textbf{Mass}    & \textbf{Cost}    \\
       \midrule
-      \textbf{Blue Robotics 3×18Ah} & \textbf{14.8V}   & \textbf{18Ah}     & \textbf{799 Wh} & \textbf{4.05 kg} & \textbf{\$1,200} & \textbf{300m*} \\
-      Blue Robotics 2×18Ah          & 14.8V            & 18Ah              & 532 Wh          & 2.7 kg           & \$800            & 300m*          \\
-      Samsung 35E (4S6P)            & 14.8V            & 21Ah              & 311 Wh          & ~1.5 kg          & \$310-590        & 250m*          \\
-      SubCtech PowerPack            & 14-50V           & Custom            & 650-3400 Wh     & Varies           & \$3-10K+         & 6000m          \\
-      \bottomrule
-      \multicolumn{7}{l}{\tiny *Depth rating depends on enclosure design}                                                                           \\
+      \textbf{Blue Robotics 3×18Ah} & \textbf{14.8V}   & \textbf{18Ah}     & \textbf{799 Wh} & \textbf{4.05 kg} & \textbf{\$1,200} \\
+      Blue Robotics 2×18Ah          & 14.8V            & 18Ah              & 532 Wh          & 2.7 kg           & \$800            \\
+      Samsung 35E (4S6P)            & 14.8V            & 21Ah              & 311 Wh          & ~1.5 kg          & \$310-590        \\
+      SubCtech PowerPack            & 14-50V           & Custom            & 650-3400 Wh     & Varies           & \$3-10K+         \\
+      \bottomrule                                                                                                                  \\
     \end{tabular}
   \end{table}
 
@@ -593,7 +581,7 @@
     \begin{column}{0.48\textwidth}
       \textbf{Selected: 3× Blue Robotics 18Ah}
       \begin{itemize}
-        \item Energy: 799 Wh (27\% margin)
+        \item Energy: 799 Wh
         \item Endurance: 3.2 hrs @ 251W
         \item Proven platform (BlueROV2)
         \item Integrated BMS
@@ -606,7 +594,6 @@
         \item 2× config: only 532 Wh (insufficient)
         \item Samsung 35E: DIY, higher risk
         \item SubCtech: 2.5-8× cost, overkill
-        \item Best balance: proven + adequate
       \end{itemize}
     \end{column}
   \end{columns}
