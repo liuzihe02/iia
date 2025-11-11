@@ -664,34 +664,18 @@
   \vspace{1em}
 
   \textbf{Selected: Blue Robotics 3" Aluminum Enclosures}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{itemize}
-        \item ID: 74.7mm
-        \item \textbf{Depth: 500m (2× safety)}
-        \item Hard anodized
-        \item Double O-rings
-        \item Lengths: 150-400mm
-      \end{itemize}
-    \end{column}
+  \begin{itemize}
+    \item ID: 74.7mm
+    \item Depth: 500m (2× safety)
+    \item Hard anodized
+    \item Lengths: 150-400mm
+  \end{itemize}
 
-    \begin{column}{0.48\textwidth}
-      \begin{itemize}
-        \item WetLink penetrators
-        \item Tool-free assembly
-        \item Vacuum testable
-        \item Price: \$200-300 complete
-        \item Proven: 1000s deployed
-      \end{itemize}
-    \end{column}
-  \end{columns}
 
   \note{
-    Three materials were compared for pressure housing. Aluminum 6061-T6 has yield strength of 276 megapascals and density of 2,700 kilograms per cubic meter. Titanium Grade 5 has 880 megapascals yield strength but costs 30 dollars per kilogram versus 7 dollars for aluminum. Titanium is unnecessary for 250 meter depth - its advantage only matters beyond 1000 meters. Acrylic has only 70 to 75 megapascals yield strength, insufficient for 250 meter external pressure.
+    Three materials were compared for the pressure housing. Aluminum has yield strength of 276 megapascals and density of 2,700 kilograms per cubic meter. Titanium has 880 megapascals yield strength but costs 30 dollars per kilogram versus 7 dollars for aluminum. Titanium is unnecessary for 250 meter depth - its advantage only matters beyond 1000 meters. Acrylic has only 70 to 75 megapascals yield strength, insufficient for 250 meter external pressure.
 
-    Blue Robotics 3 inch aluminum enclosures were selected. Internal diameter is 74.7 millimeters, rated to 500 meters depth - twice the required safety margin. Hard anodizing provides corrosion resistance. Double O-ring seals ensure watertight integrity. Available lengths from 150 to 400 millimeters enable modular layout.
-
-    WetLink penetrators provide cable entry at 12 to 17 dollars per unit, rated to 1000 meters. These are tool-free, reusable, and significantly cheaper than traditional potted penetrators. Complete enclosures cost 200 to 300 dollars. Thousands deployed in BlueROV2 fleet validate reliability.
+    Blue Robotics 3 inch aluminum enclosures were selected. Internal diameter is 74.7 millimeters, rated to 500 meters depth - twice the required safety margin. Hard anodizing provides corrosion resistance. Available lengths from 150 to 400 millimeters enable modular layout.
   }
 \end{frame}
 
@@ -713,7 +697,7 @@
 
   \vspace{0.5em}
 
-  \textbf{ASME Section VIII Refinements}
+  \textbf{ASME Section VIII Refinements}\href{https://www.cis-inspector.com/asme-code-calculation-cylinder.html}{\textsuperscript{[ASME]}}
 
   \begin{itemize}
     \item Add biaxial stress correction: denominator becomes $(S \cdot E - 0.6P)$
@@ -729,7 +713,7 @@
 
     ASME Section VIII adds two refinements. First, the 0.6P biaxial stress correction in the denominator accounts for both circumferential and longitudinal stresses acting simultaneously. Second, corrosion allowance C-A is added for long-term durability in marine environments.
 
-    The final formula is t equals P R over S E minus 0.6P, plus C-A. This is the standard for pressure vessel design under external pressure.
+    The final formula is t equals P R over S E minus 0.6P, plus C-A. This is the standard formula for pressure vessel design under external pressure.
   }
 \end{frame}
 
@@ -744,7 +728,7 @@
 
   \vspace{0.5em}
 
-  \textbf{ASME Section VIII Formula (External Pressure):}
+  \textbf{ASME Section VIII Formula (External Pressure):}\href{https://www.cis-inspector.com/asme-code-calculation-cylinder.html}{\textsuperscript{[ASME]}}
   $$t = \frac{P \cdot R}{S \cdot E - 0.6P} + C_A = 6.3mm$$
 
 
@@ -752,7 +736,7 @@
   \begin{itemize}
     \item $P = 7.56$ MPa
     \item $R = 50$ mm (for 3" tube)
-    \item $S = 92$ MPa (Al 6061-T6)
+    \item $S = 92$ MPa (Al 6061-T6: $\sigma_{yield}$/\text{safety factor of 3} = 276/3)
     \item $E = 1.0$ (seamless)
     \item $C_A = 2$ mm (corrosion)
   \end{itemize}
@@ -760,45 +744,14 @@
   \vspace{0.5em}
 
   \centering
-  \colorbox{green!20}{Blue Robotics 3" tubes has thickness of 6.35 mm \textbf{(Feasible)}}
+  \textit{Blue Robotics 3" tubes has thickness of 6.35 mm \textbf{(Feasible)}}
 
   \note{
     Operating pressure at 250 meters is rho g h equals 2.52 megapascals or 25.2 bar. With safety factor of 3, design pressure is 7.56 megapascals.
 
-    Applying ASME Section VIII formula: P is 7.56 megapascals, R is 50 millimeters for 3 inch tube internal radius. Allowable stress S for aluminum 6061-T6 is yield strength divided by 3, giving 92 megapascals. Weld efficiency E is 1.0 for seamless tube. Corrosion allowance C-A is 2 millimeters for marine environment.
+    Applying ASME Section VIII formula (standard for design UAV vessels), calculation gives us 6.3 millimeters minimum thickness, using a safety factor of 3 for the opreating pressure and yield stress.
 
-    Calculation gives t equals 7.56 times 50, over 92 times 1.0 minus 0.6 times 7.56, plus 2. This equals 378 divided by 87.5, plus 2, giving 4.3 plus 2 equals 6.3 millimeters minimum thickness.
-
-    Blue Robotics 3 inch tubes have 6.35 millimeter wall thickness - essentially identical to calculated requirement. This validates the pressure housing design for 250 meter operation with appropriate safety margins.
-  }
-\end{frame}
-
-
-
-\begin{frame}{Buoyancy and Ballast Design}
-  \textbf{Neutral Buoyancy Requirement:}
-
-  For dry mass $m = 15.4$ kg (calculated later) in seawater:
-  $$V_{displaced} = \frac{m}{\rho} = \frac{15.4}{1027} = 0.015 \text{ m}^3 = 15.0 \text{ L}$$
-
-  \vspace{1em}
-
-  \textbf{Component Volumes and Buoyancy:}
-  \begin{itemize}
-    \item Pressure housings (3× 3" tubes): ~4 L (watertight)
-    \item Batteries (internal to housing): ~2 L
-    \item Thrusters: Negative buoyancy (~0.24 kg each × 4 = 0.96 kg)
-    \item Electronics: Neutral (in watertight housings)
-  \end{itemize}
-
-  \note{
-    Neutral buoyancy requires displaced volume equal to mass divided by seawater density. For dry mass of 15.4 kilograms, required displaced volume is 15.4 divided by 1027, equals 0.015 cubic meters or 15 liters.
-
-    Component contributions: Three 3 inch aluminum tubes displace approximately 4 liters as watertight volumes. Batteries inside housings occupy approximately 2 liters. Electronics in watertight housings are approximately neutral buoyancy.
-
-    Thrusters have negative buoyancy: each T200 is 0.24 kilograms negative in water, giving 0.96 kilograms total for four thrusters. This must be compensated with syntactic foam providing positive buoyancy.
-
-    Final buoyancy adjustment uses lead weights for fine trim, positioning center of gravity below center of buoyancy to ensure passive stability in roll and pitch.
+    Blue Robotics 3 inch tubes have 6.35 millimeter wall thickness - essentially identical to calculated requirement. This validates the pressure housing design.
   }
 \end{frame}
 
@@ -1081,6 +1034,7 @@
   \begin{itemize}
     \item MDPI - CFD Study Torpedo AUV: \url{https://www.mdpi.com/2311-5521/6/7/252}
     \item SCIRP - AUV Drag Coefficient Analysis: \url{https://www.scirp.org/html/2-2320148_49513.htm}
+    \item ASME BPVC Section VIII - Pressure Vessels: \url{https://www.asme.org/codes-standards/find-codes-standards/bpvc-viii-1-bpvc-section-viii-rules-construction-pressure-vessels-division-1}
   \end{itemize}
 \end{frame}
 
