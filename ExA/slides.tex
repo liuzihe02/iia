@@ -588,9 +588,9 @@
   \note{
     The 30 watt payload specification is a combined budget for all payload components: camera at 2.5 watts, sonar at 2 to 5 watts, and lighting at 10 to 20 watts adjustable. Total payload is 15 to 28 watts, within the 30 watt limit.
 
-    Propulsion dominates total power at peak speed: 1,225 watts total system power, with 1,178 watts for propulsion alone. At cruise, propulsion is only 39 watts out of 86 watts total.
+    Propulsion dominates total power at peak speed: 1,225 watts total system power, with 1,178 watts for propulsion alone.
 
-    The mission profile assumes 80 percent time at 1 meter per second cruise, 20 percent at 4 meters per second sprint. This gives average power of 314 watts: 0.8 times 86 plus 0.2 times 1,225. This average power determines battery capacity requirements.
+    The mission profile gives an average power of 314 watts: 0.8 times 86 plus 0.2 times 1,225. This average power determines battery capacity requirements.
   }
 \end{frame}
 
@@ -621,7 +621,6 @@
         \item Energy: 799 Wh
         \item Endurance: 2.5 hrs @ 314W
         \item Proven platform (BlueROV2)
-        \item Integrated BMS
       \end{itemize}
     \end{column}
 
@@ -636,13 +635,11 @@
   \end{columns}
 
   \note{
-    Energy requirement is 314 watts times 2 hours equals 628 watt-hours minimum.
+    The minimum energy requirement is 314 watts times 2 hours  which equals 628 watt-hours minimum.
 
-    Four battery options were evaluated. Two Blue Robotics 18Ah batteries provide only 532 watt-hours, insufficient for 628 watt-hour requirement. Custom Samsung 35E pack in 4S6P configuration with 24 cells provides 311 watt-hours at lower cost, but requires assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000 meter depth rating but costs 2.5 to 8 times more.
+    Four battery options were evaluated. Two Blue Robotics 18Ah batteries provide only 532 watt-hours, insufficient for 628 watt-hour requirement. Custom Samsung 35E pack provides 311 watt-hours at lower cost, but requires self-assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000 meter depth rating but costs 2.5 to 8 times more.
 
-    Three Blue Robotics 18Ah batteries provide 799 watt-hours - 27 percent margin over requirement. This enables 2.5 hour missions at 314 watts average power. This configuration is proven in the BlueROV2 platform with integrated battery management system.
-
-    Battery depth rating depends on the aluminum pressure enclosure design, not the battery cells themselves.
+    Three Blue Robotics 18Ah batteries provide 799 watt-hours - 27 percent margin over requirement. This enables 2.5 hour missions at 314 watts average power. This configuration is proven in the existing BlueROV2 platform with integrated battery management system.
   }
 \end{frame}
 
