@@ -245,7 +245,7 @@
 
     Mass under 25 kilograms limits battery capacity to 4 to 5 kilograms maximum. This restricts available energy, which directly limits either endurance or capabilities.
 
-    The solution is a mission profile approach: 80 percent time at 1 meter per second cruise consuming 86 watts, 20 percent time at 4 meters per second sprint consuming 1,225 watts. Average power becomes 314 watts, enabling 2 hour endurance with 799 watt-hour battery weighing 4 kilograms. This satisfies all three constraints simultaneously. Sustained 4 meters per second operation would require 2,450 watt-hours, exceeding weight limits.
+    The solution is a mission profile approach: 80 percent time at 1 meter per second cruise speed, 20 percent time at 4 meters per second peak speed. Average power is much lower, which satisfies all three constraints simultaneously.
   }
 \end{frame}
 
@@ -287,47 +287,6 @@
   \begin{center}
     \centering
     \includegraphics[width=0.9\textwidth]{img/System_design.png}
-
-    % \begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\small}]
-    %   % Five main blocks in circular arrangement
-    %   \node (power) [process, fill=yellow!30, minimum width=3.5cm, minimum height=1.2cm] {
-    %     \textbf{POWER}\\
-    %     3× 18Ah Li-ion\\
-    %     799 Wh, 14.8V
-    %   };
-
-    %   \node (control) [process, fill=blue!30, right of=power, minimum width=3.5cm, minimum height=1.2cm] {
-    %     \textbf{CONTROL}\\
-    %     Navigator + RPi4\\
-    %     IMU, Depth, GPS
-    %   };
-
-    %   \node (propulsion) [process, fill=green!30, below of=power, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
-    %     \textbf{PROPULSION}\\
-    %     4× T200 Thrusters\\
-    %     4× ESCs (30A)
-    %   };
-
-    %   \node (payload) [process, fill=orange!30, below of=control, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
-    %     \textbf{PAYLOAD}\\
-    %     Camera + Ping360\\
-    %     + Lights (30W total)
-    %   };
-
-    %   \node (comms) [process, fill=red!30, below right of=control, xshift=-0.5cm, yshift=-2cm, minimum width=3.5cm, minimum height=1.2cm] {
-    %     \textbf{COMMS}\\
-    %     WiFi + Iridium\\
-    %     (Acoustic optional)
-    %   };
-
-    %   % Arrows showing data/power flow
-    %   \draw [arrow] (power) -- (control);
-    %   \draw [arrow] (power) -- (propulsion);
-    %   \draw [arrow] (power) -- (payload);
-    %   \draw [arrow] (control) -- (propulsion);
-    %   \draw [arrow] (control) -- (payload);
-    %   \draw [arrow] (control) -- (comms);
-    % \end{tikzpicture}
   \end{center}
 
   \vspace{0.5em}
@@ -390,13 +349,11 @@
   IMU dead reckoning + depth + compass (5-15m drift/2hrs)
 
   \note{
-    The Navigator flight controller contains dual IMUs - the ICM-42688-P and ICM-20602. Dual IMUs provide redundancy and enable sensor fusion, which reduces noise and compensates for drift in individual sensors.
-
-    The Bar30 depth sensor provides 2 millimeter resolution by measuring pressure. At 250 meters depth, pressure is 25 bar. This gives accurate vertical positioning.
-
-    For horizontal positioning, GPS signals cannot penetrate seawater. The system uses dead reckoning - integrating accelerometer measurements to estimate position. Small measurement errors accumulate over time, resulting in 5 to 15 meters of horizontal drift over the 2-hour mission.
-
-    A DVL would reduce this drift to under 1 meter, but costs 5,000 to 20,000 dollars. For cable inspection, the cable itself provides a visual reference for following, so precise dead reckoning is less critical. We omit the DVL to reduce cost and weight.
+    The Navigator is the core stabilization board. Its dual IMUs are fused by the software to reduce sensor noise and drift.
+    The Raspberry Pi 4 is the "brain" or main computer. It runs the high-level autopilot software and processes all the mission and sensor data.
+    The Bar30 sensor just measures water pressure, which gives us a very accurate vertical position (depth).
+    For horizontal position, GPS only works on the surface. The Surface GPS is used to get a precise starting point before the drone dives.
+    Once underwater, the drone uses IMU dead reckoning —it estimates its position by tracking its own movement from that GPS starting point. This estimation is imperfect and accumulates errors, which causes the 5-15m drift over the mission.
   }
 \end{frame}
 
@@ -431,9 +388,7 @@
   \end{itemize}
 
   \note{
-    The communication system costs 310 dollars total: 50 dollars for WiFi and 260 dollars for RockBLOCK Iridium modem. This is 40 times cheaper than underwater acoustic modems at 12,000 to 15,000 dollars.
-
-    At the surface within 50 to 100 meters of the mothership, WiFi provides 150 megabits per second bandwidth for downloading video and sensor data. The vehicle also acquires GPS fixes to reset navigation drift.
+    At the surface, WiFi provides 150 megabits per second bandwidth for downloading video and sensor data. The vehicle also acquires GPS fixes to reset navigation drift.
 
     For open ocean operations beyond visual range, the RockBLOCK uses the Iridium satellite network with global coverage. Every 10 minutes, the vehicle surfaces and transmits 340-byte messages containing GPS coordinates and status. This ensures vehicle recovery even kilometers from the mothership.
 
@@ -466,15 +421,13 @@
   \textbf{Result:} Acoustic communication feasible at 500m range with excellent margin
 
   \note{
-    This link budget calculation demonstrates that underwater acoustic communication is technically feasible, though we omit it for cost reasons.
+    This link budget calculation demonstrates that underwater acoustic communication is technically feasible
 
     Transmission loss has two components: spreading loss at 20 log R from geometric spreading, and absorption loss alpha times R. At 25 kilohertz, seawater absorption is approximately 3 decibels per kilometer, giving 1.5 decibels absorption at 500 meters.
 
     The calculation: EvoLogics modem source level is 180 decibels re 1 micropascal at 1 meter. After 500 meters, transmission loss is 55.5 decibels. Array gain adds 10 decibels. Received signal level is 134.5 decibels.
 
     Ocean ambient noise at sea state 3 is 60 decibels. Required signal-to-noise ratio for reliable communication is 10 decibels, meaning minimum received level of 70 decibels. The link margin is 64.5 decibels, sufficient to handle multipath interference and unexpected losses.
-
-    Acoustic communication is feasible at 500 meter range with good performance margin. However, the 12,000 dollar cost is not justified for autonomous missions with periodic surfacing.
   }
 \end{frame}
 
