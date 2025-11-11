@@ -334,31 +334,24 @@
 
   \vspace{0.5em}
 
-  \textbf{Result:} → Minimise communication — majority of data stored on the vehicle, only allowing small and simple commands to be communicated.
+  \textbf{Result:} Minimise communication — majority of data stored on the vehicle, only allowing small and simple commands to be communicated.
 \end{frame}
 
-\begin{frame}{Navigation System: Actual Products}
-  \textbf{Core Navigation Components:}
+
+\begin{frame}{Navigation System}
 
   \begin{table}
-    \footnotesize
-    \begin{tabular}{llll}
+    \begin{tabular}{lll}
       \toprule
-      \textbf{Component}         & \textbf{Product}        & \textbf{Key Specs}                  & \textbf{Cost}  \\
+      \textbf{Component}         & \textbf{Product}        & \textbf{Cost} \\
       \midrule
-      \textbf{Flight Controller} & \textbf{Navigator (BR)} & ICM-42688-P + ICM-20602 dual IMU    & \textbf{\$125} \\
-                                 &                         & STM32H743, ArduSub firmware         &                \\
-                                 &                         & 16 PWM outputs, I2C/UART/SPI        &                \\
+      \textbf{Flight Controller} & Blue Robotics Navigator & \$125         \\
       \midrule
-      \textbf{Depth Sensor}      & \textbf{Bar30 (BR)}     & MS5837-30BA pressure sensor         & \textbf{\$68}  \\
-                                 &                         & 0-30 bar (0-300m depth)             &                \\
-                                 &                         & 2 mbar resolution ($\pm$2 cm depth) &                \\
+      \textbf{Depth Sensor}      & Blue Robotics Bar30     & \$68          \\
       \midrule
-      \textbf{Surface GPS}       & u-blox NEO-M8N          & 2.5m CEP accuracy                   & \textbf{\$35}  \\
-                                 &                         & 72-channel, 10 Hz update            &                \\
+      \textbf{Surface GPS}       & u-blox NEO-M8N          & \$35          \\
       \midrule
-      \textbf{Computer}          & Raspberry Pi 4 (4GB)    & Quad-core ARM, Linux                & \textbf{\$75}  \\
-                                 &                         & ArduSub + MAVLink                   &                \\
+      \textbf{Computer}          & Raspberry Pi 4 (4GB)    & \$75          \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -366,38 +359,34 @@
   \vspace{0.5em}
 
   \textbf{Navigation Strategy:}
-  \begin{itemize}
-    \item \textbf{Baseline:} IMU dead reckoning + depth + compass (5-15m drift/2hrs)
-    \item \textbf{Enhanced:} + Cable visual tracking (reduces drift to $<$5m)
-    \item \textbf{Premium (+\$20K):} Nortek DVL1000 (0.2 cm/s, $<$1m error/2hrs)
-  \end{itemize}
+  IMU dead reckoning + depth + compass (5-15m drift/2hrs)
 
   \note{
-    The Navigator flight controller uses dual IMUs (ICM-42688-P and ICM-20602) for redundancy and sensor fusion. Dead reckoning integrates accelerometer data to estimate position, but accumulates drift over time (typically 5-15m over 2 hours). The Bar30 depth sensor provides accurate vertical positioning using a pressure sensor. For cable inspection missions, visual tracking of the cable provides an external reference that significantly reduces horizontal drift. The premium DVL (Doppler Velocity Log) option bounces acoustic pulses off the seafloor to measure velocity with 0.2 cm/s accuracy, virtually eliminating drift.
+    The Navigator flight controller uses dual IMUs (ICM-42688-P and ICM-20602) for redundancy and sensor fusion. Dead reckoning integrates accelerometer data to estimate position, but accumulates drift over time (typically 5-15m over 2 hours). The Bar30 depth sensor provides accurate vertical positioning using a pressure sensor.
   }
 \end{frame}
 
-\begin{frame}{Communications Systems: Actual Products}
+\begin{frame}{Communications Systems}
   \textbf{Multi-Mode Communication Strategy:}
 
   \begin{table}
     \footnotesize
     \begin{tabular}{llll}
       \toprule
-      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}        & \textbf{Cost}       \\
+      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}      & \textbf{Cost}       \\
       \midrule
-      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps            & \textbf{\$50}       \\
-                            & (Raspberry Pi built-in)  & 50-100m range in air           &                     \\
-                            &                          & Video download, mission upload &                     \\
+      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps          & \textbf{\$50}       \\
+                            & (Raspberry Pi built-in)  & 50-100m range in air         &                     \\
+
       \midrule
-      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data       & \textbf{\$260}      \\
-                            &                          & 340 byte messages              &                     \\
-                            &                          & Global coverage (open ocean)   &                     \\
-                            &                          & GPS position reporting         &                     \\
+      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data     & \textbf{\$260}      \\
+                            &                          & 340 byte messages            &                     \\
+                            &                          & Global coverage (open ocean) &                     \\
+                            &                          & GPS position reporting       &                     \\
       \midrule
-      \textbf{Acoustic}     & \textbf{EvoLogics S2C M} & 18-34 kHz, 2 km range          & \textbf{\$12K}      \\
-      \textit{(Optional)}   & \textit{18/34}           & 13.9 kbps (in water)           & \textit{(Optional)} \\
-                            &                          & 500m operational depth         &                     \\
+      \textbf{Acoustic}     & \textbf{EvoLogics S2C M} & 18-34 kHz, 2 km range        & \textbf{\$12K}      \\
+      \textit{(Optional)}   & \textit{18/34}           & 13.9 kbps (in water)         & \textit{(Optional)} \\
+                            &                          & 500m operational depth       &                     \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -433,7 +422,7 @@
     \item Received level: $180 - 55.5 + 10 = 134.5$ dB
     \item Noise level: 60 dB (sea state 3)
     \item Required SNR: 10 dB
-    \item \textbf{Link margin: $134.5 - 60 - 10 = 64.5$ dB} $\checkmark$
+    \item Link margin: $134.5 - 60 - 10 = 64.5$ dB - \textbf{Feasible}
   \end{itemize}
 
   \vspace{0.5em}
@@ -447,9 +436,9 @@
 \begin{frame}{Hydrodynamic Drag - The Physics}
   \textbf{Vehicle Geometry (Torpedo Hull):}
   \begin{itemize}
-    \item Diameter: $D = 0.324$ m, Length: $L \approx 1.2$ m (L/D = 3.7)
+    \item Diameter: $D \approx 0.3$ m, Length: $L \approx 1.2$ m
     \item Frontal area: $A = \frac{\pi D^2}{4} = 0.0824$ m$^2$
-    \item Drag coefficient: $C_D = 0.28$-$0.32$ (optimized to standard torpedo hull)
+    \item Drag coefficient: $C_D = 0.28$-$0.32$
   \end{itemize}
 
   \vspace{0.5em}
