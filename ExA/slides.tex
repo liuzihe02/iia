@@ -773,9 +773,8 @@
       Payload               & 0.96               & 3,320              & Ping360 (\$2,750) + camera + light \\
       Communications        & 0.12               & 410                & WiFi + Iridium                     \\
       Structure             & 5.50               & 1,280              & Frame, foam, fairings, penetrators \\
-      Assembly \& Tools     & —                  & 200                & Testing equipment                  \\
       \midrule
-      \textbf{Total}        & \textbf{15.67 kg}  & \textbf{\$10,840}  &                                    \\
+      \textbf{Total}        & \textbf{15.67 kg}  & \textbf{\$10640}   &                                    \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -784,22 +783,22 @@
 
   \begin{itemize}
     \item \textbf{Mass:} 15.67 kg total, providing a 37\% margin under the 25 kg limit.
-    \item \textbf{Cost:} \$10,840 base build, much cheaper
+    \item \textbf{Cost:} \$10640 base build, much cheaper
     \item \textbf{Key Drivers:} Power/Structure are largest mass contributors; Payload (Ping360) is the largest cost.
   \end{itemize}
 
   % Combined speaker notes, preserving the full depth from both original slides
   \note{
     \textbf{(Mass Details)}
-    The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. The largest contributors are the structure (35 percent including frame, syntactic foam for buoyancy, and streamlined fairings) and power system (29 percent for three 18Ah batteries). This substantial margin allows for future additions like a DVL (approximately 3 kg) or acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
+    The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. The largest contributors are the structure and power system . This substantial margin allows for future additions like the acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
 
     \textbf{(Cost Details)}
-    The estimated build cost of 10,840 dollars represents 20-25 percent of comparable commercial AUV systems (50-150K range). The Ping360 sonar is the single most expensive component at 2,750 dollars. Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes COTS components to minimize cost while maintaining technical performance.
+    The estimated build cost of 10640 dollars represents 20-25 percent of comparable commercial AUV systems (50-150K range). The Ping360 sonar is the single most expensive component at 2,750 dollars. Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes core components to minimize cost while maintaining technical performance.
   }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Feasibility Assessment and Conclusions}
+\section{Conclusions}
 
 \begin{frame}{Requirements Verification}
   \begin{table}
@@ -824,13 +823,12 @@
   \note{
     All requirements have been met. Mass is 15.7 kilograms, 37 percent under the 25 kilogram limit. Endurance is 2.5 hours with 80/20 mission profile, exceeding 2 hour requirement. Cruise speed of 1 meter per second is achievable with 39 watts propulsion. Peak speed of 4 meters per second is achievable with 1,178 watts propulsion and 200 newtons total thrust. Payload power is 30 watts total for camera, sonar, and lighting.
 
-    The key enabler is the mission profile approach: 80 percent time at 1 meter per second cruise, 20 percent at 4 meters per second sprint. Sustained 4 meters per second operation would require 2,450 watt-hours for 2 hours, exceeding weight constraints. The mixed profile reduces average power to 314 watts, making the design feasible.
+    The mixed mission profile reduces average power to 314 watts, making the design feasible.
   }
 \end{frame}
 
-\begin{frame}{Conclusions}
+\begin{frame}{Design Conclusions}
 
-  \textbf{Critical Engineering Insights:}
   \begin{enumerate}
     \item \textbf{Power scales as $v^3$:} 4 m/s requires 30× more power than 1 m/s
     \item \textbf{Mission profile approach:} Mixed speed profile (80\% cruise) enables 2-hour endurance
@@ -844,7 +842,7 @@
     \begin{column}{0.48\textwidth}
       \textbf{Strengths:}
       \begin{itemize}
-        \item COTS components (proven)
+        \item COTS components
         \item 37\% mass margin
         \item 25\% endurance margin
         \item Modular design
@@ -854,30 +852,26 @@
     \begin{column}{0.48\textwidth}
       \textbf{Constraints:}
       \begin{itemize}
-        \item 23\% thrust margin
         \item Low-drag hull required
         \item IMU drift without DVL
-        \item Acoustic comms \$12K
       \end{itemize}
     \end{column}
   \end{columns}
 
   \note{
-    The fundamental physics constraint is that power scales with velocity cubed. Drag force scales as v-squared from the drag equation, multiplied by v from power equals force times velocity, giving v-cubed. Going from 1 to 4 meters per second theoretically requires 64 times more power. Thruster efficiency variations reduce this to 30 times in practice.
+    The fundamental constraint is that power scales with velocity cubed. Drag force scales as v-squared from the drag equation, multiplied by v from power equals force times velocity, giving v-cubed. Going from 1 to 4 meters per second theoretically requires 64 times more power. Thruster efficiency variations reduce this to 30 times in practice.
 
-    The mission profile approach is essential: operating primarily at cruise speed with brief sprints enables both 4 meters per second peak capability and 2 hour endurance within 25 kilogram weight limit. Sustained high speed is thermodynamically incompatible with the weight constraint.
+    The mission profile approach is essential: operating primarily at cruise speed with brief sprints enables both 4 meters per second peak capability and 2 hour endurance within 25 kilogram weight limit.
 
     Hydrodynamic optimization is critical. Low drag coefficient of 0.28 to 0.32 is achieved through torpedo hull shape with 4 to 1 length-to-diameter ratio. Higher drag would require more thrust, more power, heavier batteries.
 
-    Component selection focused on cost-effectiveness. T200 thrusters provide 0.38 newtons per dollar thrust-to-cost ratio, 6 to 20 times better than alternatives. COTS components from Blue Robotics ecosystem reduce integration risk and cost.
+    Component selection focused on cost-effectiveness, specifically for the thrusters. Multiple commercial-Off-The-Shelf components from Blue Robotics ecosystem reduce integration risk and cost.
 
-    The design is technically feasible with 23 percent thrust margin, 37 percent mass margin, and 25 percent endurance margin. Main constraint is the tight thrust margin - variation in drag coefficient from hull imperfections could eliminate margin.
+    Strengths: COTS components are proven in thousands of deployments, with established supply chains and documented reliability. The 37 percent mass margin enables future additions like the acoustic modem at 1.5 kilograms. The 25 percent endurance margin provides operational flexibility for longer missions or unexpected delays. Modular design allows independent subsystem testing, easier maintenance, and component upgrades without full system rebuild.
+
+    Constraints: The low-drag hull requirement is non-negotiable. If drag coefficient increases from 0.30 to 0.40, drag force at 4 meters per second increases from 162 to 216 newtons, requiring 270 newtons total thrust. Current four T200 configuration provides only 200 newtons, insufficient. IMU dead reckoning accumulates significant drift over 2 hours. Without (DVL) Doppler Velocity Logger providing velocity measurements, horizontal position uncertainty grows, requiring periodic surface GPS fixes for position correction.
   }
 \end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% BACKUP SLIDES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
 \setbeamertemplate{navigation symbols}{}  % Hide navigation for backup
