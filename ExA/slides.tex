@@ -362,7 +362,13 @@
   IMU dead reckoning + depth + compass (5-15m drift/2hrs)
 
   \note{
-    The Navigator flight controller uses dual IMUs (ICM-42688-P and ICM-20602) for redundancy and sensor fusion. Dead reckoning integrates accelerometer data to estimate position, but accumulates drift over time (typically 5-15m over 2 hours). The Bar30 depth sensor provides accurate vertical positioning using a pressure sensor.
+    The Navigator flight controller contains dual IMUs - the ICM-42688-P and ICM-20602. Dual IMUs provide redundancy and enable sensor fusion, which reduces noise and compensates for drift in individual sensors.
+
+    The Bar30 depth sensor provides 2 millimeter resolution by measuring pressure. At 250 meters depth, pressure is 25 bar. This gives accurate vertical positioning.
+
+    For horizontal positioning, GPS signals cannot penetrate seawater. The system uses dead reckoning - integrating accelerometer measurements to estimate position. Small measurement errors accumulate over time, resulting in 5 to 15 meters of horizontal drift over the 2-hour mission.
+
+    A DVL would reduce this drift to under 1 meter, but costs 5,000 to 20,000 dollars. For cable inspection, the cable itself provides a visual reference for following, so precise dead reckoning is less critical. We omit the DVL to reduce cost and weight.
   }
 \end{frame}
 
@@ -397,7 +403,13 @@
   \end{itemize}
 
   \note{
-    WiFi provides high-bandwidth communication when surfaced, enabling video download and mission updates. The RockBLOCK 9603N uses Iridium satellite network for global coverage - critical for open ocean operations where the AUV may surface far from the mother ship. It can transmit GPS coordinates and status messages (340 bytes).
+    The communication system costs 310 dollars total: 50 dollars for WiFi and 260 dollars for RockBLOCK Iridium modem. This is 40 times cheaper than underwater acoustic modems at 12,000 to 15,000 dollars.
+
+    At the surface within 50 to 100 meters of the mothership, WiFi provides 150 megabits per second bandwidth for downloading video and sensor data. The vehicle also acquires GPS fixes to reset navigation drift.
+
+    For open ocean operations beyond visual range, the RockBLOCK uses the Iridium satellite network with global coverage. Every 10 minutes, the vehicle surfaces and transmits 340-byte messages containing GPS coordinates and status. This ensures vehicle recovery even kilometers from the mothership.
+
+    The autonomous mission profile eliminates the need for real-time underwater communication. The vehicle follows pre-programmed waypoints, stores all sensor data onboard, and downloads it during surface intervals.
   }
 \end{frame}
 
@@ -424,6 +436,18 @@
   \vspace{0.5em}
 
   \textbf{Result:} Acoustic communication feasible at 500m range with excellent margin
+
+  \note{
+    This link budget calculation demonstrates that underwater acoustic communication is technically feasible, though we omit it for cost reasons.
+
+    Transmission loss has two components: spreading loss at 20 log R from geometric spreading, and absorption loss alpha times R. At 25 kilohertz, seawater absorption is approximately 3 decibels per kilometer, giving 1.5 decibels absorption at 500 meters.
+
+    The calculation: EvoLogics modem source level is 180 decibels re 1 micropascal at 1 meter. After 500 meters, transmission loss is 55.5 decibels. Array gain adds 10 decibels. Received signal level is 134.5 decibels.
+
+    Ocean ambient noise at sea state 3 is 60 decibels. Required signal-to-noise ratio for reliable communication is 10 decibels, meaning minimum received level of 70 decibels. The link margin is 64.5 decibels, sufficient to handle multipath interference and unexpected losses.
+
+    Acoustic communication is feasible at 500 meter range with good performance margin. However, the 12,000 dollar cost is not justified for autonomous missions with periodic surfacing.
+  }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -451,7 +475,15 @@
     \item \textbf{At 4 m/s peak} $C_D = 0.28$: $F_D = 162$ N
   \end{itemize}
 
-  \note{The drag force is calculated using the standard hydrodynamic equation. We assume a torpedo-shaped hull with length 1.2m and diameter 0.3m (based on Blue Robotics 3" housing with streamlined cowling), giving a streamlined L/D ratio of 4:1. The frontal area is 0.0707 m² from the circular cross-section. Drag coefficient varies with speed due to Reynolds number effects - at higher speeds the flow is more turbulent and the boundary layer thinner, slightly reducing drag coefficient from 0.32 to 0.28. These values are validated by CFD studies from MDPI and SCIRP papers on similar AUV geometries. At 1 m/s, drag is 11.6 N, but at 4 m/s it increases to 162 N due to the quadratic relationship with velocity. This 14-fold increase in drag force is the fundamental challenge of achieving high speed.}
+  \note{
+    Hydrodynamic drag is the fundamental constraint on our design. The drag equation F-D equals one-half rho v-squared C-D A shows that drag force scales with velocity squared. Doubling speed quadruples drag force.
+
+    Vehicle geometry is torpedo-shaped: 1.2 meters long, 0.3 meters diameter. The length-to-diameter ratio of 4 to 1 optimizes streamlining. Frontal area is 0.071 square meters.
+
+    Drag coefficient C-D varies from 0.28 to 0.32 with speed. At low speeds, flow separation and turbulence near protrusions increases C-D to 0.32. At high speeds, Reynolds number increases, boundary layer becomes thinner, and C-D drops to 0.28. These values are validated against CFD studies on similar torpedo-shaped AUVs.
+
+    At 1 meter per second, drag is 11.6 newtons. At 4 meters per second, drag is 162 newtons - a 14-fold increase for 4-times speed increase. This quadratic relationship creates the fundamental challenge: high speed requires overcoming dramatically higher drag forces.
+  }
 \end{frame}
 
 \begin{frame}{Power Requirements and Thruster Efficiency}
@@ -476,7 +508,17 @@
 
   \textit{4 m/s requires 1.2 kW propulsion power (30× cruise power)}
 
-  \note{The mechanical power required is simply force times velocity (P = F × v). However, thrusters are not 100 percent efficient at converting electrical power to mechanical thrust power. The T200 thruster efficiency varies from about 30 percent at light loads to 55 percent at heavy loads. At 1 m/s cruise with only 11.6W mechanical power needed, the thruster operates inefficiently at 30 percent, requiring 39W electrical. At 4 m/s peak with 648W mechanical power, the thruster operates more efficiently at 55 percent, requiring 1,178W electrical. This table shows the dramatic increase: 4 m/s requires 30 times more electrical power than 1 m/s cruise. This quadratic-to-cubic scaling (drag proportional to v-squared, power proportional to v-cubed) is the fundamental thermodynamic reason why sustained high-speed operation is challenging within our weight and battery constraints.}
+  \note{
+    Power scales with velocity cubed because power equals force times velocity. Drag force has v-squared, multiplied by another v from the power equation gives v-cubed scaling.
+
+    Thruster efficiency varies with load. At 1 meter per second, mechanical power required is 11.6 watts, but thruster efficiency at light load is only 30 percent, requiring 39 watts electrical.
+
+    At 4 meters per second, mechanical power is 648 watts - 56 times cruise. At heavy load, thruster efficiency increases to 55 percent, so electrical power is 1,178 watts.
+
+    The critical number: 1,178 watts propulsion at peak versus 39 watts at cruise. This is 30 times more power for 4 times speed. Pure v-cubed scaling would give 64 times, but efficiency improvement at high load reduces this to 30 times.
+
+    This cubic scaling makes sustained high-speed underwater operation challenging. The constraint is battery energy, which translates directly to weight. Battery energy requirements conflict with the 25 kilogram mass limit.
+  }
 \end{frame}
 \begin{frame}{Thruster Selection - T200}
   \begin{table}
@@ -525,7 +567,13 @@
     \end{column}
   \end{columns}
 
-  \note{We compared four thruster options. The SeaBotix BTD150 has good efficiency but insufficient thrust (28N vs 50N for T200). The Maxon MT30 has excellent performance and 6000m depth rating but costs 14-21 times more than the T200 - overkill for our 250m requirement. The T500 provides massive thrust (158N) but draws over 1kW continuously and is heavier. The T200 offers the best thrust-to-cost ratio at 0.36-0.42 N per dollar. Four T200 thrusters provide 200N total thrust for 162N required - 23 percent safety margin which is comfortable. This allows for some variation in drag coefficient from hull imperfections. The flooded brushless motor design is naturally pressure-tolerant, proven to 3000m at Woods Hole testing.}
+  \note{
+    Four thruster options were evaluated. SeaBotix BTD150 has good efficiency but insufficient thrust: 28 newtons versus 50 newtons for T200. Maxon MT30 has 6000 meter depth rating and costs 14 to 21 times more than T200 - unnecessary for 250 meter requirement. T500 provides 158 newtons thrust but draws over 1 kilowatt continuously and weighs 1.1 kilograms.
+
+    T200 offers best thrust-to-cost ratio at 0.38 newtons per dollar. Four T200 thrusters provide 200 newtons total thrust for 162 newtons required - 23 percent safety margin. This margin accommodates variation in drag coefficient from hull imperfections.
+
+    The T200 uses flooded brushless motor design, which is naturally pressure-tolerant with no sealed air cavities. Tested to 3000 meters at Woods Hole, exceeding the 300 meter official rating and our 250 meter requirement.
+  }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -554,7 +602,13 @@
   \centering
   $P_{avg} = 314 \text{ W}$ (Accounting for mission profile)
 
-  \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,225W total, of which 1,178W is propulsion). The mission profile assumes 80 percent of time at cruise, 20 percent at peak for sprints. This gives an average power of 314W which determines our battery requirements.}
+  \note{
+    The 30 watt payload specification is a combined budget for all payload components: camera at 2.5 watts, sonar at 2 to 5 watts, and lighting at 10 to 20 watts adjustable. Total payload is 15 to 28 watts, within the 30 watt limit.
+
+    Propulsion dominates total power at peak speed: 1,225 watts total system power, with 1,178 watts for propulsion alone. At cruise, propulsion is only 39 watts out of 86 watts total.
+
+    The mission profile assumes 80 percent time at 1 meter per second cruise, 20 percent at 4 meters per second sprint. This gives average power of 314 watts: 0.8 times 86 plus 0.2 times 1,225. This average power determines battery capacity requirements.
+  }
 \end{frame}
 
 \begin{frame}{Battery Sizing}
@@ -598,7 +652,15 @@
     \end{column}
   \end{columns}
 
-  \note{The energy requirement is calculated from our mixed mission profile power of 314W times 2 hours, giving 628 Wh minimum. We compared four options: Two Blue Robotics 18Ah batteries give only 532 Wh which is insufficient for our 628 Wh requirement. Custom Samsung 35E pack (4S6P configuration, 24 cells) provides 311 Wh at lower cost but requires DIY assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000m depth rating but costs 2.5 to 8 times more. Three Blue Robotics 18Ah batteries provide 799 Wh (27 percent margin), enabling 2.5 hour missions at average power. This is the proven BlueROV2 platform configuration with integrated BMS. The depth rating depends on our aluminum enclosure design, not the batteries themselves.}
+  \note{
+    Energy requirement is 314 watts times 2 hours equals 628 watt-hours minimum.
+
+    Four battery options were evaluated. Two Blue Robotics 18Ah batteries provide only 532 watt-hours, insufficient for 628 watt-hour requirement. Custom Samsung 35E pack in 4S6P configuration with 24 cells provides 311 watt-hours at lower cost, but requires assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000 meter depth rating but costs 2.5 to 8 times more.
+
+    Three Blue Robotics 18Ah batteries provide 799 watt-hours - 27 percent margin over requirement. This enables 2.5 hour missions at 314 watts average power. This configuration is proven in the BlueROV2 platform with integrated battery management system.
+
+    Battery depth rating depends on the aluminum pressure enclosure design, not the battery cells themselves.
+  }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -643,6 +705,14 @@
       \end{itemize}
     \end{column}
   \end{columns}
+
+  \note{
+    Three materials were compared for pressure housing. Aluminum 6061-T6 has yield strength of 276 megapascals and density of 2,700 kilograms per cubic meter. Titanium Grade 5 has 880 megapascals yield strength but costs 30 dollars per kilogram versus 7 dollars for aluminum. Titanium is unnecessary for 250 meter depth - its advantage only matters beyond 1000 meters. Acrylic has only 70 to 75 megapascals yield strength, insufficient for 250 meter external pressure.
+
+    Blue Robotics 3 inch aluminum enclosures were selected. Internal diameter is 74.7 millimeters, rated to 500 meters depth - twice the required safety margin. Hard anodizing provides corrosion resistance. Double O-ring seals ensure watertight integrity. Available lengths from 150 to 400 millimeters enable modular layout.
+
+    WetLink penetrators provide cable entry at 12 to 17 dollars per unit, rated to 1000 meters. These are tool-free, reusable, and significantly cheaper than traditional potted penetrators. Complete enclosures cost 200 to 300 dollars. Thousands deployed in BlueROV2 fleet validate reliability.
+  }
 \end{frame}
 
 \begin{frame}{Pressure Vessel Design - Theory}
@@ -672,7 +742,15 @@
 
   $$\boxed{t = \frac{P \cdot R}{S \cdot E - 0.6P} + C_A}$$
 
-  \note{This derivation shows how the ASME formula builds on basic thin-walled cylinder theory. The fundamental relationship is that hoop stress equals PR/t, which comes from force balance on a cylinder element. The ASME code refines this with the 0.6P biaxial stress correction (accounting for both circumferential and longitudinal stresses) and the corrosion allowance for long-term durability in marine environments.}
+  \note{
+    Pressure vessel design starts from thin-walled cylinder theory. Hoop stress equals P R over t from force balance on a cylinder element. This stress must not exceed allowable stress S times weld efficiency E.
+
+    Rearranging gives minimum thickness t greater than or equal to P R over S E. This is the basic thin-wall formula.
+
+    ASME Section VIII adds two refinements. First, the 0.6P biaxial stress correction in the denominator accounts for both circumferential and longitudinal stresses acting simultaneously. Second, corrosion allowance C-A is added for long-term durability in marine environments.
+
+    The final formula is t equals P R over S E minus 0.6P, plus C-A. This is the standard for pressure vessel design under external pressure.
+  }
 \end{frame}
 
 
@@ -703,6 +781,16 @@
 
   \centering
   \colorbox{green!20}{Blue Robotics 3" tubes has thickness of 6.35 mm \textbf{(Feasible)}}
+
+  \note{
+    Operating pressure at 250 meters is rho g h equals 2.52 megapascals or 25.2 bar. With safety factor of 3, design pressure is 7.56 megapascals.
+
+    Applying ASME Section VIII formula: P is 7.56 megapascals, R is 50 millimeters for 3 inch tube internal radius. Allowable stress S for aluminum 6061-T6 is yield strength divided by 3, giving 92 megapascals. Weld efficiency E is 1.0 for seamless tube. Corrosion allowance C-A is 2 millimeters for marine environment.
+
+    Calculation gives t equals 7.56 times 50, over 92 times 1.0 minus 0.6 times 7.56, plus 2. This equals 378 divided by 87.5, plus 2, giving 4.3 plus 2 equals 6.3 millimeters minimum thickness.
+
+    Blue Robotics 3 inch tubes have 6.35 millimeter wall thickness - essentially identical to calculated requirement. This validates the pressure housing design for 250 meter operation with appropriate safety margins.
+  }
 \end{frame}
 
 
@@ -723,6 +811,15 @@
     \item Electronics: Neutral (in watertight housings)
   \end{itemize}
 
+  \note{
+    Neutral buoyancy requires displaced volume equal to mass divided by seawater density. For dry mass of 15.4 kilograms, required displaced volume is 15.4 divided by 1027, equals 0.015 cubic meters or 15 liters.
+
+    Component contributions: Three 3 inch aluminum tubes displace approximately 4 liters as watertight volumes. Batteries inside housings occupy approximately 2 liters. Electronics in watertight housings are approximately neutral buoyancy.
+
+    Thrusters have negative buoyancy: each T200 is 0.24 kilograms negative in water, giving 0.96 kilograms total for four thrusters. This must be compensated with syntactic foam providing positive buoyancy.
+
+    Final buoyancy adjustment uses lead weights for fine trim, positioning center of gravity below center of buoyancy to ensure passive stability in roll and pitch.
+  }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -791,6 +888,11 @@
 
   \vspace{1em}
 
+  \note{
+    All requirements have been met. Mass is 15.7 kilograms, 37 percent under the 25 kilogram limit. Endurance is 2.5 hours with 80/20 mission profile, exceeding 2 hour requirement. Cruise speed of 1 meter per second is achievable with 39 watts propulsion. Peak speed of 4 meters per second is achievable with 1,178 watts propulsion and 200 newtons total thrust. Payload power is 30 watts total for camera, sonar, and lighting.
+
+    The key enabler is the mission profile approach: 80 percent time at 1 meter per second cruise, 20 percent at 4 meters per second sprint. Sustained 4 meters per second operation would require 2,450 watt-hours for 2 hours, exceeding weight constraints. The mixed profile reduces average power to 314 watts, making the design feasible.
+  }
 \end{frame}
 
 \begin{frame}{Conclusions}
@@ -828,7 +930,15 @@
   \end{columns}
 
   \note{
-    The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 30× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a $<$25 kg weight constraint. The design is technically feasible with 23 percent thrust margin allowing for some variation in drag coefficient from hull design.
+    The fundamental physics constraint is that power scales with velocity cubed. Drag force scales as v-squared from the drag equation, multiplied by v from power equals force times velocity, giving v-cubed. Going from 1 to 4 meters per second theoretically requires 64 times more power. Thruster efficiency variations reduce this to 30 times in practice.
+
+    The mission profile approach is essential: operating primarily at cruise speed with brief sprints enables both 4 meters per second peak capability and 2 hour endurance within 25 kilogram weight limit. Sustained high speed is thermodynamically incompatible with the weight constraint.
+
+    Hydrodynamic optimization is critical. Low drag coefficient of 0.28 to 0.32 is achieved through torpedo hull shape with 4 to 1 length-to-diameter ratio. Higher drag would require more thrust, more power, heavier batteries.
+
+    Component selection focused on cost-effectiveness. T200 thrusters provide 0.38 newtons per dollar thrust-to-cost ratio, 6 to 20 times better than alternatives. COTS components from Blue Robotics ecosystem reduce integration risk and cost.
+
+    The design is technically feasible with 23 percent thrust margin, 37 percent mass margin, and 25 percent endurance margin. Main constraint is the tight thrust margin - variation in drag coefficient from hull imperfections could eliminate margin.
   }
 \end{frame}
 
@@ -839,5 +949,263 @@
 \appendix
 \setbeamertemplate{navigation symbols}{}  % Hide navigation for backup
 \setbeamertemplate{footline}{}  % Optionally hide footline for backup
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX: COMPONENT DATASHEETS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Appendix: Core Component Datasheets}
+  \centering
+  \Large Component Specifications
+
+  \vspace{1em}
+  \normalsize
+  \begin{itemize}
+    \item Blue Robotics T200 Thruster
+    \item Blue Robotics Navigator Flight Controller
+    \item Blue Robotics Bar30 Depth Sensor
+    \item Blue Robotics 18Ah Lithium-ion Battery
+    \item RockBLOCK 9603N Iridium Modem
+    \item Blue Robotics Ping360 Sonar
+    \item Blue Robotics 3" Watertight Enclosure
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{T200 Thruster Specifications}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Performance:}
+      \begin{itemize}
+        \item Max thrust (fwd): 5.1 kgf (50 N) @ 16V
+        \item Max thrust (rev): 4.1 kgf (40 N) @ 16V
+        \item Voltage range: 6-20V (12-16V nominal)
+        \item Max current: 25A
+        \item Max power: 350W
+        \item Efficiency: ~55\% @ high load
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Physical:}
+      \begin{itemize}
+        \item Depth rating: 300m (tested 3000m)
+        \item Dimensions: 113mm L × 100mm dia.
+        \item Mass: 344g (air), 156g (water)
+        \item Propeller: 76mm diameter, CW/CCW
+        \item Motor: Flooded brushless DC
+        \item Materials: PC body, 316 SS fasteners
+        \item Cost: \$119-139
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \tiny Source: Blue Robotics T200 Datasheet, bluerobotics.com
+\end{frame}
+
+\begin{frame}{Navigator Flight Controller Specifications}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Sensors:}
+      \begin{itemize}
+        \item IMU 1: ICM-20602 (6-axis)
+        \item IMU 2: ICM-42688-P (high precision)
+        \item Magnetometer: 2× BMM150 (dual)
+        \item Barometer: BMP388
+        \item Gyro noise: 2.8 mdps/Hz (ICM-42688-P)
+        \item Accel noise: 70 µg/Hz
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{I/O \& Integration:}
+      \begin{itemize}
+        \item PWM outputs: 16 channels
+        \item Serial ports: 4× UART
+        \item I2C ports: 2×
+        \item ADC: 2× 16-bit
+        \item Platform: Raspberry Pi 4 (direct mount)
+        \item Software: ArduSub, BlueOS
+        \item Power: 8-10W typical
+        \item Cost: \$125-181
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \tiny Source: Blue Robotics Navigator Datasheet, bluerobotics.com
+\end{frame}
+
+\begin{frame}{Bar30 Depth Sensor \& 18Ah Battery Specifications}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Bar30 Depth Sensor:}
+      \begin{itemize}
+        \item Sensor: MS5837-30BA
+        \item Pressure range: 0-30 bar (0-300m)
+        \item Resolution: 0.2 mbar (2mm depth)
+        \item Accuracy: ±200 mbar (±2m) @ 0-40°C
+        \item Interface: I2C, JST GH 4-pin
+        \item Power: <1mA @ 3.3V
+        \item Maintenance: Daily drying recommended
+        \item Cost: \$68-85
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{18Ah Lithium-ion Battery:}
+      \begin{itemize}
+        \item Voltage: 14.8V nominal (4S configuration)
+        \item Capacity: 18Ah (266 Wh)
+        \item Energy density: ~195 Wh/kg
+        \item Mass: ~1.35 kg per battery
+        \item Chemistry: Li-ion 18650 cells
+        \item BMS: Integrated, 30A continuous
+        \item Depth: Enclosure-dependent (300-500m)
+        \item Cost: \$357-400 each
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \tiny Sources: Blue Robotics Bar30 \& Battery Datasheets, bluerobotics.com
+\end{frame}
+
+\begin{frame}{RockBLOCK 9603N \& Ping360 Sonar Specifications}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{RockBLOCK 9603N Iridium Modem:}
+      \begin{itemize}
+        \item Network: Iridium Short Burst Data
+        \item Message size: 340B uplink, 270B downlink
+        \item Latency: 10-60s average
+        \item Coverage: Global (pole-to-pole)
+        \item Power: 0.8W avg, 6.5W peak transmit
+        \item Dimensions: 45×45×15.5mm, 45g
+        \item Cost: \$260 + \$15/month service
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Ping360 Scanning Sonar:}
+      \begin{itemize}
+        \item Configuration: Mechanical scanning, 360°
+        \item Frequency: 750 kHz
+        \item Range: 2-50m (adjustable)
+        \item Resolution: 400 points/scan, 1-2° angular
+        \item Update rate: 10-20 Hz (2-5s per 360°)
+        \item Power: 5W max, 2W typical
+        \item Depth rating: 300m
+        \item Interface: Serial UART
+        \item Cost: \$2,750
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \tiny Sources: RockBLOCK 9603N Datasheet (SparkFun); Ping360 Datasheet (Blue Robotics)
+\end{frame}
+
+\begin{frame}{3" Watertight Enclosure Specifications}
+  \textbf{Blue Robotics 3" Aluminum Watertight Enclosure:}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Physical:}
+      \begin{itemize}
+        \item Material: Aluminum 6061-T6
+        \item Surface: Type III hard anodized
+        \item Inner diameter: 74.7mm (2.94")
+        \item Outer diameter: ~89mm (3.5")
+        \item Wall thickness: 6.35mm (0.25")
+        \item Lengths: 150, 240, 300, 400mm
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Performance:}
+      \begin{itemize}
+        \item Depth rating: 500m (Gen 2)
+        \item Sealing: Double O-rings per flange
+        \item Penetrators: WetLink compatible
+        \item Test: Vacuum testable (10 inHg)
+        \item Proven: 1000s deployed (BlueROV2)
+        \item Cost: \$200-300 complete
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5em}
+  \textbf{WetLink Penetrators:} \$12-17 each, 1000m rated, tool-free installation
+
+  \vspace{0.5em}
+  \tiny Source: Blue Robotics Watertight Enclosures Catalog, bluerobotics.com
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REFERENCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{References}
+  \tiny
+  \textbf{Thrusters \& Propulsion:}
+  \begin{itemize}
+    \item T200 Thruster: \url{https://bluerobotics.com/store/thrusters/t100-t200-thrusters/t200-thruster-r2-rp/}
+    \item T200 Performance Data: \url{https://cad.bluerobotics.com/T200-Public-Performance-Data-10-20-V-September-2019.xlsx}
+    \item Basic ESC 30A: \url{https://bluerobotics.com/store/thrusters/speed-controllers/besc30-r3/}
+  \end{itemize}
+
+  \textbf{Power Systems:}
+  \begin{itemize}
+    \item Blue Robotics 18Ah Battery: \url{https://bluerobotics.com/store/comm-control-power/powersupplies-batteries/battery-li-4s-15-6ah/}
+    \item Samsung INR18650-35E Datasheet: \url{https://www.orbtronic.com/content/samsung-35e-datasheet-inr18650-35e.pdf}
+    \item SubCtech PowerPack: \url{https://subctech.com/ocean-power/subsea-batteries/}
+  \end{itemize}
+
+  \textbf{Navigation \& Control:}
+  \begin{itemize}
+    \item Navigator Flight Controller: \url{https://bluerobotics.com/store/comm-control-power/control/navigator/}
+    \item Bar30 Depth Sensor: \url{https://bluerobotics.com/store/sensors-cameras/sensors/bar30-sensor-r1/}
+    \item MS5837-30BA Sensor: \url{https://www.te.com/commerce/DocumentDelivery/DDEController?Action=showdoc&DocId=Data+Sheet\%7FMS5837-30BA\%7FB1\%7Fpdf}
+    \item VectorNav VN-100: \url{https://www.navtechgps.com/wp-content/uploads/VN100_ProductBrief_DS.pdf}
+    \item Nortek DVL1000-300m: \url{https://www.nortekgroup.com/products/dvl-1000-300m}
+    \item Water Linked DVL A50: \url{https://waterlinked.com/datasheets/dvl-a50}
+  \end{itemize}
+
+  \framebreak
+
+  \textbf{Communications:}
+  \begin{itemize}
+    \item RockBLOCK 9603N: \url{https://cdn.sparkfun.com/assets/4/d/2/1/1/DS_Iridium_9603_Datasheet_031720_2_.pdf}
+    \item RockBLOCK Developer Guide: \url{https://cdn.sparkfun.com/assets/6/d/4/c/a/RockBLOCK-9603-Developers-Guide_1.pdf}
+    \item EvoLogics S2C Acoustic Modems: \url{https://www.subsea2020.com/evologics}
+    \item LinkQuest UWM2000H: \url{https://www.oceanscan.net/p-LinkQuest-UWM2000H-Underwater-Modem}
+  \end{itemize}
+
+  \textbf{Imaging \& Sensors:}
+  \begin{itemize}
+    \item Low-Light HD Camera: \url{https://bluerobotics.com/store/sensors-cameras/cameras/cam-usb-low-light-r1/}
+    \item Ping360 Sonar: \url{https://bluerobotics.com/store/sonars/imaging-sonars/ping360-sonar-r1-rp/}
+    \item SubC Rayfin Micro: \url{https://www.outlandtech.com/product-page/subc-imaging-rayfin-micro-camera-500m}
+    \item Lumen Light: \url{https://bluerobotics.com/store/thrusters/lights/lumen-r2-rp/}
+  \end{itemize}
+
+  \textbf{Mechanical Components:}
+  \begin{itemize}
+    \item 3" Watertight Enclosures: \url{https://bluerobotics.com/store/watertight-enclosures/wte-vp/}
+    \item WetLink Penetrators: \url{https://bluerobotics.com/store/cables-connectors/penetrators/wlp-vp/}
+    \item Aluminum Tubes Design: \url{https://bluerobotics.com/new-products-aluminum-tubes/}
+  \end{itemize}
+
+  \framebreak
+
+  \textbf{Commercial AUV Platforms:}
+  \begin{itemize}
+    \item BlueROV2: \url{https://bluerobotics.com/store/rov/bluerov2/}
+    \item ecoSUB m-Power+: \url{https://www.ecosub.uk/ecosubm5---500-m-rated-small-auv.html}
+    \item ecoSUB Datasheet: \url{https://www.unmannedsystemstechnology.com/wp-content/uploads/2024/05/240305-ecoSUBm-P-datasheet.pdf}
+    \item L3Harris Iver3: \url{https://www.l3harris.com/sites/default/files/2022-11/ims-maritime-Iver3-Spec-Sheet.pdf}
+    \item Boxfish AUV: \url{https://www.boxfishrobotics.com/products/boxfish-auv/}
+  \end{itemize}
+
+  \textbf{Hydrodynamics \& Engineering:}
+  \begin{itemize}
+    \item MDPI - CFD Study Torpedo AUV: \url{https://www.mdpi.com/2311-5521/6/7/252}
+    \item SCIRP - AUV Drag Analysis: \url{https://www.scirp.org/html/2-2320148_49513.htm}
+    \item Pressure Vessel Design: \url{https://philipmcgaw.com/pressure-vessel/}
+    \item DOE - Powering the Blue Economy: \url{https://www.energy.gov/sites/prod/files/2019/03/f61/Chapter\%203.pdf}
+  \end{itemize}
+\end{frame}
 
 \end{document}
