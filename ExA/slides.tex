@@ -314,13 +314,9 @@
   \textbf{Result:} Minimise communication — majority of data stored on the vehicle, only allowing small and simple commands to be communicated.
 
   \note{
-    Radio frequency signals attenuate extremely rapidly in seawater due to conductivity. Skin depth at WiFi frequencies is less than 10 centimeters. Effective RF range underwater is only a few meters maximum, making it useless for cable inspection missions.
+    Radio signals attenuate within meters underwater due to conductivity. Optical communication requires line-of-sight and operates under 100 meters in clear water, much shorter in turbid conditions. Acoustic is the only long-range option with ranges exceeding several kilometers, but has severe limitations: 1-10 kilobit per second data rates, high latency, and costs 12,000 dollars versus 310 dollars for WiFi plus Iridium.
 
-    Optical communication uses laser or LED light transmission. Water absorbs and scatters light, with attenuation increasing significantly in turbid or murky conditions. Optical systems require direct line-of-sight and operate at ranges under 100 meters in clear water, much shorter in realistic ocean environments with sediment and particulates.
-
-    Acoustic communication is the only viable long-range option. Sound propagates well in water with ranges exceeding several kilometers. However, acoustic modems have severe limitations: data rates around 1 to 10 kilobits per second, latency of seconds due to slow sound speed, and interference from reflections off the surface and seafloor. Cost is also prohibitive - acoustic modems cost 12,000 dollars versus 310 dollars for WiFi plus Iridium satellite.
-
-    The design solution stores most sensor data onboard during the mission. High-resolution camera video and sonar scans are recorded to the Raspberry Pi storage. At the surface, WiFi provides high-bandwidth data transfer at 50 megabits per second. Iridium satellite enables position reporting and mission status updates when beyond WiFi range. This approach avoids expensive acoustic hardware while maintaining operational capability.
+    The design solution stores sensor data onboard during the mission. At the surface, WiFi provides high-bandwidth data transfer at 50 megabits per second. Iridium enables position reporting when beyond WiFi range. This avoids expensive acoustic hardware while maintaining operational capability.
   }
 \end{frame}
 
@@ -424,13 +420,7 @@
   \textbf{Result:} Acoustic communication feasible at 500m range with excellent margin
 
   \note{
-    This link budget calculation demonstrates that underwater acoustic communication is technically feasible
-
-    Transmission loss has two components: spreading loss at 20 log R from geometric spreading, and absorption loss alpha times R. At 25 kilohertz, seawater absorption is approximately 3 decibels per kilometer, giving 1.5 decibels absorption at 500 meters.
-
-    The calculation: EvoLogics modem source level is 180 decibels re 1 micropascal at 1 meter. After 500 meters, transmission loss is 55.5 decibels. Array gain adds 10 decibels. Received signal level is 134.5 decibels.
-
-    Ocean ambient noise at sea state 3 is 60 decibels. Required signal-to-noise ratio for reliable communication is 10 decibels, meaning minimum received level of 70 decibels. The link margin is 64.5 decibels, sufficient to handle multipath interference and unexpected losses.
+    Transmission loss has two components: spreading loss at 20 log R, and absorption loss alpha times R. At 500 meters, total loss is 55.5 decibels. Source level 180 dB plus array gain 10 dB gives received level 134.5 dB. With noise level 60 dB and required SNR 10 dB, link margin is 64.5 decibels - sufficient to handle multipath interference. However, we chose WiFi and Iridium instead due to cost - 12,000 dollars for acoustic versus 310 dollars.
   }
 \end{frame}
 
@@ -869,7 +859,7 @@
 
     Strengths: COTS components are proven in thousands of deployments, with established supply chains and documented reliability. The 37 percent mass margin enables future additions like the acoustic modem at 1.5 kilograms. The 25 percent endurance margin provides operational flexibility for longer missions or unexpected delays. Modular design allows independent subsystem testing, easier maintenance, and component upgrades without full system rebuild.
 
-    Constraints: The low-drag hull requirement is non-negotiable. If drag coefficient increases from 0.30 to 0.40, drag force at 4 meters per second increases from 162 to 216 newtons, requiring 270 newtons total thrust. Current four T200 configuration provides only 200 newtons, insufficient. IMU dead reckoning accumulates significant drift over 2 hours. Without (DVL) Doppler Velocity Logger providing velocity measurements, horizontal position uncertainty grows, requiring periodic surface GPS fixes for position correction.
+    Constraints: The low-drag hull is essential - higher drag would easily exceed available thrust. IMU dead reckoning accumulates drift over 2 hours, requiring periodic surface GPS fixes for position correction.
   }
 \end{frame}
 
