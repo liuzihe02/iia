@@ -6,6 +6,8 @@
 \usepackage{booktabs}
 \usepackage{color}
 \usepackage{xcolor}
+\usepackage{amssymb}      % For \checkmark
+\usepackage[utf8]{inputenc} % For ° and £ (or use \pounds)
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning, calc, fit, backgrounds}
 
@@ -109,9 +111,9 @@
 
   \vspace{0.5em}
   \centering
-  \colorbox{yellow!30}{\textbf{Solution: Free-roving autonomous AUV}}
+  \colorbox{yellow!30}{\textbf{Solution: Free-roving Autonomous Underwater Vehicle}}
 
-  \note{In shallow waters however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year. In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, could not use card payments, could not access online banking. Businesses lost thousands. Emergency services were disrupted. These are not rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would be able to identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable. Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintenance costs for dedicated vessels.}
+  \note{In shallow waters however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year. In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, could not use card payments, could not access online banking. Businesses lost thousands. Emergency services were disrupted. These are not rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable. Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintenance costs for dedicated vessels. Therefore we propose the use of an untethered AUV}
 \end{frame}
 
 
@@ -119,7 +121,7 @@
 \section{Requirements and Operating Environment}
 
 \begin{frame}{Requirements and Operating Environment}
-  \textit{``A free-roving (no umbilical cable) submarine inspection drone is required for undersea cables: operating down to 250 m depth. It should have an endurance of 2 hours continuously powered operation, carrying video and ultrasound imaging equipment drawing a 30 W electrical load, and have suitable propulsion to travel up to 4 m/s peak speed with 1 m/s cruise. Total mass is to be < 25 kg, to allow easy handling on board the mothership.''}
+  \textit{``A free-roving (no umbilical cable) submarine inspection drone is required for undersea cables: operating down to 250 m depth. It should have an endurance of 2 hours continuously powered operation, carrying video and ultrasound imaging equipment drawing a 30 W electrical load, and have suitable propulsion to travel up to 4 m/s peak speed with 1 m/s cruise. Total mass is to be $<$ 25 kg, to allow easy handling on board the mothership.''}
 
   \vspace{0.5em}
 
@@ -131,7 +133,7 @@
         \item Endurance: 2 hours continuous
         \item Speed: 1 m/s cruise, 4 m/s peak
         \item Payload: 30W (imaging + ultrasound + lighting)
-        \item Mass: <25 kg total
+        \item Mass: $<$ 25 kg total
       \end{itemize}
     \end{column}
 
@@ -160,7 +162,7 @@
       \toprule
       \textbf{Model}      & \textbf{Type} & \textbf{Mass} & \textbf{Depth} & \textbf{Speed} & \textbf{Endurance} & \textbf{Cost} \\
       \midrule
-      \textbf{Our Target} & AUV           & <25 kg        & 250m           & 4 m/s peak     & 2 hrs              & \$10-23K      \\
+      \textbf{Our Target} & AUV           & $<$25 kg      & 250m           & 4 m/s peak     & 2 hrs              & \$10-23K      \\
       \midrule
       Iver3 (L3Harris)    & AUV           & 27-39 kg      & 100m           & 1.3 m/s        & 8-14 hrs           & \$75-120K     \\
       ecoSUB m-Power+     & AUV           & 17 kg         & 500m           & ~1.5 m/s       & 8-10 hrs           & £35-50K       \\
@@ -197,7 +199,7 @@
 
   \vspace{0.3em}
   \centering
-  \colorbox{yellow!30}{\small\textbf{Key finding: No commercial AUV <25 kg achieves 4 m/s sustained speed}}
+  Key finding: No commercial AUV $<$25 kg achieves 4 m/s sustained speed
 
   \note{Many commercial solutions exist but vary in capability. Commercial designs such as the Iver3 and ecoSUB use fully autonomous operation with single thruster plus fins for pitch/yaw control. The Boxfish uses 8 vectored thrusters for full 6-DOF control including hovering. BlueROV2 is included as it is a Blue Robotics reference platform that proves component viability, though it is a tethered ROV not an autonomous AUV. Key finding: Few commercial AUVs under 25 kg achieve 4 m/s sustained speed - most operate at 1.5-2.5 m/s due to power limitations. Commercial pricing (50-150K dollars) reflects support and warranty, not just hardware costs. Our target specifications are ambitious but achievable with careful trade-off management.}
 \end{frame}
@@ -205,70 +207,69 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Design Approach and System Architecture}
 
-\begin{frame}{ The Trade-off Triangle}
+\begin{frame}{Trade-offs}
   \begin{center}
-    \begin{tikzpicture}[scale=1.2]
+    \begin{tikzpicture}[scale=0.8]
       % Triangle
       \draw[ultra thick, blue] (0,0) -- (4,0) -- (2,3.464) -- cycle;
 
-      % Labels at corners
-      \node[above] at (2,3.464) {\Large\textbf{Capabilities}};
-      \node[below left] at (0,0) {\Large\textbf{Endurance}};
-      \node[below right] at (4,0) {\Large\textbf{Mass}};
-
       % Center text
-      \node[text width=3cm, align=center] at (2,1.2) {
-        \textcolor{red}{\textbf{Cannot optimize\\all three\\simultaneously}}
+      \node[text width=2.5cm, align=center] at (2,1.2) {
+        \textcolor{red}{\textbf{Trade-Off}}
       };
 
-      % Constraint labels
-      \node[right, text width=3cm, align=left] at (4.2,3) {
-        Better Capabilities (higher speed, sensor equipment etc) – Often meaning an increase in both power draw (endurance) and weight (mass), but is also the most vital aspect of the design.
+      % CAPABILITIES (top vertex)
+      \node[text width=8cm, align=center, anchor=south] at (2,3.7) {
+        \small \textbf{Capabilities:} Better Capabilities (higher speed, sensor equipment etc) – Often meaning an increase in both power draw and weight, but is also the most vital aspect of the design.
       };
-      \node[left, text width=3cm, align=right] at (-0.2,3) {
-        Longer Operating Time – Either reduce power draw (capabilities), or larger battery (mass)
+
+      % ENDURANCE (bottom left vertex)
+      \node[text width=3.5cm, align=right, anchor=north east] at (-0.1,-0.1) {
+        \small \textbf{Endurance:} Longer operating Time – Either reduce power draw, or larger battery
       };
-      \node[below, text width=4cm, align=center] at (2,-0.5) {
-        $<$ 25 kg limits battery\\to ~4-5 kg max (endurance), also sacrifices equipment or payload (capabilities)
+
+      % MASS (bottom right vertex)
+      \node[text width=3.5cm, align=left, anchor=north west] at (4.1,-0.1) {
+        \small \textbf{Mass} $<$ 25kg limits battery to 4-5 kg max, also sacrifices equipment or payload
       };
     \end{tikzpicture}
   \end{center}
 
   \vspace{0.5em}
-
   \textbf{Our Solution:} \textit{Mission profile with 80\% cruise (1-2 m/s) + 20\% sprint (4 m/s)}
 \end{frame}
 
+
 \begin{frame}{System Design Directions}
   \begin{center}
-  \begin{itemize}
-    \item Autonomous/programmable solution to remove the need for high-quality real-time data transmission which limits untethered ROVs
-      \begin{itemize}
-        \item Enables self-contained operation with onboard power, navigation, and data handling
-        \item Supports scalable inspection missions without reliance on surface tethers
-      \end{itemize}
-
-    \item 6-thruster design for stability and hovering capabilities for detailed inspection
     \begin{itemize}
-      \item Provides full 6-DOF control for precise hovering, lateral motion, and pitch/yaw stability
-      \item Redundancy for safe recovery in case of partial thruster failure
-      \item Efficient low-speed maneuvering for inspection tasks
+      \item Autonomous/programmable solution to remove the need for high-quality real-time data transmission which limits untethered ROVs
+            \begin{itemize}
+              \item Enables self-contained operation with onboard power, navigation, and data handling
+              \item Supports scalable inspection missions without reliance on surface tethers
+            \end{itemize}
+
+      \item 6-thruster design for stability and hovering capabilities for detailed inspection
+            \begin{itemize}
+              \item Provides full 6-DOF control for precise hovering, lateral motion, and pitch/yaw stability
+              \item Redundancy for safe recovery in case of partial thruster failure
+              \item Efficient low-speed maneuvering for inspection tasks
+            \end{itemize}
+      \item Hull design to be cylindrical (pill) shaped to minimise volume as well as simplify hydrodynamic calculations.
+            \begin{itemize}
+              \item Streamlined shape reduces drag forces at higher speeds
+              \item Simplifies internal component layout and waterproofing
+              \item Proven design in existing AUVs for balance of speed and stability
+            \end{itemize}
     \end{itemize}
-    \item Hull design to be cylindrical (pill) shaped to minimise volume as well as simplify hydrodynamic calculations.
-      \begin{itemize}
-        \item Streamlined shape reduces drag forces at higher speeds
-        \item Simplifies internal component layout and waterproofing
-        \item Proven design in existing AUVs for balance of speed and stability
-      \end{itemize}
-  \end{itemize}
   \end{center}
 \end{frame}
 
 \begin{frame}{System Architecture - Simplified Block Diagram}
   \begin{center}
     \centering
-      \includegraphics[width=0.9\textwidth]{img/System_design.png}
-      
+    \includegraphics[width=0.9\textwidth]{img/System_design.png}
+
     % \begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\small}]
     %   % Five main blocks in circular arrangement
     %   \node (power) [process, fill=yellow!30, minimum width=3.5cm, minimum height=1.2cm] {
@@ -541,7 +542,7 @@
 
   \vspace{0.5em}
   \centering
-  \colorbox{yellow!30}{\small\textbf{Tight margin requires hydrodynamic optimization (streamlined hull, C$_D$ < 0.30)}}
+  \colorbox{yellow!30}{\small\textbf{Tight margin requires hydrodynamic optimization (streamlined hull, C$_D$ $<$ 0.30)}}
 
   \note{We compared four thruster options. The SeaBotix BTD150 has good efficiency but insufficient thrust (28N vs 50N for T200). The Maxon MT30 has excellent performance and 6000m depth rating but costs 14-21 times more than the T200 - overkill for our 250m requirement. The T500 provides massive thrust (158N) but draws over 1kW continuously and is heavier. The T200 offers the best thrust-to-cost ratio at 0.36-0.42 N per dollar. Four T200 thrusters provide 200N total thrust for 188N required - only 6 percent margin which is tight. This means we must achieve our assumed drag coefficient through careful hull design. The flooded brushless motor design is naturally pressure-tolerant, proven to 3000m at Woods Hole testing.}
 \end{frame}
@@ -554,15 +555,15 @@
     \small
     \begin{tabular}{lccc}
       \toprule
-      \textbf{Subsystem}          & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}           \\
+      \textbf{Subsystem}                    & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}   \\
       \midrule
-      Propulsion (4× T200)        & 45                  & 1,367             & Dominant at peak         \\
-      Paylodad (camera, lighting and sonar)  &30                & 30               & Low-light USB            \\
-      Navigation sensors          & 5                   & 5                 & IMU, depth, GPS          \\
-      Control (RPi4+Nav)          & 10                  & 10                & ArduSub firmware         \\
-      Comms (WiFi/Iridium)        & 2                   & 2                 & Surface only             \\
+      Propulsion (4× T200)                  & 45                  & 1,367             & Dominant at peak \\
+      Paylodad (camera, lighting and sonar) & 30                  & 30                & Low-light USB    \\
+      Navigation sensors                    & 5                   & 5                 & IMU, depth, GPS  \\
+      Control (RPi4+Nav)                    & 10                  & 10                & ArduSub firmware \\
+      Comms (WiFi/Iridium)                  & 2                   & 2                 & Surface only     \\
       \midrule
-      \textbf{TOTAL}              & \textbf{92 W}       & \textbf{1,414 W}  &                          \\
+      \textbf{TOTAL}                        & \textbf{92 W}       & \textbf{1,414 W}  &                  \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -835,7 +836,7 @@
 \begin{frame}{Conclusions: Technical Feasibility Confirmed}
   \textbf{Requirements Status:}
   \begin{itemize}
-    \item Depth 300m (spec: 250m), Mass 15.7 kg (spec: <25 kg), Endurance 3.4 hrs (spec: 2 hrs)
+    \item Depth 300m (spec: 250m), Mass 15.7 kg (spec: $<$25 kg), Endurance 3.4 hrs (spec: 2 hrs)
     \item Speed: 1 m/s cruise met, 4 m/s peak achievable with 6\% margin
     \item Build cost: \$10,840 vs \$50-150K commercial (20-25\% of market)
   \end{itemize}
@@ -880,7 +881,7 @@
   \colorbox{green!20}{\parbox{0.85\textwidth}{\centering\textbf{RECOMMENDATION: Proceed with development}}}
 
   \note{
-    The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 18× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a <25 kg weight constraint. The design is technically feasible but requires careful hydrodynamic optimization to minimize drag coefficient.
+    The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 18× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a $<$25 kg weight constraint. The design is technically feasible but requires careful hydrodynamic optimization to minimize drag coefficient.
   }
 \end{frame}
 
