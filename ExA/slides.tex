@@ -604,48 +604,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mechanical Design and Structural Analysis}
 
-\begin{frame}{Pressure Vessel Design - ASME Calculation}
-  \textbf{Operating Conditions:}
-  \begin{itemize}
-    \item Depth: 250m → Pressure: $P = \rho gh = 1027 \times 9.81 \times 250 = 2.52$ MPa (25.2 bar)
-    \item Safety factor: 3× → Design pressure: $P_d = 7.56$ MPa
-  \end{itemize}
-
-  \vspace{0.5em}
-
-  \textbf{ASME Section VIII Formula (External Pressure):}
-  $$t = \frac{P \cdot R}{S \cdot E - 0.6P} + C_A$$
-
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      Where:
-      \begin{itemize}
-        \item $P = 7.56$ MPa
-        \item $R = 50$ mm (for 3" tube)
-        \item $S = 92$ MPa (Al 6061-T6)
-        \item $E = 1.0$ (seamless)
-        \item $C_A = 2$ mm (corrosion)
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.48\textwidth}
-      \textbf{Calculation:}
-      $$t = \frac{7.56 \times 50}{92 - 4.5} + 2$$
-      $$t = 4.3 + 2 = \textbf{6.3 mm}$$
-
-      \vspace{0.5em}
-
-      Blue Robotics 3" tubes:\\
-      \textbf{Wall: 6.35 mm} $\checkmark$
-    \end{column}
-  \end{columns}
-
-  \vspace{0.5em}
-
-  \centering
-  \colorbox{green!20}{\textbf{Commercial tubes meet calculated requirement}}
-\end{frame}
-
 \begin{frame}{Material Selection and Component Specifications}
   \textbf{Pressure Housing Comparison:}
   \begin{table}
@@ -687,10 +645,72 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Pressure Vessel Design - Theory}
+  \textbf{Basic Thin-Walled Cylinder Theory}
+
+  For external pressure $P$ on cylinder with radius $R$ and wall thickness $t$:
+
+  $$\text{Hoop stress: } \sigma_\theta = \frac{P \cdot R}{t}$$
+
+  \vspace{0.5em}
+
+  \textbf{Apply Safety Criteria}
+
+  Stress must not exceed allowable stress $S$ (with weld efficiency $E$):
+  $$\sigma_\theta \leq S \cdot E$$
+
+  $$\frac{P \cdot R}{t} \leq S \cdot E \quad \Rightarrow \quad t \geq \frac{P \cdot R}{S \cdot E}$$
+
+  \vspace{0.5em}
+
+  \textbf{ASME Section VIII Refinements}
+
+  \begin{itemize}
+    \item Add biaxial stress correction: denominator becomes $(S \cdot E - 0.6P)$
+    \item Add corrosion allowance: $+C_A$ term
+  \end{itemize}
+
+  $$\boxed{t = \frac{P \cdot R}{S \cdot E - 0.6P} + C_A}$$
+
+  \note{This derivation shows how the ASME formula builds on basic thin-walled cylinder theory. The fundamental relationship is that hoop stress equals PR/t, which comes from force balance on a cylinder element. The ASME code refines this with the 0.6P biaxial stress correction (accounting for both circumferential and longitudinal stresses) and the corrosion allowance for long-term durability in marine environments.}
+\end{frame}
+
+
+
+\begin{frame}{Pressure Vessel Design - ASME Calculation}
+  \textbf{Operating Conditions:}
+  \begin{itemize}
+    \item Pressure: $P = \rho gh \approx 2.52$ MPa (25.2 bar)
+    \item With safety factor 3x, design pressure: $P_d = 7.56$ MPa
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \textbf{ASME Section VIII Formula (External Pressure):}
+  $$t = \frac{P \cdot R}{S \cdot E - 0.6P} + C_A = 6.3mm$$
+
+
+  Where:
+  \begin{itemize}
+    \item $P = 7.56$ MPa
+    \item $R = 50$ mm (for 3" tube)
+    \item $S = 92$ MPa (Al 6061-T6)
+    \item $E = 1.0$ (seamless)
+    \item $C_A = 2$ mm (corrosion)
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \centering
+  \colorbox{green!20}{Blue Robotics 3" tubes has thickness of 6.35 mm \textbf{(Feasible)}}
+\end{frame}
+
+
+
 \begin{frame}{Buoyancy and Ballast Design}
   \textbf{Neutral Buoyancy Requirement:}
 
-  For dry mass $m = 15.4$ kg in seawater ($\rho = 1027$ kg/m³):
+  For dry mass $m = 15.4$ kg (calculated later) in seawater:
   $$V_{displaced} = \frac{m}{\rho} = \frac{15.4}{1027} = 0.015 \text{ m}^3 = 15.0 \text{ L}$$
 
   \vspace{1em}
@@ -708,77 +728,42 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Consolidated Mass and Cost Budgets}
 
-\begin{frame}{Mass Budget Summary}
+\begin{frame}[shrink]{Mass \& Cost Summary}
+
   \begin{table}
     \footnotesize
-    \begin{tabular}{lccl}
+    % Combined table with 4 columns: Subsystem, Mass, Cost, Components
+    \begin{tabular}{l r r l}
       \toprule
-      \textbf{Subsystem}        & \textbf{Mass (kg)} & \textbf{\% of Total} & \textbf{Key Components}            \\
+      \textbf{Subsystem}    & \textbf{Mass (kg)} & \textbf{Cost (\$)} & \textbf{Key Components}            \\
       \midrule
-      \textbf{Propulsion}       & 1.88               & 12.0\%               & 4× T200 thrusters + ESCs           \\
-      \textbf{Power}            & 4.55               & 29.0\%               & 3× 18Ah batteries + housing        \\
-      \textbf{Control \& Nav}   & 0.62               & 4.0\%                & RPi4 + Navigator + Bar30           \\
-      \textbf{Payload}          & 0.96               & 6.1\%                & Ping360 + camera + lights          \\
-      \textbf{Communications}   & 0.12               & 0.8\%                & WiFi + Iridium                     \\
-      \textbf{Structure}        & 5.50               & 35.1\%               & Frame, foam, fairings, penetrators \\
+      Propulsion            & 1.88               & 1,278              & 4× T200 + ESCs                     \\
+      Power                 & 4.55               & 1,680              & 3× 18Ah batteries + housing        \\
+      Control \& Navigation & 0.62               & 665                & RPi4 + Navigator + Bar30           \\
+      Payload               & 0.96               & 3,320              & Ping360 (\$2,750) + camera + light \\
+      Communications        & 0.12               & 410                & WiFi + Iridium                     \\
+      Structure             & 5.50               & 1,280              & Frame, foam, fairings, penetrators \\
+      Assembly \& Tools     & —                  & 200                & Testing equipment                  \\
       \midrule
-      \textbf{Subtotal}         & \textbf{13.63}     & 87.0\%               &                                    \\
-      Contingency (15\%)        & 2.04               & 13.0\%               & Margin for unknowns                \\
-      \midrule
-      \textbf{TOTAL ESTIMATED}  & \textbf{15.67 kg}  & \textbf{62.7\%}      & of 25 kg limit                     \\
-      \textbf{AVAILABLE MARGIN} & \textbf{9.33 kg}   & \textbf{37.3\%}      & For DVL, acoustic modem, etc.      \\
+      \textbf{Total}        & \textbf{15.67 kg}  & \textbf{\$10,840}  &                                    \\
       \bottomrule
     \end{tabular}
   \end{table}
 
-  \vspace{0.5em}
+  \vspace{1em}
 
-  \textbf{Key Takeaways:}
   \begin{itemize}
-    \item Power system (batteries) is largest mass contributor (29\%)
-    \item Structure (35\%) includes buoyancy foam and low-drag fairing
-    \item 37\% margin enables future capability additions
+    \item \textbf{Mass:} 15.67 kg total, providing a 37\% margin under the 25 kg limit.
+    \item \textbf{Cost:} \$10,840 base build, much cheaper
+    \item \textbf{Key Drivers:} Power/Structure are largest mass contributors; Payload (Ping360) is the largest cost.
   \end{itemize}
 
+  % Combined speaker notes, preserving the full depth from both original slides
   \note{
+    \textbf{(Mass Details)}
     The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. The largest contributors are the structure (35 percent including frame, syntactic foam for buoyancy, and streamlined fairings) and power system (29 percent for three 18Ah batteries). This substantial margin allows for future additions like a DVL (approximately 3 kg) or acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
-  }
-\end{frame}
 
-\begin{frame}{Build Cost Summary}
-  \begin{table}
-    \footnotesize
-    \begin{tabular}{lrl}
-      \toprule
-      \textbf{Subsystem}          & \textbf{Cost (\$)} & \textbf{Major Components}          \\
-      \midrule
-      Propulsion                  & 1,278              & 4× T200 + ESCs                     \\
-      Power                       & 1,680              & 3× 18Ah batteries + housing        \\
-      Control \& Navigation       & 665                & RPi4 + Navigator + Bar30           \\
-      Payload                     & 3,320              & Ping360 (\$2,750) + camera + light \\
-      Communications              & 410                & WiFi + Iridium                     \\
-      Structure                   & 1,280              & Frame, foam, fairings              \\
-      Assembly \& Tools           & 200                & Testing equipment                  \\
-      \midrule
-      \textbf{Subtotal}           & \textbf{9,033}     &                                    \\
-      Contingency (20\%)          & 1,807              &                                    \\
-      \midrule
-      \textbf{CORE BUILD COST}    & \textbf{\$10,840}  & \textbf{20-25\% of commercial}     \\
-      \midrule
-      \textit{Optional: Acoustic} & \textit{+\$12K}    & \textit{EvoLogics S2C}             \\
-      \textit{Optional: DVL}      & \textit{+\$20K}    & \textit{Nortek DVL1000}            \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{0.5em}
-
-  \begin{center}
-    \textbf{Comparison:} \$10,840 build cost vs \$50-150K commercial AUVs\\
-    (BlueROV2: \$3.5K but tethered ROV, not autonomous)
-  \end{center}
-
-  \note{
+    \textbf{(Cost Details)}
     The estimated build cost of 10,840 dollars represents 20-25 percent of comparable commercial AUV systems (50-150K range). The Ping360 sonar is the single most expensive component at 2,750 dollars. Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes COTS components to minimize cost while maintaining technical performance.
   }
 \end{frame}
@@ -791,16 +776,15 @@
     \footnotesize
     \begin{tabular}{lccl}
       \toprule
-      \textbf{Requirement}         & \textbf{Specification} & \textbf{Achieved}  & \textbf{Status}        \\
+      \textbf{Requirement}         & \textbf{Specification} & \textbf{Achieved} & \textbf{Status} \\
       \midrule
-      Depth rating                 & 250m                   & 300-500m           & $\checkmark$ Exceeded  \\
-      Mass constraint              & $<$25 kg               & 15.7 kg (62.7\%)   & $\checkmark$ Excellent \\
-      Endurance                    & 2 hours                & 3.4 hrs (mixed)    & $\checkmark$ Exceeded  \\
-      Cruise speed                 & 1 m/s                  & 1 m/s              & $\checkmark$ Met       \\
-      Peak speed                   & 4 m/s                  & 4 m/s (6\% margin) & $\triangle$! Tight     \\
-      Payload power                & 30W                    & 26W peak (all)     & $\checkmark$ Margin    \\
+      Mass constraint              & $<$25 kg               & 15.7 kg           & Met             \\
+      Endurance                    & 2 hours                & 3.4 hrs (mixed)   & Met             \\
+      Cruise speed                 & 1 m/s                  & 1 m/s             & Met             \\
+      Peak speed                   & 4 m/s                  & 4 m/s             & Met             \\
+      Payload power                & 30W                    & 26W peak (all)    & Met             \\
       \midrule
-      \textbf{Overall Feasibility} &                        &                    & \textbf{VIABLE}        \\
+      \textbf{Overall Feasibility} &                        &                   & \textbf{Viable} \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -809,15 +793,7 @@
 
 \end{frame}
 
-\begin{frame}{Conclusions: Technical Feasibility Confirmed}
-  \textbf{Requirements Status:}
-  \begin{itemize}
-    \item Depth 300m (spec: 250m), Mass 15.7 kg (spec: $<$25 kg), Endurance 3.4 hrs (spec: 2 hrs)
-    \item Speed: 1 m/s cruise met, 4 m/s peak achievable with 6\% margin
-    \item Build cost: \$10,840 vs \$50-150K commercial (20-25\% of market)
-  \end{itemize}
-
-  \vspace{0.5em}
+\begin{frame}{Conclusions}
 
   \textbf{Critical Engineering Insights:}
   \begin{enumerate}
@@ -850,11 +826,6 @@
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \vspace{0.5em}
-
-  \centering
-  \colorbox{green!20}{\parbox{0.85\textwidth}{\centering\textbf{RECOMMENDATION: Proceed with development}}}
 
   \note{
     The key physics insight is that drag force scales with velocity squared (F = 0.5 × rho × v² × Cd × A), so power required scales with velocity cubed (P = F × v = v³). This means going from 1 m/s to 4 m/s requires 4³ = 64 times more power theoretically, though efficiency variations reduce this to about 18× in practice. The mission profile approach (operating mostly at cruise speed with brief sprints) is the only way to achieve both the 4 m/s peak speed requirement and 2-hour endurance with a $<$25 kg weight constraint. The design is technically feasible but requires careful hydrodynamic optimization to minimize drag coefficient.
