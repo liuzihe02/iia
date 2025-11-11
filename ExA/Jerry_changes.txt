@@ -1,0 +1,12 @@
+ Slide 8 (Commercial solutions)
+ Include blue robotics image in the img folder, size needs some adjustment
+
+ Slide 9  (Philosophy triangle)
+ power requirements come from nowhere, cut it down
+
+Removed backup slides
+
+Remove redundant numbers from tables (e.g. percentage reduction)
+
+I only went in detail up to the hydrodynamic slides, look through the power budget and energy storage stuff
+also fixed the table for system power budget, and fact check the rest of the figures.

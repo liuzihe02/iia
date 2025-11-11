@@ -10,8 +10,8 @@
 \usetikzlibrary{shapes.geometric, arrows, positioning, calc, fit, backgrounds}
 
 % Enable speaker notes (uncomment one of these options)
-\setbeameroption{show notes} % Notes on separate pages
-% \setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
+%\setbeameroption{show notes} % Notes on separate pages
+\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
 \usepackage{pgfpages}
 
 % TikZ styles for block diagrams
@@ -186,12 +186,12 @@
     \begin{column}{0.24\textwidth}
       \centering
       \includegraphics[width=0.9\textwidth]{img/boxfish.png}
-      \tiny Boxfish: 8 thrusters, 6-DOF
+      \tiny Boxfish: Tethered AUV, 6-DOF
     \end{column}
     \begin{column}{0.24\textwidth}
       \centering
-      \textbf{BlueROV2}
-      \tiny Reference platform (tethered ROV). Proves component viability
+      \includegraphics[width=0.9\textwidth]{img/bluerobtoicsROV2.png}
+      \tiny BlueROV2: Tethered ROV, 6-DOF
     \end{column}
   \end{columns}
 
@@ -205,14 +205,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Design Approach and System Architecture}
 
-\begin{frame}{Design Philosophy - The Trade-off Triangle}
+\begin{frame}{ The Trade-off Triangle}
   \begin{center}
     \begin{tikzpicture}[scale=1.2]
       % Triangle
       \draw[ultra thick, blue] (0,0) -- (4,0) -- (2,3.464) -- cycle;
 
       % Labels at corners
-      \node[above] at (2,3.464) {\Large\textbf{Speed}};
+      \node[above] at (2,3.464) {\Large\textbf{Capabilities}};
       \node[below left] at (0,0) {\Large\textbf{Endurance}};
       \node[below right] at (4,0) {\Large\textbf{Mass}};
 
@@ -223,13 +223,13 @@
 
       % Constraint labels
       \node[right, text width=3cm, align=left] at (4.2,3) {
-        4 m/s requires\\1.1 kW power
+        Better Capabilities (higher speed, sensor equipment etc) – Often meaning an increase in both power draw (endurance) and weight (mass), but is also the most vital aspect of the design.
       };
       \node[left, text width=3cm, align=right] at (-0.2,3) {
-        2 hrs at 4 m/s\\needs 2.2 kWh
+        Longer Operating Time – Either reduce power draw (capabilities), or larger battery (mass)
       };
       \node[below, text width=4cm, align=center] at (2,-0.5) {
-        <25 kg limits battery\\to ~4-5 kg max
+        $<$ 25 kg limits battery\\to ~4-5 kg max (endurance), also sacrifices equipment or payload (capabilities)
       };
     \end{tikzpicture}
   \end{center}
@@ -239,48 +239,76 @@
   \textbf{Our Solution:} \textit{Mission profile with 80\% cruise (1-2 m/s) + 20\% sprint (4 m/s)}
 \end{frame}
 
+\begin{frame}{System Design Directions}
+  \begin{center}
+  \begin{itemize}
+    \item Autonomous/programmable solution to remove the need for high-quality real-time data transmission which limits untethered ROVs
+      \begin{itemize}
+        \item Enables self-contained operation with onboard power, navigation, and data handling
+        \item Supports scalable inspection missions without reliance on surface tethers
+      \end{itemize}
+
+    \item 6-thruster design for stability and hovering capabilities for detailed inspection
+    \begin{itemize}
+      \item Provides full 6-DOF control for precise hovering, lateral motion, and pitch/yaw stability
+      \item Redundancy for safe recovery in case of partial thruster failure
+      \item Efficient low-speed maneuvering for inspection tasks
+    \end{itemize}
+    \item Hull design to be cylindrical (pill) shaped to minimise volume as well as simplify hydrodynamic calculations.
+      \begin{itemize}
+        \item Streamlined shape reduces drag forces at higher speeds
+        \item Simplifies internal component layout and waterproofing
+        \item Proven design in existing AUVs for balance of speed and stability
+      \end{itemize}
+  \end{itemize}
+  \end{center}
+\end{frame}
+
 \begin{frame}{System Architecture - Simplified Block Diagram}
   \begin{center}
-    \begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\small}]
-      % Five main blocks in circular arrangement
-      \node (power) [process, fill=yellow!30, minimum width=3.5cm, minimum height=1.2cm] {
-        \textbf{POWER}\\
-        3× 18Ah Li-ion\\
-        799 Wh, 14.8V
-      };
+    \centering
+      \includegraphics[width=0.9\textwidth]{img/System_design.png}
+      
+    % \begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\small}]
+    %   % Five main blocks in circular arrangement
+    %   \node (power) [process, fill=yellow!30, minimum width=3.5cm, minimum height=1.2cm] {
+    %     \textbf{POWER}\\
+    %     3× 18Ah Li-ion\\
+    %     799 Wh, 14.8V
+    %   };
 
-      \node (control) [process, fill=blue!30, right of=power, minimum width=3.5cm, minimum height=1.2cm] {
-        \textbf{CONTROL}\\
-        Navigator + RPi4\\
-        IMU, Depth, GPS
-      };
+    %   \node (control) [process, fill=blue!30, right of=power, minimum width=3.5cm, minimum height=1.2cm] {
+    %     \textbf{CONTROL}\\
+    %     Navigator + RPi4\\
+    %     IMU, Depth, GPS
+    %   };
 
-      \node (propulsion) [process, fill=green!30, below of=power, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
-        \textbf{PROPULSION}\\
-        4× T200 Thrusters\\
-        4× ESCs (30A)
-      };
+    %   \node (propulsion) [process, fill=green!30, below of=power, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
+    %     \textbf{PROPULSION}\\
+    %     4× T200 Thrusters\\
+    %     4× ESCs (30A)
+    %   };
 
-      \node (payload) [process, fill=orange!30, below of=control, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
-        \textbf{PAYLOAD}\\
-        Camera + Ping360\\
-        + Lights (30W total)
-      };
+    %   \node (payload) [process, fill=orange!30, below of=control, yshift=-0.5cm, minimum width=3.5cm, minimum height=1.2cm] {
+    %     \textbf{PAYLOAD}\\
+    %     Camera + Ping360\\
+    %     + Lights (30W total)
+    %   };
 
-      \node (comms) [process, fill=red!30, below right of=control, xshift=-0.5cm, yshift=-2cm, minimum width=3.5cm, minimum height=1.2cm] {
-        \textbf{COMMS}\\
-        WiFi + Iridium\\
-        (Acoustic optional)
-      };
+    %   \node (comms) [process, fill=red!30, below right of=control, xshift=-0.5cm, yshift=-2cm, minimum width=3.5cm, minimum height=1.2cm] {
+    %     \textbf{COMMS}\\
+    %     WiFi + Iridium\\
+    %     (Acoustic optional)
+    %   };
 
-      % Arrows showing data/power flow
-      \draw [arrow] (power) -- (control);
-      \draw [arrow] (power) -- (propulsion);
-      \draw [arrow] (power) -- (payload);
-      \draw [arrow] (control) -- (propulsion);
-      \draw [arrow] (control) -- (payload);
-      \draw [arrow] (control) -- (comms);
-    \end{tikzpicture}
+    %   % Arrows showing data/power flow
+    %   \draw [arrow] (power) -- (control);
+    %   \draw [arrow] (power) -- (propulsion);
+    %   \draw [arrow] (power) -- (payload);
+    %   \draw [arrow] (control) -- (propulsion);
+    %   \draw [arrow] (control) -- (payload);
+    %   \draw [arrow] (control) -- (comms);
+    % \end{tikzpicture}
   \end{center}
 
   \vspace{0.5em}
@@ -290,6 +318,127 @@
   \note{This simplified system architecture shows the five main subsystems. POWER provides 799 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera, Ping360 sonar, and lights totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting, with optional acoustic modem for underwater comms. This modular design allows independent testing and phased development.}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Communications and Navigation}
+
+\begin{frame}{Underwater Communication Challenges}
+  \textbf{Underwater Communication:}
+  \begin{itemize}
+    \item High signal attenuation limits the usage of radio frequency signals - effective range only a few metres
+    \item Optical communication limited by turbidity and scattering - short range, line-of-sight only
+    \item Acoustic communication is the only viable option for long-range underwater comms, but inherently slow, high latency, and affected by multipath
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \textbf{Result:} → Minimise communication — majority of data stored on the vehicle, only allowing small and simple commands to be communicated.
+\end{frame}
+
+\begin{frame}{Navigation System: Actual Products}
+  \textbf{Core Navigation Components:}
+
+  \begin{table}
+    \footnotesize
+    \begin{tabular}{llll}
+      \toprule
+      \textbf{Component}         & \textbf{Product}        & \textbf{Key Specs}                  & \textbf{Cost}  \\
+      \midrule
+      \textbf{Flight Controller} & \textbf{Navigator (BR)} & ICM-42688-P + ICM-20602 dual IMU    & \textbf{\$125} \\
+                                 &                         & STM32H743, ArduSub firmware         &                \\
+                                 &                         & 16 PWM outputs, I2C/UART/SPI        &                \\
+      \midrule
+      \textbf{Depth Sensor}      & \textbf{Bar30 (BR)}     & MS5837-30BA pressure sensor         & \textbf{\$68}  \\
+                                 &                         & 0-30 bar (0-300m depth)             &                \\
+                                 &                         & 2 mbar resolution ($\pm$2 cm depth) &                \\
+      \midrule
+      \textbf{Surface GPS}       & u-blox NEO-M8N          & 2.5m CEP accuracy                   & \textbf{\$35}  \\
+                                 &                         & 72-channel, 10 Hz update            &                \\
+      \midrule
+      \textbf{Computer}          & Raspberry Pi 4 (4GB)    & Quad-core ARM, Linux                & \textbf{\$75}  \\
+                                 &                         & ArduSub + MAVLink                   &                \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.5em}
+
+  \textbf{Navigation Strategy:}
+  \begin{itemize}
+    \item \textbf{Baseline:} IMU dead reckoning + depth + compass (5-15m drift/2hrs)
+    \item \textbf{Enhanced:} + Cable visual tracking (reduces drift to $<$5m)
+    \item \textbf{Premium (+\$20K):} Nortek DVL1000 (0.2 cm/s, $<$1m error/2hrs)
+  \end{itemize}
+
+  \note{
+    The Navigator flight controller uses dual IMUs (ICM-42688-P and ICM-20602) for redundancy and sensor fusion. Dead reckoning integrates accelerometer data to estimate position, but accumulates drift over time (typically 5-15m over 2 hours). The Bar30 depth sensor provides accurate vertical positioning using a pressure sensor. For cable inspection missions, visual tracking of the cable provides an external reference that significantly reduces horizontal drift. The premium DVL (Doppler Velocity Log) option bounces acoustic pulses off the seafloor to measure velocity with 0.2 cm/s accuracy, virtually eliminating drift.
+  }
+\end{frame}
+
+\begin{frame}{Communications Systems: Actual Products}
+  \textbf{Multi-Mode Communication Strategy:}
+
+  \begin{table}
+    \footnotesize
+    \begin{tabular}{llll}
+      \toprule
+      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}        & \textbf{Cost}       \\
+      \midrule
+      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps            & \textbf{\$50}       \\
+                            & (Raspberry Pi built-in)  & 50-100m range in air           &                     \\
+                            &                          & Video download, mission upload &                     \\
+      \midrule
+      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data       & \textbf{\$260}      \\
+                            &                          & 340 byte messages              &                     \\
+                            &                          & Global coverage (open ocean)   &                     \\
+                            &                          & GPS position reporting         &                     \\
+      \midrule
+      \textbf{Acoustic}     & \textbf{EvoLogics S2C M} & 18-34 kHz, 2 km range          & \textbf{\$12K}      \\
+      \textit{(Optional)}   & \textit{18/34}           & 13.9 kbps (in water)           & \textit{(Optional)} \\
+                            &                          & 500m operational depth         &                     \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.5em}
+
+  \textbf{Operational Modes:}
+  \begin{itemize}
+    \item \textbf{At surface:} WiFi for high-bandwidth video/data + GPS fix
+    \item \textbf{Open ocean:} RockBLOCK for GPS position reporting every 10 min
+    \item \textbf{Underwater (optional):} Acoustic modem for short messaging, real-time monitoring during critical phases
+  \end{itemize}
+
+  \note{
+    WiFi provides high-bandwidth communication when surfaced, enabling video download and mission updates. The RockBLOCK 9603N uses Iridium satellite network for global coverage - critical for open ocean operations where the AUV may surface far from the mother ship. It can transmit GPS coordinates and status messages (340 bytes). The optional EvoLogics acoustic modem enables underwater communication at up to 2 km range, useful for real-time monitoring during critical inspection phases. However, for cable-following missions with periodic surfacing, the acoustic modem is not essential, saving \$12K.
+  }
+\end{frame}
+
+\begin{frame}{Underwater Acoustic Link Budget}
+  \textbf{Acoustic Communication Constraints:}
+
+  Transmission Loss: $TL = 20\log_{10}(R) + \alpha R \times 10^{-3}$ dB
+
+  Where: $R$ = range (m), $\alpha$ = absorption coefficient (~3 dB/km @ 25 kHz)
+
+  \vspace{1em}
+
+  \textbf{Link Budget Calculation for R = 500m:}
+  \begin{itemize}
+    \item Transmission loss: $TL = 20\log_{10}(500) + 3 \times 0.5 = 54 + 1.5 = 55.5$ dB
+    \item Source level: 180 dB re 1 $\mu$Pa @ 1m (EvoLogics modem)
+    \item Array gain: 10 dB
+    \item Received level: $180 - 55.5 + 10 = 134.5$ dB
+    \item Noise level: 60 dB (sea state 3)
+    \item Required SNR: 10 dB
+    \item \textbf{Link margin: $134.5 - 60 - 10 = 64.5$ dB} $\checkmark$
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \textbf{Result:} Acoustic communication feasible at 500m range with excellent margin
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Hydrodynamics and Propulsion Analysis}
@@ -408,24 +557,19 @@
       \textbf{Subsystem}          & \textbf{Cruise (W)} & \textbf{Peak (W)} & \textbf{Notes}           \\
       \midrule
       Propulsion (4× T200)        & 45                  & 1,367             & Dominant at peak         \\
-      \textbf{[PAYLOAD] Camera}   & 1.1                 & 1.1               & Low-light USB            \\
-      \textbf{[PAYLOAD] Sonar}    & 2                   & 5                 & Ping360 scanning         \\
-      \textbf{[PAYLOAD] Lighting} & 10                  & 20                & 2× Lumen adjustable      \\
-      \textbf{PAYLOAD SUBTOTAL}   & \textbf{13.1}       & \textbf{26.1}     & \textbf{Within 30W spec} \\
-      \midrule
+      Paylodad (camera, lighting and sonar)  &30                & 30               & Low-light USB            \\
       Navigation sensors          & 5                   & 5                 & IMU, depth, GPS          \\
       Control (RPi4+Nav)          & 10                  & 10                & ArduSub firmware         \\
       Comms (WiFi/Iridium)        & 2                   & 2                 & Surface only             \\
       \midrule
-      \textbf{TOTAL}              & \textbf{75 W}       & \textbf{1,415 W}  &                          \\
+      \textbf{TOTAL}              & \textbf{92 W}       & \textbf{1,414 W}  &                          \\
       \bottomrule
     \end{tabular}
   \end{table}
 
   \vspace{0.3em}
 
-  \textbf{Mixed Mission Profile} (60\% cruise + 30\% medium @216W + 10\% peak):
-  $$P_{avg} = 0.6 \times 75 + 0.3 \times 216 + 0.1 \times 1{,}415 = 251 \text{ W}$$
+  $$P_{avg} = 744 \text{ W}$$
 
   \note{This power budget clarifies that the 30W payload specification includes ALL payload components: camera (1.1W), sonar (2-5W), and lighting (10-20W adjustable). The subtotal is 13-26W which is well within the 30W budget. Propulsion dominates the total power at peak speed (1,415W total, of which 1,367W is propulsion). The mission profile assumes 60 percent of time at cruise, 30 percent at medium speed for active cable following, and 10 percent at peak for sprints. This gives an average power of 251W which determines our battery requirements.}
 \end{frame}
@@ -663,205 +807,6 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Communications and Navigation}
-
-\begin{frame}{Underwater Acoustic Link Budget}
-  \textbf{Acoustic Communication Constraints:}
-
-  Transmission Loss: $TL = 20\log_{10}(R) + \alpha R \times 10^{-3}$ dB
-
-  Where: $R$ = range (m), $\alpha$ = absorption coefficient (~3 dB/km @ 25 kHz)
-
-  \vspace{1em}
-
-  \textbf{Link Budget Calculation for R = 500m:}
-  \begin{itemize}
-    \item Transmission loss: $TL = 20\log_{10}(500) + 3 \times 0.5 = 54 + 1.5 = 55.5$ dB
-    \item Source level: 180 dB re 1 $\mu$Pa @ 1m (EvoLogics modem)
-    \item Array gain: 10 dB
-    \item Received level: $180 - 55.5 + 10 = 134.5$ dB
-    \item Noise level: 60 dB (sea state 3)
-    \item Required SNR: 10 dB
-    \item \textbf{Link margin: $134.5 - 60 - 10 = 64.5$ dB} $\checkmark$
-  \end{itemize}
-
-  \vspace{0.5em}
-
-  \textbf{Result:} Acoustic communication feasible at 500m range with excellent margin
-\end{frame}
-
-\begin{frame}{Navigation System: Actual Products}
-  \textbf{Core Navigation Components:}
-
-  \begin{table}
-    \footnotesize
-    \begin{tabular}{llll}
-      \toprule
-      \textbf{Component}         & \textbf{Product}        & \textbf{Key Specs}                  & \textbf{Cost}  \\
-      \midrule
-      \textbf{Flight Controller} & \textbf{Navigator (BR)} & ICM-42688-P + ICM-20602 dual IMU    & \textbf{\$125} \\
-                                 &                         & STM32H743, ArduSub firmware         &                \\
-                                 &                         & 16 PWM outputs, I2C/UART/SPI        &                \\
-      \midrule
-      \textbf{Depth Sensor}      & \textbf{Bar30 (BR)}     & MS5837-30BA pressure sensor         & \textbf{\$68}  \\
-                                 &                         & 0-30 bar (0-300m depth)             &                \\
-                                 &                         & 2 mbar resolution ($\pm$2 cm depth) &                \\
-      \midrule
-      \textbf{Surface GPS}       & u-blox NEO-M8N          & 2.5m CEP accuracy                   & \textbf{\$35}  \\
-                                 &                         & 72-channel, 10 Hz update            &                \\
-      \midrule
-      \textbf{Computer}          & Raspberry Pi 4 (4GB)    & Quad-core ARM, Linux                & \textbf{\$75}  \\
-                                 &                         & ArduSub + MAVLink                   &                \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{0.5em}
-
-  \textbf{Navigation Strategy:}
-  \begin{itemize}
-    \item \textbf{Baseline:} IMU dead reckoning + depth + compass (5-15m drift/2hrs)
-    \item \textbf{Enhanced:} + Cable visual tracking (reduces drift to $<$5m)
-    \item \textbf{Premium (+\$20K):} Nortek DVL1000 (0.2 cm/s, $<$1m error/2hrs)
-  \end{itemize}
-
-  \note{
-    The Navigator flight controller uses dual IMUs (ICM-42688-P and ICM-20602) for redundancy and sensor fusion. Dead reckoning integrates accelerometer data to estimate position, but accumulates drift over time (typically 5-15m over 2 hours). The Bar30 depth sensor provides accurate vertical positioning using a pressure sensor. For cable inspection missions, visual tracking of the cable provides an external reference that significantly reduces horizontal drift. The premium DVL (Doppler Velocity Log) option bounces acoustic pulses off the seafloor to measure velocity with 0.2 cm/s accuracy, virtually eliminating drift.
-  }
-\end{frame}
-
-\begin{frame}{Communications Systems: Actual Products}
-  \textbf{Multi-Mode Communication Strategy:}
-
-  \begin{table}
-    \footnotesize
-    \begin{tabular}{llll}
-      \toprule
-      \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}        & \textbf{Cost}       \\
-      \midrule
-      \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps            & \textbf{\$50}       \\
-                            & (Raspberry Pi built-in)  & 50-100m range in air           &                     \\
-                            &                          & Video download, mission upload &                     \\
-      \midrule
-      \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data       & \textbf{\$260}      \\
-                            &                          & 340 byte messages              &                     \\
-                            &                          & Global coverage (open ocean)   &                     \\
-                            &                          & GPS position reporting         &                     \\
-      \midrule
-      \textbf{Acoustic}     & \textbf{EvoLogics S2C M} & 18-34 kHz, 2 km range          & \textbf{\$12K}      \\
-      \textit{(Optional)}   & \textit{18/34}           & 13.9 kbps (in water)           & \textit{(Optional)} \\
-                            &                          & 500m operational depth         &                     \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{0.5em}
-
-  \textbf{Operational Modes:}
-  \begin{itemize}
-    \item \textbf{At surface:} WiFi for high-bandwidth video/data + GPS fix
-    \item \textbf{Open ocean:} RockBLOCK for GPS position reporting every 10 min
-    \item \textbf{Underwater (optional):} Acoustic modem for real-time telemetry
-  \end{itemize}
-
-  \note{
-    WiFi provides high-bandwidth communication when surfaced, enabling video download and mission updates. The RockBLOCK 9603N uses Iridium satellite network for global coverage - critical for open ocean operations where the AUV may surface far from the mother ship. It can transmit GPS coordinates and status messages (340 bytes). The optional EvoLogics acoustic modem enables underwater communication at up to 2 km range, useful for real-time monitoring during critical inspection phases. However, for cable-following missions with periodic surfacing, the acoustic modem is not essential, saving \$12K.
-  }
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Sensor Payload - Datasheet Extracts}
-
-\begin{frame}{Vision System: Low-Light HD Camera}
-  \textbf{Blue Robotics Low-Light HD USB Camera}
-
-  \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{Key Specifications:}
-      \begin{itemize}
-        \item \textbf{Sensor:} Sony IMX322, 1/2.9" CMOS
-        \item \textbf{Resolution:} 1920×1080 @ 30 fps
-        \item \textbf{Low-light:} 2.8 $\mu$m pixel, excellent sensitivity
-        \item \textbf{FOV:} 80° horizontal, minimal distortion
-        \item \textbf{Interface:} USB 2.0 (plug-and-play)
-        \item \textbf{Power:} 220 mA @ 5V = 1.1W
-        \item \textbf{Depth:} Tested to 300m
-        \item \textbf{Temp:} -20°C to 75°C
-        \item \textbf{Mass:} 13.5g (without cable)
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.42\textwidth}
-      \textbf{Advantages:}
-      \begin{itemize}
-        \item Very low power
-        \item Simple USB integration
-        \item Excellent low-light
-        \item H.264 compression
-        \item Proven underwater
-        \item Low cost (\$120)
-      \end{itemize}
-
-      \vspace{1em}
-
-      \textbf{With Lighting:}
-      \begin{itemize}
-        \item 2× Lumen (1500 lm)
-        \item 10W each (adjustable)
-        \item Total: 21W payload
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Sonar System: Ping360 Scanning Imager}
-  \textbf{Blue Robotics Ping360 Scanning Imaging Sonar}
-
-  \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{Key Specifications:}
-      \begin{itemize}
-        \item \textbf{Type:} Mechanical scanning, 360°
-        \item \textbf{Frequency:} 750 kHz
-        \item \textbf{Range:} 2-50m (adjustable)
-        \item \textbf{Resolution:} 1-2° angular, 400 pts/scan
-        \item \textbf{Update:} 10-20 Hz (2-5 sec full scan)
-        \item \textbf{Power:} 5W max, 2W typical
-        \item \textbf{Depth:} 300m rating
-        \item \textbf{Interface:} UART (9600-115200 baud)
-        \item \textbf{Mass:} 350g
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.42\textwidth}
-      \textbf{Capabilities:}
-      \begin{itemize}
-        \item Cable detection (2-5 cm)
-        \item 10-20m detection range
-        \item Zero-visibility operation
-        \item Obstacle avoidance
-        \item Seafloor mapping
-      \end{itemize}
-
-      \vspace{1em}
-
-      \textbf{Use Case:}
-      \begin{itemize}
-        \item Detect cable in turbid water
-        \item Maintain standoff distance
-        \item Navigate around obstacles
-        \item Price: \$2,750
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-  \vspace{0.5em}
-
-  \centering
-  \colorbox{green!20}{\textbf{750 kHz optimal for 2-5 cm cable detection at 10-20m range}}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Feasibility Assessment and Conclusions}
 
 \begin{frame}{Requirements Verification}
@@ -946,98 +891,5 @@
 \appendix
 \setbeamertemplate{navigation symbols}{}  % Hide navigation for backup
 \setbeamertemplate{footline}{}  % Optionally hide footline for backup
-
-\begin{frame}{Backup: Detailed T200 Performance Curves}
-  \textbf{Thrust vs Voltage (from datasheet):}
-
-  \begin{table}
-    \scriptsize
-    \begin{tabular}{ccccc}
-      \toprule
-      \textbf{Voltage (V)} & \textbf{Forward (kgf)} & \textbf{Reverse (kgf)} & \textbf{Current (A)} & \textbf{Power (W)} \\
-      \midrule
-      10                   & 2.92                   & 2.31                   & 11                   & 110                \\
-      12                   & 3.71                   & 2.92                   & 15                   & 180                \\
-      14                   & 4.44                   & 3.49                   & 19                   & 266                \\
-      16 (nominal)         & 5.25                   & 4.10                   & 24                   & 390                \\
-      18                   & 5.95                   & 4.62                   & 28                   & 504                \\
-      20 (maximum)         & 6.70                   & 5.05                   & 32                   & 645                \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{1em}
-
-  \textbf{Efficiency Characteristics:}
-  \begin{itemize}
-    \item Peak efficiency: ~55\% at heavy load (>250W)
-    \item Medium efficiency: ~50\% at 100-200W
-    \item Low efficiency: ~30\% at light load (<50W)
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Backup: Alternative Thruster Configurations}
-  \begin{table}
-    \footnotesize
-    \begin{tabular}{lcccc}
-      \toprule
-      \textbf{Configuration} & \textbf{Total Thrust} & \textbf{Power @ 4m/s} & \textbf{Cost}   & \textbf{Margin} \\
-      \midrule
-      3× T200 @ 16V          & 150 N                 & ~1500W (overload)     & \$777           & -20\% $\times$  \\
-      \textbf{4× T200 @ 16V} & \textbf{200 N}        & \textbf{1367W}        & \textbf{\$1036} & \textbf{+6\%}   \\
-      5× T200 @ 16V          & 250 N                 & 1100W                 & \$1295          & +33\%           \\
-      4× T200 @ 18V          & 228 N                 & 1200W                 & \$1036          & +21\%           \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{1em}
-
-  \textbf{Analysis:}
-  \begin{itemize}
-    \item 3× config insufficient - would exceed thruster ratings
-    \item 4× config @ 16V: minimal margin, selected for cost/performance
-    \item 5× config: better margin but +\$259, +0.43 kg, more complex frame
-    \item 4× @ 18V: alternative using higher voltage (requires battery upgrade)
-  \end{itemize}
-
-  \vspace{0.5em}
-
-  \textbf{Recommendation:} 4× T200 @ 16V with contingency for adding 5th thruster if testing shows insufficient thrust
-\end{frame}
-
-\begin{frame}{Backup: Drag Coefficient Literature}
-  \textbf{Torpedo-Shaped AUV Drag Coefficients:}
-
-  \begin{table}
-    \scriptsize
-    \begin{tabular}{lccl}
-      \toprule
-      \textbf{Hull Configuration}       & \textbf{Cd} & \textbf{Re}       & \textbf{Source}         \\
-      \midrule
-      Myring optimized (smooth)         & 0.28-0.30   & $>10^6$           & MDPI CFD study          \\
-      Standard torpedo                  & 0.32-0.35   & $10^6 - 10^7$     & SCIRP analysis          \\
-      With external sensors/protrusions & 0.40-0.50   & Varies            & Experimental data       \\
-      \midrule
-      \textit{Our design estimates:}    &             &                   &                         \\
-      1 m/s cruise                      & 0.32        & $1.1 \times 10^6$ & Conservative            \\
-      4 m/s peak                        & 0.28        & $4.6 \times 10^6$ & Optimistic (streamline) \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-
-  \vspace{1em}
-
-  \textbf{Reynolds Number:} $Re = \frac{\rho v L}{\mu} = \frac{1027 \times v \times 1.2}{1.08 \times 10^{-3}}$
-
-  \begin{itemize}
-    \item @ 1 m/s: $Re = 1.14 \times 10^6$ (turbulent flow)
-    \item @ 4 m/s: $Re = 4.56 \times 10^6$ (fully turbulent)
-  \end{itemize}
-
-  \vspace{0.5em}
-
-  \textbf{Sensitivity:} If actual $C_D = 0.35$ (worst case), thrust required = 235 N → \textcolor{red}{deficit of 35 N}
-\end{frame}
 
 \end{document}
