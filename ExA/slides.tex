@@ -167,7 +167,7 @@
       \toprule
       \textbf{Model}      & \textbf{Type} & \textbf{Mass} & \textbf{Depth} & \textbf{Speed} & \textbf{Endurance} & \textbf{Cost} \\
       \midrule
-      \textbf{Our Target} & AUV           & $<$25 kg      & 250m           & 4 m/s peak     & 2 hrs              & \$10-23K      \\
+      \textbf{Our Target} & AUV           & $<$25 kg      & 250m           & 4 m/s peak     & 2 hrs              & \$9-10K       \\
       \midrule
       Iver3 (L3Harris)    & AUV           & 27-39 kg      & 100m           & 1.3 m/s        & 8-14 hrs           & \$75-120K     \\
       ecoSUB m-Power+     & AUV           & 17 kg         & 500m           & ~1.5 m/s       & 8-10 hrs           & £35-50K       \\
@@ -298,7 +298,7 @@
   \centering
   \small Modular architecture enables phased development and testing
 
-  \note{This simplified system architecture shows the five main subsystems. POWER provides 799 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera, Ping360 sonar, and lights totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting, with optional acoustic modem for underwater comms. This modular design allows independent testing and phased development.}
+  \note{This simplified system architecture shows the five main subsystems. POWER provides 803 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera, Ping360 sonar, and lights totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting, with optional acoustic modem for underwater comms. This modular design allows independent testing and phased development.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -865,7 +865,7 @@
       \textbf{Requirement}         & \textbf{Specification} & \textbf{Achieved} & \textbf{Status} \\
       \midrule
       Mass constraint              & $<$25 kg               & 15.7 kg           & Met             \\
-      Endurance                    & 2 hours                & 2.5 hrs (mixed)   & Met             \\
+      Endurance                    & 2 hours                & 2.6 hrs (mixed)   & Met             \\
       Cruise speed                 & 1 m/s                  & 1 m/s             & Met             \\
       Peak speed                   & 4 m/s                  & 4 m/s             & Met             \\
       Payload power                & 30W                    & 30W (all)         & Met             \\
@@ -878,7 +878,7 @@
   \vspace{1em}
 
   \note{
-    All requirements have been met. Mass is 15.7 kilograms, 37 percent under the 25 kilogram limit. Endurance is 2.5 hours with 80/20 mission profile, exceeding 2 hour requirement. Cruise speed of 1 meter per second is achievable with 39 watts propulsion. Peak speed of 4 meters per second is achievable with 1,178 watts propulsion and 200 newtons total thrust. Payload power is 30 watts total for camera, sonar, and lighting.
+    All requirements have been met. Mass is 15.7 kilograms, 37 percent under the 25 kilogram limit. Endurance is 2.6 hours with 80/20 mission profile, exceeding 2 hour requirement. Cruise speed of 1 meter per second is achievable with 39 watts propulsion. Peak speed of 4 meters per second is achievable with 1,178 watts propulsion and 206 newtons total thrust. Payload power is 30 watts total for camera, sonar, and lighting.
 
     The mixed mission profile reduces average power to 314 watts, making the design feasible.
   }
@@ -890,7 +890,7 @@
     \item \textbf{Power scales as $v^3$:} 4 m/s requires 30× more power than 1 m/s
     \item \textbf{Mission profile approach:} Mixed speed profile (80\% cruise) enables 2-hour endurance
     \item \textbf{Hydrodynamic optimization critical:} Low $C_D$ (0.28-0.32) essential for achieving 4 m/s
-    \item \textbf{Component selection:} T200 thrusters offer best thrust-to-cost ratio (0.36-0.42)
+    \item \textbf{Component selection:} T200 thrusters offer best thrust-to-cost ratio (0.22 N/\$)
   \end{enumerate}
 
   \vspace{0.5em}
@@ -901,7 +901,7 @@
       \begin{itemize}
         \item COTS components
         \item 37\% mass margin
-        \item 25\% endurance margin
+        \item 28\% endurance margin
         \item Modular design
       \end{itemize}
     \end{column}
@@ -953,28 +953,16 @@
 \end{frame}
 
 \begin{frame}{T200 Thruster}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Key Specifications:}
-      \begin{itemize}
-        \item Thrust: 51.5 N fwd @ 16V
-        \item Max power: 390W
-        \item Efficiency: 30\% @ light load, 55\% @ heavy load
-        \item Depth rating: 300m
-        \item Mass: 427g air, 239g in water
-        \item Cost: \$230
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Design Rationale:}
-      \begin{itemize}
-        \item 4× thrusters = 206N total
-        \item Flooded brushless motor (pressure-tolerant)
-        \item Thrust/cost: 0.22 N/\$
-        \item 3.5-10× cheaper than alternatives
-      \end{itemize}
-    \end{column}
-  \end{columns}
+
+  \begin{itemize}
+    \item Thrust: 51.5 N fwd @ 16V
+    \item Max power: 390W
+    \item Efficiency: 30\% @ light load, 55\% @ heavy load
+    \item Depth rating: 300m
+    \item Mass: 427g air, 239g in water
+    \item Cost: \$230
+  \end{itemize}
+
   \vspace{0.5em}
   \tiny Source: bluerobotics.com/store/thrusters/t200-thruster-r2-rp/
 \end{frame}
