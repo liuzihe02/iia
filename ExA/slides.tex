@@ -13,7 +13,7 @@
 
 % Enable speaker notes (uncomment one of these options)
 %\setbeameroption{show notes} % Notes on separate pages
-%\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
+\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
 \usepackage{pgfpages}
 
 % TikZ styles for block diagrams
@@ -61,10 +61,6 @@
 % Title slide
 \frame{\titlepage}
 
-% Table of contents
-\begin{frame}{Outline}
-  \tableofcontents
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Problem - Subsea Cable Inspection}
@@ -155,6 +151,55 @@
   \end{columns}
 
   \note{At 250 m depth, the pressure is approximately 25 bar (2.5 MPa). This is calculated using P = rho g h, where rho is seawater density (1027 kg/m cubed), g is gravitational acceleration, and h is depth. The temperature is approximately 4 degrees Celsius. Materials must resist corrosion - we will use 316 stainless steel and anodized aluminum. Sensors must work in turbid water with near-zero visibility. Communications are limited to acoustic modems underwater since radio and GPS signals cannot penetrate seawater beyond a few meters. The 30W payload limit includes all imaging equipment (camera), ultrasound sensors, and lighting - this is a combined budget, not separate allocations.}
+\end{frame}
+
+
+\begin{frame}{Problem Definition}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Hydrodynamics}
+
+      Analyze underwater drag forces to estimate thrust needed for efficient movement.
+      \begin{itemize}
+        \item Degrees of freedom and stability control
+        \item Drag and resistive forces
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textbf{Mechanical Design}
+
+      Develop the mechanical system ensuring all components fit within the 25kg weight limit.
+      \begin{itemize}
+        \item Buoyancy system
+        \item Structural integrity
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{1em}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{Power Consumption}
+
+      Identify energy storage limits to define mission duration and vehicle size within constraints.
+      \begin{itemize}
+        \item 2 hours continuous operation
+        \item Support 30W load as well as communications and mechanical systems
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textbf{Communication and Control}
+
+      Assess feasibility of underwater wireless communication methods for control and data transfer.
+      \begin{itemize}
+        \item Attenuation in seawater
+        \item Navigation and mapping
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
