@@ -13,7 +13,7 @@
 
 % Enable speaker notes (uncomment one of these options)
 %\setbeameroption{show notes} % Notes on separate pages
-%\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
+\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
 \usepackage{pgfpages}
 
 % TikZ styles for block diagrams
@@ -498,11 +498,11 @@
   \note{
     Our navigation system centers on the Blue Robotics Navigator (220), which integrates dual IMUs and magnetometers for attitude and heading estimation. It costs less than the Pixhawk 6C while offering comparable performance and full ArduSub support.
 
-The Bar30 depth sensor (90) provides 2mm resolution—ideal for maintaining our 2-5m inspection altitude above the cable. At the surface, a u-blox GPS (35) resets IMU drift with 2.5m accuracy every 30 minutes, eliminating the need for costly RTK GPS.
+    The Bar30 depth sensor (90) provides 2mm resolution—ideal for maintaining our 2-5m inspection altitude above the cable. At the surface, a u-blox GPS (35) resets IMU drift with 2.5m accuracy every 30 minutes, eliminating the need for costly RTK GPS.
 
-We evaluated adding a DVL (Doppler Velocity Log) like the Nortek DVL1000 for sub-meter positioning accuracy. However, at 15-25K dollars and an additional 1.2kg, it's unnecessary for cable-following missions where the cable itself serves as our reference frame.
+    We evaluated adding a DVL (Doppler Velocity Log) like the Nortek DVL1000 for sub-meter positioning accuracy. However, at 15-25K dollars and an additional 1.2kg, it's unnecessary for cable-following missions where the cable itself serves as our reference frame.
 
-Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
+    Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
 \end{frame}
 
 
