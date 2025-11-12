@@ -860,10 +860,10 @@ Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
   % Combined speaker notes, preserving the full depth from both original slides
   \note{
     \textbf{(Mass Details)}
-    The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. The largest contributors are the structure and power system . This substantial margin allows for future additions like the acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
+    The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. This large margin allows for future additions like the acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
 
     \textbf{(Cost Details)}
-    The estimated build cost of 10k dollars represents 15-20 percent of comparable commercial AUV systems (50-150K range). Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes core components to minimize cost while maintaining technical performance.
+    The estimated build cost of 10k dollars represents 20 percent of comparable commercial AUV systems (50-150K range). Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions.
   }
 \end{frame}
 
@@ -891,9 +891,7 @@ Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
   \vspace{1em}
 
   \note{
-    All requirements have been met. Mass is 15.7 kilograms, much less than the 25 kilogram limit. Endurance is 2.6 hours with 80/20 mission profile, exceeding 2 hour requirement. Cruise speed of 1 meter per second is achievable with 40W propulsion. Peak speed of 4 meters per second is achievable with 1.2kW watts propulsion and 206N total thrust. Payload power is 30 watts total for camera, sonar, and lighting.
-
-    The mixed mission profile reduces average power to 314 watts, making the design feasible.
+    All requirements have been met. Mass at 15kg, endurance at 2.6 hrs, with the mixed mission profile making the design feasible.
   }
 \end{frame}
 
@@ -903,7 +901,6 @@ Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
     \item \textbf{Power scales as $v^3$:} 4 m/s requires 30× more power than 1 m/s
     \item \textbf{Mission profile approach:} Mixed speed profile (80\% cruise) enables 2-hour endurance
     \item \textbf{Hydrodynamic optimization critical:} Low $C_D$ (0.28-0.32) essential for achieving 4 m/s
-    \item \textbf{Component selection:} T200 thrusters offer best thrust-to-cost ratio (0.22 N/\$)
   \end{enumerate}
 
   \vspace{0.5em}
@@ -929,15 +926,8 @@ Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
   \end{columns}
 
   \note{
-    The fundamental constraint is that power scales with velocity cubed, so we need much higher minimum power for fast peak speeds.
 
-    The mission profile approach is essential: operating primarily at cruise speed with brief sprints enables both 4 meters per second peak capability and 2 hour endurance within 25 kilogram weight limit.
-
-    Hydrodynamic optimization is also important. Low drag coefficient of 0.28 to 0.32 is achieved through a torpedo hull shape with 4 to 1 length-to-diameter ratio. Higher drag would require more thrust, more power, heavier batteries.
-
-    Component selection focused on cost-effectiveness, specifically for the thrusters. Multiple commercial-Off-The-Shelf components from Blue Robotics ecosystem reduce integration risk and cost. These COTS components are proven in thousands of deployments, with established supply chains and documented reliability.
-
-    Strengths of our design include large mass and weight margins, where the 40 percent mass margin enables future additions like the acoustic modem at 1.5 kilograms. The 25 percent endurance margin provides operational flexibility for longer missions or unexpected delays.
+    Strengths of our design include great cost effectiveness, where we focused on commercial-off-the-shelf components which has good reliability and decreases complexity too. We have good mass and weight margins, where the 40 percent mass margin enables future additions like the acoustic modem at 1.5 kilograms. The 25 percent endurance margin provides operational flexibility for longer missions or unexpected delays.
 
     However our power constraints are quite tight. The low-drag form is essential - higher drag would easily exceed available thrust and increase power requirements. IMU dead reckoning accumulates drift over 2 hours, requiring periodic surface GPS fixes for position correction. We chose this instead of using acoustic modems as this would massively increase cost.
   }
