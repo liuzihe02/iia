@@ -81,7 +81,7 @@
     \end{column}
   \end{columns}
 
-  \note{Before we dive into our design and feasibility assessment, let's give some context to the problem we're tackling: Subsea cables. Your internet connection, whether that be for online banking or video calls, 97-99\% of that data goes through a dense network of over 500+ undersea cables, spanning a total of 14 million kilometers over the seafloor making it THE largest and possibly greatest man-made infrastructure ever. This is the backbone of the internet, and when they fail, the consequences are severe. Despite the significance of these cables, these cables are no thicker than your average garden-hose around 2-5 cm in diameter, with hair-thin strands of optical fiber embedded within, designed to remain undisturbed across the seabed.}
+  \note{Before we dive into our design and feasibility assessment, let's give some context to the problem we're tackling: Subsea cables. Your internet connection, whether that be for online banking or video calls, 97-99\% of that data goes through a dense network of over 500+ undersea cables, spanning a total of 14 million kilometers over the seafloor making it THE largest man-made infrastructure. Despite the significance of these cables, these cables are no thicker than your average garden-hose around 2-5 cm in diameter, with hair-thin strands of optical fiber embedded within, designed to remain undisturbed across the seabed.}
 \end{frame}
 
 \begin{frame}{Problem - Current Limitations}
@@ -114,7 +114,7 @@
   \centering
   \textit{Solution: Free-roving Autonomous Underwater Vehicle}
 
-  \note{In shallow waters however, these subsea cables are susceptible to a wider range of disturbances, largely from human activities such as anchoring, or snagged by nets, resulting in roughly 200 faults a year. In October 2022, both cables serving the Shetland Islands were damaged. For days, 23,000 people had no internet, could not use card payments, could not access online banking. Businesses lost thousands. Emergency services were disrupted. These are not rare events, they require constant monitoring and effective maintenance. When a fault occurs, an army of ships strategically placed around the world would identify and repair the location of the fault, which usually involves the usage of a tethered drone to inspect the damaged cable. Despite the effectiveness of tethered communications and unlimited power, this comes at the cost of a limited range of motion and risks of entanglement, as well as higher maintenance costs for dedicated vessels. Therefore we propose the use of an untethered AUV}
+  \note{In shallow waters however, these subsea cables are vulnerable to human activities, causing an average of 200 faults per year. Incidents such as these may cause severe consequences such as in October 2022 when both cables serving the Shetland Islands were damaged, leaving 23,000 people without internet for days. Traditional tethered ROVs can be used to fix these damages, providing unlimited power and real-time control. However, they suffer from limited range, entanglement risks and high operational costs.}
 \end{frame}
 
 
@@ -152,8 +152,8 @@
 
   \note{
     We are required to design an untethered cable inspection drone operating at 250m depth with a top speed of 4m/s and 1m/s cruise, allowing an operation time of around 2 hours, while keeping the total weight below 25kg.
-    The pressure at this depth is approximately 25 bar, calculated using P = rho g h, where rho is seawater density (1027 kg/m cubed).The temperature is approximately 4 degrees Celsius.
-    We should account for the high signal attenuation underwater, as well as materials' resistance to corrosion. Sensors must work in turbid water with near-zero visibility. }
+    The pressure at this depth is approximately 25 bars, with a temperature of approximately 4 degrees Celsius.
+    We should account for the high signal attenuation underwater, as well as materials' resistance to corrosion. Furthermore, Sensors must work in turbid water with near-zero visibility. }
 \end{frame}
 
 
@@ -354,7 +354,7 @@
   \centering
   \small Modular architecture enables phased development and testing
 
-  \note{This simplified system architecture shows the five main subsystems. POWER provides 803 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera and ultrasound totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting. This modular design allows independent testing and phased development.}
+  \note{This simplified system architecture shows the five main subsystems. A power supply provides 803Whs from 3 lithium-ion batteries feeding to the on-board Raspberry Pi 4 computer, running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera and ultrasound totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -375,15 +375,11 @@
   \textbf{Result:} Minimise communication underwater — store data onboard, transfer at surface
 
   \note{
-    Before diving into our design decisions, it’s important to understand why underwater communication and navigation are inherently difficult problems.
+    We'll start with Communication and Navigation, addressing the challenges of underwater communication.
 
-    First, radio waves — which power all our terrestrial wireless communication — are heavily absorbed by seawater. Even at low frequencies, the signal strength drops to unusable levels within just a few meters.
+    The most commonly used radio waves are heavily absorbed by seawater, making their effective length limited to a few metres. alternatives such as optical communication may achieve higher data rates, but only in clear water and over short, line-of-sight distances.
 
-    Optical communication, like lasers or LEDs, can achieve higher data rates, but only in clear water and over short, line-of-sight distances — typically less than 100 meters.
-
-    That leaves acoustics as the only practical long-range option. Acoustic modems can reach several kilometers, but at a steep cost: data rates of only a few kilobits per second, high latency, and unit prices easily exceeding twelve thousand dollars.
-
-    For our small, autonomous inspection drone, these trade-offs simply aren’t efficient.
+    That leaves acoustics as the only practical long-range option, however they are still limited in bandwidth and high latency, not to mention their steep cost.
 
     As a result, our design minimizes underwater communication by storing all sensor data onboard during the mission and transferring it to the surface once the vehicle resurfaces. This approach maximizes data throughput while avoiding the complexities of underwater communication.
 
