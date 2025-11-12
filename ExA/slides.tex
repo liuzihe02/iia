@@ -421,11 +421,11 @@
   \end{itemize}
 
   \note{
-    When the AUV surfaces, it uses the Raspberry Pi 4’s built-in WiFi with a marine-grade antenna to transfer data at around 150 megabits per second. This allows a complete upload of all mission data such as recorded video — roughly 7–8 gigabytes — in just a few minutes. Surfacing every 30 minutes lets us offload data incrementally when the vehicle is in the 50-100 meter range, reducing onboard storage requirements and ensuring data safety even if the vehicle is lost.
+    When the AUV surfaces, it uses the Raspberry Pi 4’s built-in WiFi to transfer data, allowing a complete upload of all mission data such as recorded video in just a few minutes. Surfacing every 30 minutes lets us offload data incrementally, reducing onboard storage requirements and ensuring data safety, even if the vehicle is lost.
 
-    For open-ocean or long-range missions, we include a RockBLOCK 9603N Iridium module. It provides global satellite coverage and transmits compact status messages — GPS coordinates, depth, and system health — every 10 minutes.  This ensures vehicle recoverability and global operational capability.
+    For open-ocean or long-range missions, we include a RockBLOCK Iridium module which provides global satellite coverage and transmits compact status messages every 10 minutes such as location updates and status, ensuring vehicle recoverability.
 
-    Excluding acoustic and optical modems dramatically reduces costs, as acoustic systems cost over 12,000 dollars, have very low bandwidth (under 20 kbps), and are impractical for transferring gigabytes of data.
+    The choice of excluding acoustic and optical modems dramatically reduces costs, as acoustic systems cost over 12,000 dollars, have very low bandwidth (under 20 kbps), and are impractical for transferring gigabytes of data.
   }
 \end{frame}
 
@@ -453,18 +453,14 @@
     \textbf{Speaker Notes:}
 
     When designing a free-roving underwater vehicle, one of the biggest challenges is maintaining a reliable sense of position and orientation without GPS.
-    One of the most cost-effective solutions is to rely on an Inertial Measurement Unit, or IMU, which combines gyroscopes and accelerometers to track motion.
-    However, IMU-based navigation underwater is an integration problem: we integrate angular rate for orientation and acceleration twice for position.
-    This process inherently accumulates error—random noise grows as the square root of time, and bias causes linear drift.
-    Over long missions, these effects can lead to significant position uncertainty if left uncorrected.
+    One of the most cost-effective solutions is to rely on an IMU, which combines gyroscopes and accelerometers to measure angular rates and linear accelerations, integrating them to find their orientation and position.
+    However, this process inherently accumulates error—random noise, causing position drift over time and unbounded error growth.
 
-    Our mitigation strategy combines multiple complementary techniques:
+    We address these shortcomings with a range of mitigation techniques:
     zero-velocity detection to reset errors during stationary periods,
-    sensor fusion to stabilize heading and depth,
-    cable-relative tracking using sonar or vision to maintain lateral alignment,
+    sensor fusion to stabilize heading and depth by combining with magnetometer and depth sensors, and optionally a DVL to constrain horizontal drift.
+    cable-relative tracking using sonar or vision to maintain lateral alignment if on an inspection path,
     and periodic GPS updates during surfacing to reset accumulated horizontal drift.
-
-    Together, these methods ensure reliable navigation for cable inspection, with accuracy sufficient for operational needs without requiring costly DVL systems.
   }
 \end{frame}
 
@@ -500,7 +496,7 @@
   \textbf{Baseline Cost: \$420} (Navigator + Bar30 + u-blox + RPi4)
 
   \note{
-    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation, and connects directly to our Raspberry Pi. At 220 dollars, it costs less than the Pixhawk 6C with a similar performance, and is fully supported by ArduSub.
+    This influences our navigation system that is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation, and connects directly to our Raspberry Pi. At 220 dollars, it costs less than the Pixhawk 6C with a similar performance, and is fully supported by ArduSub.
 
     Sensor fusion uses the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
 
