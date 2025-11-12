@@ -13,7 +13,7 @@
 
 % Enable speaker notes (uncomment one of these options)
 %\setbeameroption{show notes} % Notes on separate pages
-\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
+%\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
 \usepackage{pgfpages}
 
 % TikZ styles for block diagrams
@@ -157,6 +157,16 @@
 \begin{frame}{Problem Definition}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
+      \textbf{Communications and Navigation}
+
+      Assess feasibility of underwater wireless communication methods for control and data transfer.
+      \begin{itemize}
+        \item Attenuation in seawater
+        \item Navigation and mapping
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
       \textbf{Hydrodynamics}
 
       Analyze underwater drag forces to estimate thrust needed for efficient movement.
@@ -165,23 +175,14 @@
         \item Drag and resistive forces
       \end{itemize}
     \end{column}
-
-    \begin{column}{0.48\textwidth}
-      \textbf{Mechanical Design}
-
-      Develop the mechanical system ensuring all components fit within the 25kg weight limit.
-      \begin{itemize}
-        \item Buoyancy system
-        \item Structural integrity
-      \end{itemize}
-    \end{column}
   \end{columns}
 
   \vspace{1em}
 
   \begin{columns}[T]
+
     \begin{column}{0.48\textwidth}
-      \textbf{Power Consumption}
+      \textbf{Power Budget Analysis}
 
       Identify energy storage limits to define mission duration and vehicle size within constraints.
       \begin{itemize}
@@ -191,14 +192,15 @@
     \end{column}
 
     \begin{column}{0.48\textwidth}
-      \textbf{Communication and Control}
+      \textbf{Mechanical and Structural Design}
 
-      Assess feasibility of underwater wireless communication methods for control and data transfer.
+      Develop the mechanical system ensuring all components fit within the 25kg weight limit.
       \begin{itemize}
-        \item Attenuation in seawater
-        \item Navigation and mapping
+        \item Buoyancy system
+        \item Structural integrity
       \end{itemize}
     \end{column}
+
   \end{columns}
 \end{frame}
 
@@ -504,7 +506,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Hydrodynamics and Propulsion Analysis}
+\section{Hydrodynamics Analysis}
 
 \begin{frame}{Hydrodynamic Drag}
   \textbf{Vehicle Geometry (Torpedo Hull):}
@@ -573,7 +575,7 @@
     This cubic scaling makes sustained high-speed underwater operation challenging. The constraint is battery energy, which translates directly to weight. Battery energy requirements conflict with the 25 kilogram mass limit.
   }
 \end{frame}
-\begin{frame}{Thruster Selection - T200}
+\begin{frame}{Thruster Selection}
   \begin{table}
     \scriptsize
     \setlength{\tabcolsep}{4pt}
@@ -629,9 +631,9 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Power Budget and Energy Storage}
+\section{Power Budget Analysis}
 
-\begin{frame}{Complete System Power Budget}
+\begin{frame}{System Power Budget}
   \begin{table}
     \footnotesize
     \begin{tabular}{lccc}
@@ -713,7 +715,7 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Mechanical Design and Structural Analysis}
+\section{Mechanical and Structural Analysis}
 
 \begin{frame}{Material Selection and Component Specifications}
   \textbf{Pressure Housing Comparison:}
