@@ -367,10 +367,10 @@
   \note{
     When the AUV surfaces, it uses the Raspberry Pi 4’s built-in WiFi with a marine-grade antenna to transfer data at around 150 megabits per second. This allows a complete upload of all mission data such as recorded video — roughly 7–8 gigabytes — in just a few minutes. Surfacing every 30 minutes lets us offload data incrementally when the vehicle is in the 50-100 meter range, reducing onboard storage requirements and ensuring data safety even if the vehicle is lost.
 
-For open-ocean or long-range missions, we include a RockBLOCK 9603N Iridium module. It provides global satellite coverage and transmits compact status messages — GPS coordinates, depth, and system health — every 10 minutes.  This ensures vehicle recoverability and global operational capability.
+    For open-ocean or long-range missions, we include a RockBLOCK 9603N Iridium module. It provides global satellite coverage and transmits compact status messages — GPS coordinates, depth, and system health — every 10 minutes.  This ensures vehicle recoverability and global operational capability.
 
-Excluding acoustic and optical modems dramatically reduces costs, as acoustic systems cost over 12,000 dollars, have very low bandwidth (under 20 kbps), and are impractical for transferring gigabytes of data.
-    }
+    Excluding acoustic and optical modems dramatically reduces costs, as acoustic systems cost over 12,000 dollars, have very low bandwidth (under 20 kbps), and are impractical for transferring gigabytes of data.
+  }
 \end{frame}
 
 \begin{frame}{Navigation Scoping Calculations}
@@ -428,9 +428,11 @@ Excluding acoustic and optical modems dramatically reduces costs, as acoustic sy
                                  & Keller PA-7LD          & ±0.3m accuracy, stable                 & \$200-500     \\
       \midrule
       \textbf{Surface GPS}       & u-blox NEO-M8N         & 2.5m accuracy                          & \$35          \\
-                                 & RTK GPS                & $<$0.1m accuracy                         & \$300-600     \\
+                                 & RTK GPS                & $<$0.1m accuracy                       & \$300-600     \\
       \midrule
-      \textbf{DVL (Optional)}               & Nortek DVL1000         & 0.2 cm/s, <1m over 2 hrs               & \$20,000      \\
+      \textbf{Computer}          & Raspberry Pi 4         & Quad-core ARM, 4GB RAM                 & \$75          \\
+      \midrule
+      \textbf{DVL (Optional)}    & Nortek DVL1000         & 0.2 cm/s, <1m over 2 hrs               & \$20,000      \\
                                  & Teledyne Pathfinder    & Similar, proven                        & \$18-28K      \\
       \bottomrule
     \end{tabular}
@@ -439,18 +441,18 @@ Excluding acoustic and optical modems dramatically reduces costs, as acoustic sy
 
   \vspace{0.5em}
 
-  \textbf{Baseline Cost: \$228} (Navigator + Bar30 + u-blox + RPi4)
+  \textbf{Baseline Cost: \$420} (Navigator + Bar30 + u-blox + RPi4)
 
   \note{
-    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation. It connects directly to the Raspberry Pi, reducing cabling and improving reliability. At only 125 dollars, it delivers Pixhawk-level performance at less than half the cost and is fully supported by ArduSub, a proven open-source autopilot.
+    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation. It connects directly to the Raspberry Pi, reducing cabling and improving reliability. At 220 dollars, it costs 27 percent less than Pixhawk 6C (300 dollars) and is fully supported by ArduSub, a proven open-source autopilot.
 
-Depth is measured with the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
+    Depth is measured with the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
 
-At the surface, a u-blox NEO-M8N GPS resets accumulated IMU drift with ~2.5 m accuracy, which is sufficient for our 30-minute surface intervals—no need for costly RTK GPS.
+    At the surface, a u-blox NEO-M8N GPS resets accumulated IMU drift with ~2.5 m accuracy, which is sufficient for our 30-minute surface intervals—no need for costly RTK GPS.
 
-We also considered a DVL like the Nortek DVL1000 for sub-meter accuracy, but at  a 15–25k dollar price and +1.2 kg weight, it’s unnecessary for cable-following missions.
+    We also considered a DVL like the Nortek DVL1000 for sub-meter accuracy, but at  a 15–25k dollar price and +1.2 kg weight, it’s unnecessary for cable-following missions.
 
-Altogether, the baseline navigation stack — Navigator, Bar30, GPS, and Pi — costs about 228,.
+    Altogether, the baseline navigation stack — Navigator (220), Bar30 (90), GPS (35), and Raspberry Pi 4 (75) — costs 420 dollars total.
   }
 \end{frame}
 
