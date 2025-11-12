@@ -13,7 +13,7 @@
 
 % Enable speaker notes (uncomment one of these options)
 %\setbeameroption{show notes} % Notes on separate pages
-%\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
+\setbeameroption{show notes on second screen=right} % Notes on second screen for presentation
 \usepackage{pgfpages}
 
 % TikZ styles for block diagrams
@@ -573,11 +573,9 @@
 
     Thruster efficiency varies with load. At 1 meter per second, mechanical power required is 11.6 watts, but thruster efficiency at light load is only 30 percent, which gives us a minimum electrical power requirement of 39W
 
-    At 4 meters per second, mechanical power required is 648 watts - much higher than at cruise speed. At heavy load, thruster efficiency increases to 55 percent, so electrical power is 1,178 watts.
+    At 4 meters per second, mechanical power required is 648 watts - much higher than at cruise speed. At heavy load, thruster efficiency increases to 55 percent, so electrical power required is about 1.1kW
 
-    The critical number: 1,178 watts propulsion at peak versus 39 watts at cruise. This is 30 times more power for 4 times speed, which is helped by efficiency gains with higher speed
-
-    However this cubic scaling makes sustained high-speed underwater operation challenging. The constraint is battery energy, where a larger battery weighs much heavier
+    This much higher peak power requirement makes sustained high-speed underwater operation challenging. The constraint is battery energy, where a larger battery weighs add to our mass constraint
   }
 \end{frame}
 \begin{frame}{Thruster Selection}
