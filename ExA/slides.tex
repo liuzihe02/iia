@@ -496,16 +496,13 @@
   \textbf{Baseline Cost: \$420} (Navigator + Bar30 + u-blox + RPi4)
 
   \note{
-    This influences our navigation system that is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation, and connects directly to our Raspberry Pi. At 220 dollars, it costs less than the Pixhawk 6C with a similar performance, and is fully supported by ArduSub.
+    Our navigation system centers on the Blue Robotics Navigator (220), which integrates dual IMUs and magnetometers for attitude and heading estimation. It costs less than the Pixhawk 6C while offering comparable performance and full ArduSub support.
 
-    Sensor fusion uses the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
+The Bar30 depth sensor (90) provides 2mm resolution—ideal for maintaining our 2-5m inspection altitude above the cable. At the surface, a u-blox GPS (35) resets IMU drift with 2.5m accuracy every 30 minutes, eliminating the need for costly RTK GPS.
 
-    At the surface, a u-blox NEO-M8N GPS resets accumulated IMU drift with ~2.5 m accuracy, which is sufficient for our 30-minute surface intervals—no need for costly RTK GPS.
+We evaluated adding a DVL (Doppler Velocity Log) like the Nortek DVL1000 for sub-meter positioning accuracy. However, at 15-25K dollars and an additional 1.2kg, it's unnecessary for cable-following missions where the cable itself serves as our reference frame.
 
-    We also considered a DVL like the Nortek DVL1000 for sub-meter accuracy, but at  a 15–25k dollar price and +1.2 kg weight, it’s unnecessary for cable-following missions.
-
-    Altogether, the baseline navigation stack — Navigator (220), Bar30 (90), GPS (35), and Raspberry Pi 4 (75) — costs 420 dollars total.
-  }
+Total baseline navigation cost: 420 (Navigator + Bar30 + GPS + RPi4).  }
 \end{frame}
 
 
