@@ -150,7 +150,10 @@
     \end{column}
   \end{columns}
 
-  \note{At 250 m depth, the pressure is approximately 25 bar (2.5 MPa). This is calculated using P = rho g h, where rho is seawater density (1027 kg/m cubed), g is gravitational acceleration, and h is depth. The temperature is approximately 4 degrees Celsius. Materials must resist corrosion - we will use 316 stainless steel and anodized aluminum. Sensors must work in turbid water with near-zero visibility. Communications are limited to acoustic modems underwater since radio and GPS signals cannot penetrate seawater beyond a few meters. The 30W payload limit includes all imaging equipment (camera), ultrasound sensors, and lighting - this is a combined budget, not separate allocations.}
+  \note{
+    We are required to design an untethered cable inspection drone operating at 250m depth with a top speed of 4m/s and 1m/s cruise, allowing an operation time of around 2 hours, while keeping the total weight below 25kg.
+    The pressure at this depth is approximately 25 bar, calculated using P = rho g h, where rho is seawater density (1027 kg/m cubed).The temperature is approximately 4 degrees Celsius.
+    We should account for the high signal attenuation underwater, as well as materials' resistance to corrosion. Sensors must work in turbid water with near-zero visibility. }
 \end{frame}
 
 
@@ -202,6 +205,10 @@
     \end{column}
 
   \end{columns}
+  \note{
+    We characterise the requirements into 4 sections, Communication and control, hydrondynamics, power and mechanical design, each addressing different aspects of the design to be considered. Communication and control addresses the difficulty of untethered communications, as well as navigating in the undersea environment. Hydrodynamics characterises the operating environment, addressing movement and agility of the drone. 
+  Power defines the endurance of the operations, and finally mechanical design ensures structural integrity.
+  }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,7 +260,9 @@
   \centering
   Key finding: No commercial AUV $<$25 kg achieves 4 m/s sustained speed
 
-  \note{Many commercial solutions exist but vary in capability. Commercial designs such as the Iver3 and ecoSUB use fully autonomous operation with single thruster plus fins for pitch/yaw control. The Boxfish uses 8 vectored thrusters for full 6-DOF control including hovering. BlueROV2 is included as it is a Blue Robotics reference platform that proves component viability, though it is a tethered ROV not an autonomous AUV. Key finding: Few commercial AUVs under 25 kg achieve 4 m/s sustained speed - most operate at 1.5-2.5 m/s due to power limitations. Commercial pricing (50-150K dollars) reflects support and warranty, not just hardware costs. Our target specifications are ambitious but achievable with careful trade-off management.}
+  \note{Many commercial solutions exist but vary in capability. Simple untethered designs such as the Iver3 and ecoSUB use fully autonomous operation with single thruster designs plus fins for pitch/yaw control, but can be limited in depth and agility.
+  More advanced designs offer better mobility such as the Boxfish using 8 vectored thrusters for full 6-DOF control, allowing hovering and other fine movements. BlueROV2 demonstrates the capabilities of a tethered ROV with an optional autonomous mode, offering lighter design as well as live feedback as an example of a semi-tethered design.
+  We find that few commercial AUVs achieve 4 m/s sustained speed - most operate at 1.5-2.5 m/s due to power limitations, however it is reasonable to believe our target specifications despite ambitious is achievable with careful trade-off management.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -327,11 +336,11 @@
   \end{center}
 
   \note{
-    The design uses an autonomous approach instead of untethered ROV operation, as untethered ROVs require continuous high-bandwidth communication for real-time control, which is only possible with a physical cable limiting range and adding complexity. Autonomous operation enables self-contained missions with onboard power, navigation, and data storage.
+    Our design uses an autonomous approach instead of untethered ROV operation, as untethered ROVs require continuous high-bandwidth communication for real-time control, which is impractical with limited battery life and processing power (more on this later). Autonomous operation enables self-contained missions with onboard power, navigation, and data storage, and removes the need for human operators to constantly monitor the mission.
 
-    The 4-thruster configuration provides full 6-degree-of-freedom control. Four horizontal thrusters control surge, sway, and yaw. Two vertical thrusters control heave, pitch, and roll. This enables precise hovering at fixed positions for detailed cable inspection, and lateral motion without changing heading. Redundancy allows safe recovery if one thruster fails. The configuration is efficient for low-speed maneuvering typical of inspection tasks.
+    The 4-thruster configuration provides a good balance between maneuverability and power draw. This enables precise hovering at fixed positions for detailed cable inspection, and lateral motion without changing heading. The configuration is efficient for low-speed maneuvering typical of inspection tasks.
 
-    The cylindrical pill-shaped hull minimizes drag and simplifies hydrodynamics. At 4 meters per second, drag force is 0.5 times density times velocity squared times drag coefficient times frontal area. A streamlined torpedo shape achieves drag coefficient 0.28 to 0.32, significantly lower than spherical hulls at 0.47. The cylindrical geometry also simplifies internal component layout and pressure vessel calculations using standard ASME formulas.
+    The cylindrical pill-shaped hull minimizes drag and simplifies hydrodynamics, and is a staple in underwater ROV design.
   }
 \end{frame}
 
@@ -345,7 +354,7 @@
   \centering
   \small Modular architecture enables phased development and testing
 
-  \note{This simplified system architecture shows the five main subsystems. POWER provides 803 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera, Ping360 sonar, and lights totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting, with optional acoustic modem for underwater comms. This modular design allows independent testing and phased development.}
+  \note{This simplified system architecture shows the five main subsystems. POWER provides 803 Wh from three 18Ah lithium-ion batteries at 14.8V. CONTROL uses the Navigator flight controller with dual IMUs plus Raspberry Pi 4 running ArduSub for mission control, along with depth sensor, compass, and surface GPS. PROPULSION consists of four T200 thrusters controlled by ESCs. PAYLOAD includes camera and ultrasound totaling 30W. COMMUNICATIONS uses WiFi for high-bandwidth surface data transfer and Iridium satellite for position reporting. This modular design allows independent testing and phased development.}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -491,9 +500,9 @@
   \textbf{Baseline Cost: \$420} (Navigator + Bar30 + u-blox + RPi4)
 
   \note{
-    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation. It connects directly to the Raspberry Pi, reducing cabling and improving reliability. At 220 dollars, it costs 27 percent less than Pixhawk 6C (300 dollars) and is fully supported by ArduSub, a proven open-source autopilot.
+    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation, and connects directly to our Raspberry Pi. At 220 dollars, it costs less than the Pixhawk 6C with a similar performance, and is fully supported by ArduSub.
 
-    Depth is measured with the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
+    Sensor fusion uses the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
 
     At the surface, a u-blox NEO-M8N GPS resets accumulated IMU drift with ~2.5 m accuracy, which is sufficient for our 30-minute surface intervals—no need for costly RTK GPS.
 
