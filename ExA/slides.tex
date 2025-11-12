@@ -264,9 +264,9 @@
               \item Supports scalable inspection missions without reliance on surface tethers
             \end{itemize}
 
-      \item 6-thruster design for stability and hovering capabilities for detailed inspection
+      \item 4-thruster design gives a good balance between maneuverability, stability, and power efficiency
             \begin{itemize}
-              \item Provides full 6-DOF control for precise hovering, lateral motion, and pitch/yaw stability
+              \item Sufficient for precise hovering and pitch/yaw stability
               \item Redundancy for safe recovery in case of partial thruster failure
               \item Efficient low-speed maneuvering for inspection tasks
             \end{itemize}
@@ -280,9 +280,9 @@
   \end{center}
 
   \note{
-    The design uses an autonomous approach instead of tethered ROV operation. Tethered ROVs require continuous high-bandwidth communication for real-time control, which is only possible with a physical cable limiting range and adding complexity. Autonomous operation enables self-contained missions with onboard power, navigation, and data storage.
+    The design uses an autonomous approach instead of untethered ROV operation, as untethered ROVs require continuous high-bandwidth communication for real-time control, which is only possible with a physical cable limiting range and adding complexity. Autonomous operation enables self-contained missions with onboard power, navigation, and data storage.
 
-    The 6-thruster configuration provides full 6-degree-of-freedom control. Four horizontal thrusters control surge, sway, and yaw. Two vertical thrusters control heave, pitch, and roll. This enables precise hovering at fixed positions for detailed cable inspection, and lateral motion without changing heading. Redundancy allows safe recovery if one thruster fails. The configuration is efficient for low-speed maneuvering typical of inspection tasks.
+    The 4-thruster configuration provides full 6-degree-of-freedom control. Four horizontal thrusters control surge, sway, and yaw. Two vertical thrusters control heave, pitch, and roll. This enables precise hovering at fixed positions for detailed cable inspection, and lateral motion without changing heading. Redundancy allows safe recovery if one thruster fails. The configuration is efficient for low-speed maneuvering typical of inspection tasks.
 
     The cylindrical pill-shaped hull minimizes drag and simplifies hydrodynamics. At 4 meters per second, drag force is 0.5 times density times velocity squared times drag coefficient times frontal area. A streamlined torpedo shape achieves drag coefficient 0.28 to 0.32, significantly lower than spherical hulls at 0.47. The cylindrical geometry also simplifies internal component layout and pressure vessel calculations using standard ASME formulas.
   }
@@ -329,7 +329,7 @@
 
     For our small, autonomous inspection drone, these trade-offs simply aren’t efficient.
 
-    As a result, our design minimizes underwater communication. Instead, we store all sensor data onboard during the mission and transfer it to the surface once the vehicle resurfaces. This approach maximizes data throughput while avoiding the complexities of underwater comms.
+    As a result, our design minimizes underwater communication by storing all sensor data onboard during the mission and transferring it to the surface once the vehicle resurfaces. This approach maximizes data throughput while avoiding the complexities of underwater communication.
 
   }
 \end{frame}
@@ -365,35 +365,12 @@
   \end{itemize}
 
   \note{
-    \textbf{WiFi 802.11n - WHY THIS CHOICE:}
+    When the AUV surfaces, it uses the Raspberry Pi 4’s built-in WiFi with a marine-grade antenna to transfer data at around 150 megabits per second. This allows a complete upload of all mission data such as recorded video — roughly 7–8 gigabytes — in just a few minutes. Surfacing every 30 minutes lets us offload data incrementally when the vehicle is in the 50-100 meter range, reducing onboard storage requirements and ensuring data safety even if the vehicle is lost.
 
-    The Raspberry Pi 4 includes built-in WiFi at zero additional hardware cost - we only need a 50-dollar marine-grade antenna with waterproof connector. When the vehicle surfaces, WiFi provides 150 megabits per second bandwidth enabling complete mission data download in 2-5 minutes. Our 2-hour mission generates approximately 7-8 gigabytes of 1080p video plus 20-25 gigabytes of Ping360 sonar data if recording continuously. At 150 megabits per second (approximately 18 megabytes per second real throughput), we can transfer 2-4 gigabytes in 2-5 minutes. The operational strategy is to surface every 30 minutes, dump accumulated data via WiFi, then continue the mission. This eliminates the need for expensive onboard storage (a 512 gigabyte industrial SSD costs 200-400 dollars) and ensures data is safely transferred even if the vehicle is lost. WiFi range of 50-100 meters at the surface is adequate when operating near the mothership. For operations beyond WiFi range, the vehicle stores data locally and dumps it when returning to the ship.
+For open-ocean or long-range missions, we include a RockBLOCK 9603N Iridium module. It provides global satellite coverage and transmits compact status messages — GPS coordinates, depth, and system health — every 10 minutes.  This ensures vehicle recoverability and global operational capability.
 
-    \textbf{RockBLOCK 9603N Iridium - WHY THIS CHOICE:}
-
-    The RockBLOCK provides global satellite coverage pole-to-pole, critical for open ocean operations where the vehicle may travel kilometers from the mothership following the cable route. Every 10 minutes, the vehicle surfaces and transmits a 340-byte message containing GPS coordinates (latitude, longitude, ~20 bytes), depth, heading, battery voltage, and status flags. This costs approximately 11-14 cents per message, so 12 messages over a 2-hour mission costs 1.32-1.68 dollars in data charges. The monthly line rental is 15 dollars whether we use it or not. This small operational cost ensures vehicle recoverability - if the vehicle loses communication or experiences a fault, the last-known position enables recovery. The RockBLOCK draws only 0.8 watts average during message transmission (20 second session) and 40 milliamps idle (0.2 watts), making power impact negligible. At 260 dollars hardware cost, it's 30-50 times cheaper than marine satellite terminals costing 8,000-15,000 dollars.
-
-    \textbf{WHY NOT ACOUSTIC MODEM (12,000 dollars):}
-
-    Acoustic modems like the EvoLogics S2C M 18/34 cost 12,000-15,000 dollars and provide 13.9 kilobits per second data rate. Transferring our 7-8 gigabytes of video data would require 72-80 hours at full acoustic bandwidth - completely impractical. Even if we only sent status telemetry (100 bytes every 10 seconds = 1 kilobyte per minute = 120 kilobytes over 2 hours), this represents only 0.0017 percent of our total data volume. The acoustic modem costs 40 times our entire communication budget (WiFi plus Iridium = 310 dollars) yet provides no practical benefit for our autonomous mission profile. Acoustic modems are justified for tethered ROVs requiring real-time video and control, or for multi-vehicle coordination. Our vehicle follows pre-programmed waypoints, stores data onboard, and surfaces for communication - eliminating acoustic modem necessity.
-
-    \textbf{WHY NOT OPTICAL MODEM (8,000-12,000 dollars):}
-
-    Underwater optical communication achieves megabit per second data rates but requires line-of-sight and operates only in clear water under 50-100 meters range. Subsea cable inspection occurs in turbid coastal waters where visibility may be 1-3 meters. Optical modems cost 8,000-12,000 dollars and would be useless in our operating environment. Even in clear water, the vehicle must maintain precise alignment with the mothership's optical transceiver - incompatible with autonomous cable-following missions.
-
-    \textbf{DATA VOLUME ANALYSIS - JUSTIFYING SURFACE COMMUNICATION:}
-
-    Camera: 1080p at 30 fps, H.264 compression = 8 megabits per second = 1 megabyte per second = 3.6 gigabytes per hour = 7.2 gigabytes for 2-hour mission.
-
-    Ping360 sonar: 400 points per scan, 10-20 hertz scan rate, 16-bit data = approximately 12-24 kilobits per second = 1.5-3 megabytes per minute = 90-180 megabytes per hour. If we record every scan, this is 180-360 megabytes for 2 hours - much less than video.
-
-    Total: approximately 7.5-8 gigabytes per mission. At 150 megabits per second WiFi throughput (18-19 megabytes per second), transfer time is 7,500 megabytes divided by 18 = 417 seconds = 7 minutes. If we surface every 30 minutes (four times during 2-hour mission), each surface interval transfers approximately 2 gigabytes in 2 minutes, well within our operational margin.
-
-    \textbf{ALTERNATIVE APPROACH REJECTED - ONBOARD STORAGE ONLY:}
-
-    We could store all data on a 512 gigabyte SSD and download after mission completion. This saves 2-minute surface intervals but introduces risk - if the vehicle is lost, all mission data is lost. The surface-and-dump strategy ensures data is safely transferred even if subsequent vehicle loss occurs. The 2-minute surface intervals every 30 minutes also allow GPS position resets that reduce IMU drift, making them operationally beneficial rather than purely communication-driven.
-
-    =  }
+Excluding acoustic and optical modems dramatically reduces costs, as acoustic systems cost over 12,000 dollars, have very low bandwidth (under 20 kbps), and are impractical for transferring gigabytes of data.
+    }
 \end{frame}
 
 \begin{frame}{Navigation Scoping Calculations}
@@ -419,7 +396,9 @@
   \note{
     \textbf{Speaker Notes:}
 
-    IMU-based navigation underwater is an integration problem: we integrate angular rate for orientation and acceleration twice for position.
+    When designing a free-roving underwater vehicle, one of the biggest challenges is maintaining a reliable sense of position and orientation without GPS.
+    One of the most cost-effective solutions is to rely on an Inertial Measurement Unit, or IMU, which combines gyroscopes and accelerometers to track motion.
+    However, IMU-based navigation underwater is an integration problem: we integrate angular rate for orientation and acceleration twice for position.
     This process inherently accumulates error—random noise grows as the square root of time, and bias causes linear drift.
     Over long missions, these effects can lead to significant position uncertainty if left uncorrected.
 
@@ -449,9 +428,9 @@
                                  & Keller PA-7LD          & ±0.3m accuracy, stable                 & \$200-500     \\
       \midrule
       \textbf{Surface GPS}       & u-blox NEO-M8N         & 2.5m accuracy                          & \$35          \\
-                                 & RTK GPS                & <0.1m accuracy                         & \$300-600     \\
+                                 & RTK GPS                & $<$0.1m accuracy                         & \$300-600     \\
       \midrule
-      \textbf{DVL}               & Nortek DVL1000         & 0.2 cm/s, <1m over 2 hrs               & \$20,000      \\
+      \textbf{DVL (Optional)}               & Nortek DVL1000         & 0.2 cm/s, <1m over 2 hrs               & \$20,000      \\
                                  & Teledyne Pathfinder    & Similar, proven                        & \$18-28K      \\
       \bottomrule
     \end{tabular}
@@ -460,32 +439,18 @@
 
   \vspace{0.5em}
 
-  \textbf{Baseline Cost: \$20,420} (Navigator + Bar30 + GPS + DVL + RPi4)
+  \textbf{Baseline Cost: \$228} (Navigator + Bar30 + u-blox + RPi4)
 
   \note{
-    \textbf{Navigator Flight Controller - Component Justification:}
+    Our navigation system is built around the Blue Robotics Navigator, which integrates dual IMUs and magnetometers for reliable attitude and heading estimation. It connects directly to the Raspberry Pi, reducing cabling and improving reliability. At only 125 dollars, it delivers Pixhawk-level performance at less than half the cost and is fully supported by ArduSub, a proven open-source autopilot.
 
-    The Navigator provides dual IMUs: ICM-42688-P with 2.8 millidegrees per second per root hertz gyro noise (industry-leading for MEMS), and ICM-20602 backup with 0.015 degrees per second per root hertz. Dual magnetometers (BMM150) provide heading reference with redundancy. The Navigator integrates directly with Raspberry Pi 4 via 40-pin GPIO header, eliminating external cabling and reducing failure points inside the pressure housing. At 220 dollars, it costs 27 percent less than Pixhawk 6C (300 dollars) while providing equivalent or better sensor specifications. The Navigator is the native platform for ArduSub autopilot with proven reliability in thousands of BlueROV2 deployments worldwide.
+Depth is measured with the Bar30 pressure sensor, offering 2 mm resolution and 2 m accuracy, ideal for maintaining a 2–5 m altitude during cable inspection.
 
-    \textbf{Bar30 Depth Sensor - Why Adequate for Our Mission:}
+At the surface, a u-blox NEO-M8N GPS resets accumulated IMU drift with ~2.5 m accuracy, which is sufficient for our 30-minute surface intervals—no need for costly RTK GPS.
 
-    The Bar30 uses the MS5837-30BA pressure sensor providing 2 millimeter depth resolution and 2 meter absolute accuracy. For cable inspection missions where we maintain 2 to 5 meter altitude above the seabed, 2 meter accuracy is entirely adequate - we're not doing bathymetric surveys requiring centimeter precision. The limitation is that the sensor gel can absorb water over multi-day deployments, causing drift. Our 2-hour missions with daily topside access allow drying the sensor, eliminating this concern. Industrial alternatives like Keller PA-7LD provide 0.3 meter accuracy and superior long-term stability but cost 2 to 6 times more (200 to 500 dollars). The Bar30's I2C interface and native ArduSub support make integration trivial. At 90 dollars, it's exceptional value for short-duration applications.
+We also considered a DVL like the Nortek DVL1000 for sub-meter accuracy, but at  a 15–25k dollar price and +1.2 kg weight, it’s unnecessary for cable-following missions.
 
-    \textbf{GPS Selection - Adequate Accuracy for Drift Reset:}
-
-    The u-blox NEO-M8N provides 2.5 meter horizontal accuracy in open ocean conditions. We use GPS only at the surface to reset accumulated IMU drift every 30 minutes. The 2.5 meter GPS error is negligible compared to 5 to 15 meter IMU drift over 30-minute intervals. RTK GPS achieves centimeter-level accuracy but costs 300 to 600 dollars - unnecessary when GPS is used for coarse position reset rather than continuous high-precision tracking. The NEO-M8N is a standard industrial module with proven reliability at 35 dollars.
-
-    \textbf{DVL - When is the Upgrade Justified:}
-
-    Doppler Velocity Logs measure water velocity relative to the seabed using acoustic Doppler effect. The Nortek DVL1000 provides 0.2 centimeters per second velocity accuracy, enabling sub-meter position accuracy over 2-hour missions. It costs 15,000 to 25,000 dollars and weighs 1.2 kilograms. When is this justified? Three scenarios: First, survey missions requiring precise bathymetry or cable route mapping where absolute position matters. Second, zero-visibility operations where visual cable tracking is impossible (heavy sediment, nighttime). Third, multi-vehicle coordination requiring precise relative positioning between AUVs. For basic cable inspection following the cable visually, the DVL cost is unjustified - it represents twice our entire baseline build cost.
-
-    Teledyne RDI Pathfinder is the alternative DVL with similar performance and extensive OEM support. Cost is 18,000 to 28,000 dollars. Choice between Nortek and Teledyne depends on availability and support requirements.
-
-    \textbf{Baseline Navigation Cost Analysis:}
-
-    Navigator 220 plus Bar30 90 plus GPS 35 plus Raspberry Pi 4 75 equals 420 dollars total. This is approximately 4.6 percent of our total 9,197 dollar build budget. We achieve adequate navigation capability for cable-following missions at minimal cost. Adding the DVL upgrade increases navigation cost to 20,420 dollars - a 49-fold increase for sub-meter accuracy that's unnecessary for our operational concept.
-
-    The key insight: navigation requirements depend entirely on mission type. For cable inspection where the cable is the reference frame, baseline IMU plus depth plus GPS is sufficient. For survey missions requiring absolute positioning, invest in DVL. The modular design allows either configuration.
+Altogether, the baseline navigation stack — Navigator, Bar30, GPS, and Pi — costs about 228,.
   }
 \end{frame}
 
