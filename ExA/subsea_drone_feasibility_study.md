@@ -30,22 +30,22 @@ The 22.2V system offers superior weight efficiency but adds complexity requiring
 
 ## 2. Propulsion System Defines Performance Envelope
 
-**The Blue Robotics T200 thruster emerges as the optimal choice** across multiple dimensions[7][8][9]. Key specifications:
+**The Blue Robotics T200 thruster emerges as the optimal choice** across multiple dimensions[7][8][9]. Key specifications (verified 2024):
 
-- **Thrust Output**: 5.1 kgf (50 N) forward at 16V[7][8]
-- **Power Consumption**: 350W maximum, 180W typical at full thrust[7][8]
-- **Depth Rating**: 300m (12× your requirement)[7]
+- **Thrust Output**: 5.25 kgf (51.5 N) forward at 16V[7][8]
+- **Power Consumption**: 390W maximum, ~180W typical at full thrust[7][8]
+- **Depth Rating**: 300m (tested, 12× your requirement)[7]
 - **Reliability**: 300+ hour continuous operation in field testing[8]
-- **Cost**: $259 each[7][9]
+- **Cost**: $230 each (2024 verified)[7][9]
 - **Design**: Flooded brushless motor, proven in thousands of ROV deployments[7][8]
 
-For your 25 kg vehicle achieving 4 m/s, you need approximately 162 N total thrust[3][4]. **Four T200 thrusters in horizontal configuration provide 200 N combined capability** with 23% safety margin[7][8].
+For your 25 kg vehicle achieving 4 m/s, you need approximately 162 N total thrust[3][4]. **Four T200 thrusters in horizontal configuration provide 206 N combined capability** with 27% safety margin[7][8].
 
 ### Alternative Thruster Comparisons
 
 | Model | Thrust | Power | Depth Rating | Cost | Suitability |
 |-------|--------|-------|--------------|------|-------------|
-| T200[7] | 5.1 kgf | 350W max | 300m | $259 | Optimal |
+| T200[7] | 5.25 kgf | 390W max | 300m | $230 | Optimal |
 | T500[10] | 16.1 kgf | 1000W+ | 300m | $690 | Overpowered |
 | SeaBotix BTD150[11] | 2.2 kgf | 80W | 300m | $300-400 est | Insufficient thrust |
 
@@ -54,11 +54,11 @@ The T500 delivers three times more thrust (16.1 kgf at 24V) but consumes over 1 
 ### Electronic Speed Controllers (ESCs)
 
 The Blue Robotics Basic ESC provides proven compatibility with T200 thrusters[12][13]:
-- **Specifications**: 30A continuous, 6-22V operation, bidirectional control[12]
+- **Specifications**: 30A continuous, 7-26V operation, bidirectional control[12]
 - **Firmware**: BLHeli_S with custom tuning capability[13]
 - **Protection**: Thermal shutdown, reverse polarity protection[12]
 - **Interface**: Standard PWM control (1100-1900 μs)[12][13]
-- **Cost**: $35-40 each ($140 for four)[12]
+- **Cost**: $40 each ($160 for four, 2024 verified)[12]
 
 The sensorless brushless design integrates seamlessly with standard autopilot systems[12][13].
 
@@ -68,16 +68,16 @@ The sensorless brushless design integrates seamlessly with standard autopilot sy
 
 ### Primary Control System: Navigator Flight Controller + Raspberry Pi 4
 
-The Blue Robotics Navigator provides a complete autopilot solution at $181-225[14][15]:
+The Blue Robotics Navigator provides a complete autopilot solution at $220 (2024 verified)[14][15]:
 
 **Hardware Specifications:**
-- **IMU**: ICM-20602 6-axis (gyro + accelerometer), ICM-42688-P backup[14][15]
-- **Magnetometer**: Dual BMM150 for redundancy[14]
-- **Barometer**: BMP388 for surface altitude/depth reference[14]
-- **PWM Channels**: 16 outputs (8 thrusters + 8 accessories)[14][15]
+- **IMU**: 6-axis IMU with accelerometers and gyroscopes for orientation[14][15]
+- **Magnetometer**: Dual 3-axis magnetometers for redundancy[14]
+- **Barometer**: Barometer for surface altitude/depth reference[14]
+- **PWM Channels**: 16 servo PWM outputs with 1 μs resolution at 250 Hz[14][15]
 - **Serial Ports**: 4× UART for sensors (depth, DVL, acoustic modem, GPS)[14][15]
 - **Power**: 8-10W typical consumption[14][15]
-- **Compute Platform**: Raspberry Pi 4 (4GB+ recommended)[14][15]
+- **Compute Platform**: Raspberry Pi 4 expansion board (4GB+ recommended)[14][15]
 
 **Software Compatibility:**
 - ArduSub autopilot (proven in BlueROV2 fleet)[14]
@@ -89,10 +89,11 @@ The Blue Robotics Navigator provides a complete autopilot solution at $181-225[1
 
 **Budget Option: Bar30 High-Resolution Depth Sensor**[16][17][18]
 - **Range**: 0-300m (30 bar)[16][17]
-- **Resolution**: 2mm depth, 16-bit ADC[16][17]
-- **Interface**: I2C (address 0x76)[16]
+- **Resolution**: 0.2 mbar (2mm water depth)[16][17]
+- **Accuracy**: ±200 mbar (±2.04m at 0-45°C)[16]
+- **Interface**: I2C[16]
 - **Power**: <1mA (<0.005W at 3.3V)[16]
-- **Cost**: $80-90[16][17][18]
+- **Cost**: $90 (2024 verified)[16][17][18]
 - **Limitation**: Requires daily drying or suffers drift; gel can absorb water over time[16][17]
 
 **Industrial Option: Keller PA-7LD Series**[19][20]
@@ -270,27 +271,27 @@ The Ping360's 750 kHz frequency provides excellent resolution for detecting 2-5 
 ### Lighting Systems
 
 **Blue Robotics Lumen Light**[42]
-- **Output**: 1,500 lumens at 16V[42]
+- **Output**: 1,500 lumens (dimmable)[42]
 - **Power**: 10W typical, adjustable 0-100%[42]
 - **Depth Rating**: 300m[42]
-- **Cost**: $150[42]
+- **Cost**: $175 (2024 verified)[42]
 - **Use Case**: Video illumination for cable inspection[42]
 
 For cable inspection requiring visual documentation, plan 10-15W continuous lighting[42]. Multiple lights may be needed for proper illumination (2-4 units = 20-40W total).
 
 ### Recommended Payload Configurations
 
-**Budget Configuration ($3,270 total, 17.5W):**
+**Budget Configuration ($3,370 total, 27.5W):**
 - Low-Light HD Camera: $120, 2.5W[35][36][37]
 - Ping360 Sonar: $2,750, 5W[40][41]
-- 2× Lumen Lights: $300, 20W (10W each)[42]
-- **Total**: $3,170 + $100 mounting = $3,270, 27.5W (within 30W with lighting dimmed to 70%)
+- 2× Lumen Lights: $350, 20W (10W each)[42]
+- **Total**: $3,220 + $150 mounting = $3,370, 27.5W (within 30W)
 
-**Professional Configuration ($10,750-17,750 total, 23-28W):**
+**Professional Configuration ($10,850-17,850 total, 32.8W):**
 - SubC Rayfin Micro: $8,000-15,000, 7.8W average[38][39]
 - Ping360 Sonar: $2,750, 5W[40][41]
-- 2× Lumen Lights: $300, 20W (dimmable)[42]
-- **Total**: $11,050-18,050, 32.8W (requires dimmed lighting or accept 33W payload)
+- 2× Lumen Lights: $350, 20W (dimmable)[42]
+- **Total**: $11,100-18,100, 32.8W (requires dimmed lighting or accept 33W payload)
 
 The budget configuration provides excellent capability for cable inspection missions at 12% of the professional option cost[35][36][37][40][41][42].
 
@@ -578,32 +579,32 @@ Component-by-component pricing enables budget planning and identifies cost-savin
 **PROPULSION SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
 |-----------|-----|------------|-------|--------|
-| T200 Thruster[7] | 4 | $259 | $1,036 | Blue Robotics[7] |
-| Basic ESC 30A[12] | 4 | $35 | $140 | Blue Robotics[12] |
+| T200 Thruster[7] | 4 | $230 | $920 | Blue Robotics[7] (2024) |
+| Basic ESC 30A[12] | 4 | $40 | $160 | Blue Robotics[12] (2024) |
 | Propeller spares | 1 set | $40 | $40 | Blue Robotics[7] |
 | Thruster mounting hardware | 1 | $50 | $50 | Custom/BR |
-| **Subtotal** | | | **$1,266** | |
+| **Subtotal** | | | **$1,170** | |
 
 **POWER SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
 |-----------|-----|------------|-------|--------|
-| 18Ah Li-ion Battery[5] | 3 | $400 | $1,200 | Blue Robotics[5] |
+| 18Ah Li-ion Battery[5] | 3 | $425 | $1,275 | Blue Robotics[5] (2024) |
 | 3" Enclosure (for batteries)[44] | 1 | $250 | $250 | Blue Robotics[44] |
 | Power distribution board | 1 | $100 | $100 | Custom/COTS |
 | Voltage regulators (5V, 12V) | 1 | $50 | $50 | COTS |
 | Battery monitoring (BMS) | 1 | $80 | $80 | COTS |
-| **Subtotal** | | | **$1,680** | |
+| **Subtotal** | | | **$1,755** | |
 
 **CONTROL & NAVIGATION SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
 |-----------|-----|------------|-------|--------|
-| Navigator Flight Controller[14] | 1 | $125 | $125 | Blue Robotics[14] |
+| Navigator Flight Controller[14] | 1 | $220 | $220 | Blue Robotics[14] (2024) |
 | Raspberry Pi 4 (4GB)[14] | 1 | $55 | $55 | Standard[14] |
 | microSD card (64GB) | 1 | $20 | $20 | Standard |
 | 4" Electronics enclosure[44] | 1 | $300 | $300 | Blue Robotics[44] |
-| Bar30 Depth Sensor[16] | 1 | $85 | $85 | Blue Robotics[16] |
+| Bar30 Depth Sensor[16] | 1 | $90 | $90 | Blue Robotics[16] (2024) |
 | GPS Module | 1 | $80 | $80 | COTS |
-| **Subtotal** | | | **$665** | |
+| **Subtotal** | | | **$765** | |
 
 **COMMUNICATION SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
@@ -618,11 +619,11 @@ Component-by-component pricing enables budget planning and identifies cost-savin
 **IMAGING PAYLOAD SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
 |-----------|-----|------------|-------|--------|
-| Low-Light HD Camera[35] | 1 | $120 | $120 | Blue Robotics[35] |
-| Ping360 Sonar[40] | 1 | $2,750 | $2,750 | Blue Robotics[40] |
-| Lumen Light[42] | 2 | $150 | $300 | Blue Robotics[42] |
+| Low-Light HD Camera[35] | 1 | $120 | $120 | Blue Robotics[35] (2024) |
+| Ping360 Sonar[40] | 1 | $2,750 | $2,750 | Blue Robotics[40] (2024) |
+| Lumen Light[42] | 2 | $175 | $350 | Blue Robotics[42] (2024) |
 | Camera/sensor housing | 1 | $150 | $150 | Custom |
-| **Subtotal** | | | **$3,320** | |
+| **Subtotal** | | | **$3,370** | |
 
 **STRUCTURAL SUBSYSTEM**
 | Component | Qty | Unit Price | Total | Source |
@@ -654,23 +655,23 @@ Component-by-component pricing enables budget planning and identifies cost-savin
 
 ---
 
-### Total Component Costs
+### Total Component Costs (2024 Verified Pricing)
 
 **Core System (without acoustic modem):**
-- Propulsion: $1,266[7][12]
-- Power: $1,680[5][44]
-- Control: $665[14][16][44]
+- Propulsion: $1,170[7][12]
+- Power: $1,755[5][44]
+- Control: $765[14][16][44]
 - Communication: $410[31][34]
-- Payload: $3,320[35][40][42]
+- Payload: $3,370[35][40][42]
 - Structure: $1,050
 - Cables: $480[47]
 - Tools: $197[44]
-- **SUBTOTAL**: $9,068
+- **SUBTOTAL**: $9,197
 
-**With 20% Contingency:** $9,068 × 1.20 = **$10,882**
+**With 20% Contingency:** $9,197 × 1.20 = **$11,036**
 
 **With Acoustic Modem:**
-- Core + EvoLogics S2C: $10,882 + $12,000 = **$22,882**[27]
+- Core + EvoLogics S2C: $11,036 + $12,000 = **$23,036**[27]
 
 ---
 

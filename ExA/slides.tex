@@ -321,17 +321,17 @@
   \note{
     Before diving into our design decisions, it’s important to understand why underwater communication and navigation are inherently difficult problems.
 
-First, radio waves — which power all our terrestrial wireless communication — are heavily absorbed by seawater. Even at low frequencies, the signal strength drops to unusable levels within just a few meters.
+    First, radio waves — which power all our terrestrial wireless communication — are heavily absorbed by seawater. Even at low frequencies, the signal strength drops to unusable levels within just a few meters.
 
-Optical communication, like lasers or LEDs, can achieve higher data rates, but only in clear water and over short, line-of-sight distances — typically less than 100 meters.
+    Optical communication, like lasers or LEDs, can achieve higher data rates, but only in clear water and over short, line-of-sight distances — typically less than 100 meters.
 
-That leaves acoustics as the only practical long-range option. Acoustic modems can reach several kilometers, but at a steep cost: data rates of only a few kilobits per second, high latency, and unit prices easily exceeding twelve thousand dollars.
+    That leaves acoustics as the only practical long-range option. Acoustic modems can reach several kilometers, but at a steep cost: data rates of only a few kilobits per second, high latency, and unit prices easily exceeding twelve thousand dollars.
 
-For our small, autonomous inspection drone, these trade-offs simply aren’t efficient.
+    For our small, autonomous inspection drone, these trade-offs simply aren’t efficient.
 
-As a result, our design minimizes underwater communication. Instead, we store all sensor data onboard during the mission and transfer it to the surface once the vehicle resurfaces. This approach maximizes data throughput while avoiding the complexities of underwater comms.
+    As a result, our design minimizes underwater communication. Instead, we store all sensor data onboard during the mission and transfer it to the surface once the vehicle resurfaces. This approach maximizes data throughput while avoiding the complexities of underwater comms.
 
-}
+  }
 \end{frame}
 
 \begin{frame}{Communications Systems}
@@ -366,34 +366,71 @@ As a result, our design minimizes underwater communication. Instead, we store al
 
   \note{
     \textbf{WiFi 802.11n - WHY THIS CHOICE:}
-    
+
     The Raspberry Pi 4 includes built-in WiFi at zero additional hardware cost - we only need a 50-dollar marine-grade antenna with waterproof connector. When the vehicle surfaces, WiFi provides 150 megabits per second bandwidth enabling complete mission data download in 2-5 minutes. Our 2-hour mission generates approximately 7-8 gigabytes of 1080p video plus 20-25 gigabytes of Ping360 sonar data if recording continuously. At 150 megabits per second (approximately 18 megabytes per second real throughput), we can transfer 2-4 gigabytes in 2-5 minutes. The operational strategy is to surface every 30 minutes, dump accumulated data via WiFi, then continue the mission. This eliminates the need for expensive onboard storage (a 512 gigabyte industrial SSD costs 200-400 dollars) and ensures data is safely transferred even if the vehicle is lost. WiFi range of 50-100 meters at the surface is adequate when operating near the mothership. For operations beyond WiFi range, the vehicle stores data locally and dumps it when returning to the ship.
-    
+
     \textbf{RockBLOCK 9603N Iridium - WHY THIS CHOICE:}
-    
+
     The RockBLOCK provides global satellite coverage pole-to-pole, critical for open ocean operations where the vehicle may travel kilometers from the mothership following the cable route. Every 10 minutes, the vehicle surfaces and transmits a 340-byte message containing GPS coordinates (latitude, longitude, ~20 bytes), depth, heading, battery voltage, and status flags. This costs approximately 11-14 cents per message, so 12 messages over a 2-hour mission costs 1.32-1.68 dollars in data charges. The monthly line rental is 15 dollars whether we use it or not. This small operational cost ensures vehicle recoverability - if the vehicle loses communication or experiences a fault, the last-known position enables recovery. The RockBLOCK draws only 0.8 watts average during message transmission (20 second session) and 40 milliamps idle (0.2 watts), making power impact negligible. At 260 dollars hardware cost, it's 30-50 times cheaper than marine satellite terminals costing 8,000-15,000 dollars.
-    
+
     \textbf{WHY NOT ACOUSTIC MODEM (12,000 dollars):}
-    
+
     Acoustic modems like the EvoLogics S2C M 18/34 cost 12,000-15,000 dollars and provide 13.9 kilobits per second data rate. Transferring our 7-8 gigabytes of video data would require 72-80 hours at full acoustic bandwidth - completely impractical. Even if we only sent status telemetry (100 bytes every 10 seconds = 1 kilobyte per minute = 120 kilobytes over 2 hours), this represents only 0.0017 percent of our total data volume. The acoustic modem costs 40 times our entire communication budget (WiFi plus Iridium = 310 dollars) yet provides no practical benefit for our autonomous mission profile. Acoustic modems are justified for tethered ROVs requiring real-time video and control, or for multi-vehicle coordination. Our vehicle follows pre-programmed waypoints, stores data onboard, and surfaces for communication - eliminating acoustic modem necessity.
-    
+
     \textbf{WHY NOT OPTICAL MODEM (8,000-12,000 dollars):}
-    
+
     Underwater optical communication achieves megabit per second data rates but requires line-of-sight and operates only in clear water under 50-100 meters range. Subsea cable inspection occurs in turbid coastal waters where visibility may be 1-3 meters. Optical modems cost 8,000-12,000 dollars and would be useless in our operating environment. Even in clear water, the vehicle must maintain precise alignment with the mothership's optical transceiver - incompatible with autonomous cable-following missions.
-    
+
     \textbf{DATA VOLUME ANALYSIS - JUSTIFYING SURFACE COMMUNICATION:}
-    
+
     Camera: 1080p at 30 fps, H.264 compression = 8 megabits per second = 1 megabyte per second = 3.6 gigabytes per hour = 7.2 gigabytes for 2-hour mission.
-    
+
     Ping360 sonar: 400 points per scan, 10-20 hertz scan rate, 16-bit data = approximately 12-24 kilobits per second = 1.5-3 megabytes per minute = 90-180 megabytes per hour. If we record every scan, this is 180-360 megabytes for 2 hours - much less than video.
-    
+
     Total: approximately 7.5-8 gigabytes per mission. At 150 megabits per second WiFi throughput (18-19 megabytes per second), transfer time is 7,500 megabytes divided by 18 = 417 seconds = 7 minutes. If we surface every 30 minutes (four times during 2-hour mission), each surface interval transfers approximately 2 gigabytes in 2 minutes, well within our operational margin.
-    
+
     \textbf{ALTERNATIVE APPROACH REJECTED - ONBOARD STORAGE ONLY:}
-    
+
     We could store all data on a 512 gigabyte SSD and download after mission completion. This saves 2-minute surface intervals but introduces risk - if the vehicle is lost, all mission data is lost. The surface-and-dump strategy ensures data is safely transferred even if subsequent vehicle loss occurs. The 2-minute surface intervals every 30 minutes also allow GPS position resets that reduce IMU drift, making them operationally beneficial rather than purely communication-driven.
-    
-=  }
+
+    =  }
+\end{frame}
+
+\begin{frame}{Navigation Scoping Calculations}
+
+  \begin{itemize}
+    \item MEMS IMUs measure angular rate and acceleration; position is estimated by integrating these signals.
+    \item \textbf{Integration:} $\theta(t) = \int \omega \, dt$ (orientation); $\; x(t) = \iint a \, dt^2$ (position)
+    \item Each integration amplifies sensor noise and bias:
+    \item Without correction, small biases lead to large accumulated position errors over time.
+  \end{itemize}
+
+  \vspace{0.8em}
+
+  \textbf{Drift Mitigation Strategies:}
+  \begin{enumerate}
+    \item \textbf{Zero-velocity updates:} Detect stationary periods and reset velocity estimates.
+    \item \textbf{Sensor fusion:} Combine IMU with magnetometer and depth sensor for heading and vertical stabilization, or DVL to constrain horizontal drift.
+    \item \textbf{Cable-relative navigation:} Use sonar or visual tracking to constrain lateral drift.
+    \item \textbf{Surface GPS fix:} Acquire GPS position during surfacing to reset accumulated horizontal error.
+  \end{enumerate}
+
+
+  \note{
+    \textbf{Speaker Notes:}
+
+    IMU-based navigation underwater is an integration problem: we integrate angular rate for orientation and acceleration twice for position.
+    This process inherently accumulates error—random noise grows as the square root of time, and bias causes linear drift.
+    Over long missions, these effects can lead to significant position uncertainty if left uncorrected.
+
+    Our mitigation strategy combines multiple complementary techniques:
+    zero-velocity detection to reset errors during stationary periods,
+    sensor fusion to stabilize heading and depth,
+    cable-relative tracking using sonar or vision to maintain lateral alignment,
+    and periodic GPS updates during surfacing to reset accumulated horizontal drift.
+
+    Together, these methods ensure reliable navigation for cable inspection, with accuracy sufficient for operational needs without requiring costly DVL systems.
+  }
 \end{frame}
 
 \begin{frame}{Navigation System Component Options}
@@ -403,19 +440,19 @@ As a result, our design minimizes underwater communication. Instead, we store al
     \scriptsize
     \begin{tabular}{lllll}
       \toprule
-      \textbf{Component}         & \textbf{Specification}      & \textbf{Performance}         & \textbf{Cost} \\
+      \textbf{Component}         & \textbf{Specification} & \textbf{Performance}                   & \textbf{Cost} \\
       \midrule
-      \textbf{Flight Controller} & Navigator (dual IMU)        & 2.8°/s/$\sqrt{\mathrm{Hz}}$ gyro noise        & \$125              \\
-                                 & Pixhawk 6C                  & Similar performance          & \$300                        \\
+      \textbf{Flight Controller} & Navigator (dual IMU)   & 2.8°/s/$\sqrt{\mathrm{Hz}}$ gyro noise & \$125         \\
+                                 & Pixhawk 6C             & Similar performance                    & \$300         \\
       \midrule
-      \textbf{Depth Sensor}      & Bar30 (MS5837)              & 2mm resolution, ±2m accuracy & \$68              \\
-                                 & Keller PA-7LD               & ±0.3m accuracy, stable       & \$200-500                    \\
+      \textbf{Depth Sensor}      & Bar30 (MS5837)         & 2mm resolution, ±2m accuracy           & \$68          \\
+                                 & Keller PA-7LD          & ±0.3m accuracy, stable                 & \$200-500     \\
       \midrule
-      \textbf{Surface GPS}       & u-blox NEO-M8N              & 2.5m accuracy                & \$35              \\
-                                 & RTK GPS                     & <0.1m accuracy               & \$300-600            \\
+      \textbf{Surface GPS}       & u-blox NEO-M8N         & 2.5m accuracy                          & \$35          \\
+                                 & RTK GPS                & <0.1m accuracy                         & \$300-600     \\
       \midrule
-      \textbf{DVL}    & Nortek DVL1000              & 0.2 cm/s, <1m over 2 hrs     & \$20,000             \\
-                                 & Teledyne Pathfinder         & Similar, proven              & \$18-28K               \\
+      \textbf{DVL}               & Nortek DVL1000         & 0.2 cm/s, <1m over 2 hrs               & \$20,000      \\
+                                 & Teledyne Pathfinder    & Similar, proven                        & \$18-28K      \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -452,166 +489,7 @@ As a result, our design minimizes underwater communication. Instead, we store al
   }
 \end{frame}
 
-\begin{frame}{Navigation Scoping Calculations}
 
-\begin{itemize}
-  \item MEMS IMUs measure angular rate and acceleration; position is estimated by integrating these signals.
-  \item \textbf{Integration:} $\theta(t) = \int \omega \, dt$ (orientation); $\; x(t) = \iint a \, dt^2$ (position)
-  \item Each integration amplifies sensor noise and bias:
-  \item Without correction, small biases lead to large accumulated position errors over time.
-\end{itemize}
-
-\vspace{0.8em}
-
-\textbf{Drift Mitigation Strategies:}
-\begin{enumerate}
-  \item \textbf{Zero-velocity updates:} Detect stationary periods and reset velocity estimates.
-  \item \textbf{Sensor fusion:} Combine IMU with magnetometer and depth sensor for heading and vertical stabilization, or DVL to constrain horizontal drift.
-  \item \textbf{Cable-relative navigation:} Use sonar or visual tracking to constrain lateral drift.
-  \item \textbf{Surface GPS fix:} Acquire GPS position during surfacing to reset accumulated horizontal error.
-\end{enumerate}
-
-
-\note{
-  \textbf{Speaker Notes:}
-
-  IMU-based navigation underwater is an integration problem: we integrate angular rate for orientation and acceleration twice for position.
-  This process inherently accumulates error—random noise grows as the square root of time, and bias causes linear drift.
-  Over long missions, these effects can lead to significant position uncertainty if left uncorrected.
-
-  Our mitigation strategy combines multiple complementary techniques:
-  zero-velocity detection to reset errors during stationary periods,
-  sensor fusion to stabilize heading and depth,
-  cable-relative tracking using sonar or vision to maintain lateral alignment,
-  and periodic GPS updates during surfacing to reset accumulated horizontal drift.
-
-  Together, these methods ensure reliable navigation for cable inspection, with accuracy sufficient for operational needs without requiring costly DVL systems.
-}
-\end{frame}
-
-
-% \begin{frame}{Acoustic Communication Options}
-%   \textbf{Underwater Communication Comparison:}
-
-%   \begin{table}
-%     \tiny
-%     \begin{tabular}{llllll}
-%       \toprule
-%       \textbf{Model}           & \textbf{Frequency} & \textbf{Data Rate} & \textbf{Range} & \textbf{Power} & \textbf{Cost}  \\
-%       \midrule
-%       \textbf{EvoLogics 18/34} & 18-34 kHz          & 13.9 kbps          & 2,000m         & 20W TX         & \$12-15K       \\
-%       EvoLogics 42/65          & 42-65 kHz          & 31.2 kbps          & 1,000m         & 20W TX         & \$12-15K       \\
-%       LinkQuest UWM2000H       & 28-38 kHz          & 1.2 kbps           & 1,500m         & 8W TX          & \$5-8K         \\
-%       Water Linked M64         & 31.25 kHz          & 64 bps             & 500m           & 2W TX          & \$2,300        \\
-%       \midrule
-%       \textbf{Baseline WiFi}   & 2.4/5 GHz          & 60 Mbps real       & 100m (surf)    & 0.5W           & \textbf{\$50}  \\
-%       \bottomrule
-%     \end{tabular}
-%   \end{table}
-
-%   \vspace{0.5em}
-
-%   \textbf{Acoustic Modem Use Cases:}
-%   \begin{itemize}
-%     \item \textbf{Real-time control:} Tethered ROV replacement (13.9 kbps adequate for telemetry)
-%     \item \textbf{Multi-vehicle coordination:} AUV swarms requiring inter-vehicle comms
-%     \item \textbf{Emergency abort:} Critical command transmission during mission
-%   \end{itemize}
-
-%   \vspace{0.5em}
-
-%   \textbf{Our Mission Profile:} Autonomous pre-programmed waypoints + surface WiFi data dump
-%   \begin{itemize}
-%     \item \textcolor{red}{Acoustic modem NOT required for baseline operation}
-%     \item Optional upgrade for enhanced safety (\$12K adds 10\% to total cost)
-%   \end{itemize}
-
-%   \note{
-%     \textbf{Acoustic Communication Physics and Limitations:}
-
-%     Radio frequency signals attenuate exponentially in seawater due to electrical conductivity. At 2.4 gigahertz WiFi frequency, penetration depth is under 1 meter. Optical communication requires line-of-sight and operates only in clear water under 100 meters range - useless in turbid coastal waters where subsea cables are located. Acoustic communication is the ONLY viable option for long-range underwater communication, propagating through sound waves at approximately 1,500 meters per second in seawater.
-
-%     However, acoustic channels are fundamentally limited. The underwater acoustic channel exhibits severe multipath propagation (reflections off surface, seabed, and thermoclines), Doppler shift from vehicle motion and ocean currents, and high ambient noise from shipping, marine life, and wave action. These physical limitations constrain data rates to kilobits per second versus megabits per second for RF in air.
-
-%     \textbf{EvoLogics S2C M 18/34 - Professional Standard:}
-
-%     The EvoLogics 18/34 operates at 18 to 34 kilohertz frequency band providing 13.9 kilobits per second data rate. Why this frequency? Lower frequencies (below 10 kilohertz) propagate further but suffer more from ambient noise and require larger transducers. Higher frequencies (above 50 kilohertz) have higher bandwidth but shorter range due to absorption. The 18 to 34 kilohertz band balances range (2,000 meters) and data rate for AUV applications.
-
-%     The modem provides 20 watts transmit power and 1.5 watts receive/idle power. It implements a TCP/IP stack over the acoustic link, enabling standard network protocols. Built-in USBL positioning option allows acoustic ranging for vehicle tracking. Cost is 12,000 to 15,000 dollars, weight approximately 2 kilograms.
-
-%     \textbf{EvoLogics 42/65 - Higher Bandwidth, Shorter Range:}
-
-%     The 42/65 model operates at 42 to 65 kilohertz providing 31.2 kilobits per second - 2.2 times faster than the 18/34. However, higher frequency reduces range to 1,000 meters due to increased absorption. Cost is similar. Use case: short-range, high-bandwidth applications like underwater docking or close-formation multi-vehicle operations.
-
-%     \textbf{LinkQuest UWM2000H - Mid-Range Option:}
-
-%     The LinkQuest modem operates at 28 to 38 kilohertz with 1.2 kilobits per second data rate (9,600 baud equivalent). Range is 1,500 meters. Power consumption is 8 watts transmit, 0.5 watts receive. Cost is 5,000 to 8,000 dollars - roughly half the EvoLogics price. The lower data rate is adequate for status telemetry and basic command/control. This is a good balance of performance and cost for applications requiring underwater communication but not high bandwidth.
-
-%     \textbf{Water Linked M64 - Ultra-Robust Budget Option:}
-
-%     The M64 provides only 64 bits per second - extremely low bandwidth. However, this ultra-low data rate achieves exceptional robustness in noisy environments. Range is 500 meters typical. Power is 2 watts transmit. Cost is 2,300 dollars. Use case: emergency abort commands or simple status pings where robustness matters more than bandwidth. 64 bps is adequate for "abort mission" (16 bytes per second) or GPS position report (8 to 10 bytes per second).
-
-%     \textbf{WiFi Comparison - Why Surface Communication Wins:}
-
-%     WiFi provides 60 megabits per second real throughput at the surface - 4,300 times faster than the EvoLogics 13.9 kilobits per second acoustic modem, at 240 times lower cost (50 dollars versus 12,000 dollars). The limitation is that WiFi requires surfacing, adding 4 minutes every 30 minutes. However, surfacing also enables GPS position reset, so the communication overhead aligns with navigation requirements.
-
-%     \textbf{When is Acoustic Modem Justified:}
-
-%     Three scenarios make acoustic modems worthwhile. First, real-time control: if replacing a tethered ROV with an untethered vehicle that still requires continuous operator control, the acoustic modem enables command/telemetry. 13.9 kilobits per second is adequate for joystick commands, vehicle status, and compressed sonar imagery. Second, multi-vehicle coordination: swarms of AUVs performing coordinated search or survey require inter-vehicle communication. Third, emergency abort: if the mission profile includes high-risk maneuvers (entering shipwrecks, navigating complex structures), the ability to send an abort command underwater provides safety margin.
-
-%     \textbf{Our Mission Profile - Why Acoustic is NOT Required:}
-
-%     Our vehicle follows pre-programmed GPS waypoints, operates autonomously underwater, surfaces every 30 minutes for WiFi data dump and GPS reset. No real-time control required. No multi-vehicle coordination. Emergency scenarios (thruster failure, leak detection) trigger autonomous abort surfacing using onboard logic, not external commands.
-
-%     The acoustic modem represents 12,000 dollars cost - more than our entire baseline build cost excluding the Ping360 sonar. It adds 1.5 to 2 kilograms weight. For our autonomous cable-following mission, it provides NO operational benefit.
-
-%     \textbf{Optional Upgrade Path:}
-
-%     The modular design allows adding the EvoLogics modem later if operational experience shows the need. The Navigator flight controller provides UART serial ports for modem integration. However, for initial technical feasibility demonstration and cost-constrained deployments, the acoustic modem is optional rather than required. This is a key design decision that reduces build cost from 22,000 dollars to 10,000 dollars while maintaining adequate capability for the specified mission.
-%   }
-% \end{frame}
-
-
-
-
-% \begin{frame}{Communications Systems}
-%   \textbf{Multi-Mode Communication Strategy:}
-
-%   \begin{table}
-%     \footnotesize
-%     \begin{tabular}{llll}
-%       \toprule
-%       \textbf{Mode}         & \textbf{Product}         & \textbf{Specifications}      & \textbf{Cost}  \\
-%       \midrule
-%       \textbf{Surface WiFi} & \textbf{802.11n module}  & 2.4/5 GHz, 150 Mbps          & \textbf{\$50}  \\
-%                             & (Raspberry Pi built-in)  & 50-100m range in air         &                \\
-
-%       \midrule
-%       \textbf{Satellite}    & \textbf{RockBLOCK 9603N} & Iridium Short Burst Data     & \textbf{\$260} \\
-%                             &                          & 340 byte messages            &                \\
-%                             &                          & Global coverage (open ocean) &                \\
-%                             &                          & GPS position reporting       &                \\
-
-%       \bottomrule
-%     \end{tabular}
-%   \end{table}
-
-%   \vspace{0.5em}
-
-%   \textbf{Operational Modes:}
-%   \begin{itemize}
-%     \item \textbf{At surface:} WiFi for high-bandwidth video/data + GPS fix
-%     \item \textbf{Open ocean:} RockBLOCK for GPS position reporting every 10 min
-%   \end{itemize}
-
-%   \note{
-%     At the surface, WiFi provides 150 megabits per second bandwidth for downloading video and sensor data. The vehicle also acquires GPS fixes to reset navigation drift.
-
-%     For open ocean operations beyond visual range, the RockBLOCK uses the Iridium satellite network with global coverage. Every 10 minutes, the vehicle surfaces and transmits 340-byte messages containing GPS coordinates and status. This ensures vehicle recovery even kilometers from the mothership.
-
-%     The autonomous mission profile eliminates the need for real-time underwater communication. The vehicle follows pre-programmed waypoints, stores all sensor data onboard, and downloads it during surface intervals.
-%   }
-% \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Hydrodynamics and Propulsion Analysis}
