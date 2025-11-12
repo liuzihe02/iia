@@ -458,10 +458,6 @@ As a result, our design minimizes underwater communication. Instead, we store al
   \item MEMS IMUs measure angular rate and acceleration; position is estimated by integrating these signals.
   \item \textbf{Integration:} $\theta(t) = \int \omega \, dt$ (orientation); $\; x(t) = \iint a \, dt^2$ (position)
   \item Each integration amplifies sensor noise and bias:
-        \begin{itemize}
-          \item Random noise → angular error grows as $\sqrt{t}$
-          \item Bias error → position drift grows linearly with $t$
-        \end{itemize}
   \item Without correction, small biases lead to large accumulated position errors over time.
 \end{itemize}
 
