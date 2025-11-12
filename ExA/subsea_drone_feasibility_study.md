@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-Your target specifications present an achievable but challenging design problem that requires careful trade-offs between speed, endurance, and mass constraints. The 4 m/s peak speed requirement drives power consumption to 1.2 kW, necessitating a 799 Wh battery system that consumes 16% of your 25 kg mass budget[5][6]. Commercial components exist for all subsystems, with complete build costs estimated at $15,000-25,000 versus $50,000-80,000 for comparable commercial AUVs (ecoSUB m-Power+, Iver3 Standard)[1][2][50]. The U.S. Department of Energy's "Powering the Blue Economy" report identifies underwater vehicle power systems as a critical technology area, confirming the engineering challenges in this domain[2].
+Your target specifications present an achievable but challenging design problem that requires careful trade-offs between speed, endurance, and mass constraints. The 4 m/s peak speed requirement drives power consumption to 1.2 kW, necessitating an 803 Wh battery system that consumes 16% of your 25 kg mass budget[5][6]. Commercial components exist for all subsystems, with complete build costs estimated at $11,000-23,000 (2024 verified pricing) versus $50,000-80,000 for comparable commercial AUVs (ecoSUB m-Power+, Iver3 Standard)[1][2][50]. The U.S. Department of Energy's "Powering the Blue Economy" report identifies underwater vehicle power systems as a critical technology area, confirming the engineering challenges in this domain[2].
 
 Critical finding: achieving 4 m/s in this weight class requires 4× Blue Robotics T200 thrusters[7][8] and provides 2.5 hours endurance with an 80/20 mission profile (80% cruise at 1 m/s, 20% peak at 4 m/s). Analysis of existing commercial platforms (ecoSUB at 17 kg/500m depth, Iver3 at 27-39 kg/100m depth, Boxfish at 25 kg/300m depth) reveals that no commercial AUV in the <25 kg class achieves sustained 4 m/s speed[1][49][50], making your specification ambitious but technically feasible with proper design optimization[3][4].
 
@@ -18,10 +18,10 @@ The hydrodynamics dominate your design. For a streamlined torpedo hull with 0.3m
 
 ### Battery Sizing - Critical Decision Point
 
-For 2-hour endurance with 80/20 mission profile (80% cruise at 86W, 20% peak at 1,225W), you need 314W average power requiring 628 Wh. The Blue Robotics triple 18Ah battery configuration provides 799 Wh at 14.8V, weighing 4.1 kg, at a cost of $1,200[5][6]. This provides 2.5 hours endurance with 25% margin and adequate burst capability to deliver 1.2 kW peak power.
+For 2-hour endurance with 80/20 mission profile (80% cruise at 86W, 20% peak at 1,225W), you need 314W average power requiring 628 Wh. The Blue Robotics triple 18Ah battery configuration provides 803 Wh (3 × 267.6 Wh) at 14.8V, weighing ~4.2 kg, at a cost of $1,275 (2024 verified)[5][6]. This provides 2.6 hours endurance with 28% margin and adequate burst capability to deliver 1.2 kW peak power.
 
 Options include:
-- **Three 18Ah batteries**: 799 Wh, 4.1 kg, $1,200 - provides adequate burst capability[5][6]
+- **Three 18Ah batteries**: 803 Wh, ~4.2 kg, $1,275 - provides adequate burst capability[5][6]
 - **Single 22.2V 28Ah Mega-Battery**: 622 Wh, 2-2.5 kg, $1,490 - better weight efficiency but requires voltage conversion for 16V thruster operation[5]
 
 The 22.2V system offers superior weight efficiency but adds complexity requiring DC-DC conversion for thruster compatibility[5][7].

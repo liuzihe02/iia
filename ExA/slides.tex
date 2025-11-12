@@ -442,10 +442,10 @@
       \toprule
       \textbf{Component}         & \textbf{Specification} & \textbf{Performance}                   & \textbf{Cost} \\
       \midrule
-      \textbf{Flight Controller} & Navigator (dual IMU)   & 2.8°/s/$\sqrt{\mathrm{Hz}}$ gyro noise & \$125         \\
+      \textbf{Flight Controller} & Navigator (dual IMU)   & 2.8°/s/$\sqrt{\mathrm{Hz}}$ gyro noise & \$220         \\
                                  & Pixhawk 6C             & Similar performance                    & \$300         \\
       \midrule
-      \textbf{Depth Sensor}      & Bar30 (MS5837)         & 2mm resolution, ±2m accuracy           & \$68          \\
+      \textbf{Depth Sensor}      & Bar30 (MS5837)         & 2mm resolution, ±2m accuracy           & \$90          \\
                                  & Keller PA-7LD          & ±0.3m accuracy, stable                 & \$200-500     \\
       \midrule
       \textbf{Surface GPS}       & u-blox NEO-M8N         & 2.5m accuracy                          & \$35          \\
@@ -460,16 +460,16 @@
 
   \vspace{0.5em}
 
-  \textbf{Baseline Cost: \$20208} (Navigator + Bar30 + GPS + DVL + RPi4)
+  \textbf{Baseline Cost: \$20,420} (Navigator + Bar30 + GPS + DVL + RPi4)
 
   \note{
     \textbf{Navigator Flight Controller - Component Justification:}
 
-    The Navigator provides dual IMUs: ICM-42688-P with 2.8 millidegrees per second per root hertz gyro noise (industry-leading for MEMS), and ICM-20602 backup with 0.015 degrees per second per root hertz. Dual magnetometers (BMM150) provide heading reference with redundancy. The Navigator integrates directly with Raspberry Pi 4 via 40-pin GPIO header, eliminating external cabling and reducing failure points inside the pressure housing. At 125 dollars, it costs 60 percent less than Pixhawk 6C (300 dollars) while providing equivalent or better sensor specifications. The Navigator is the native platform for ArduSub autopilot with proven reliability in thousands of BlueROV2 deployments worldwide.
+    The Navigator provides dual IMUs: ICM-42688-P with 2.8 millidegrees per second per root hertz gyro noise (industry-leading for MEMS), and ICM-20602 backup with 0.015 degrees per second per root hertz. Dual magnetometers (BMM150) provide heading reference with redundancy. The Navigator integrates directly with Raspberry Pi 4 via 40-pin GPIO header, eliminating external cabling and reducing failure points inside the pressure housing. At 220 dollars, it costs 27 percent less than Pixhawk 6C (300 dollars) while providing equivalent or better sensor specifications. The Navigator is the native platform for ArduSub autopilot with proven reliability in thousands of BlueROV2 deployments worldwide.
 
     \textbf{Bar30 Depth Sensor - Why Adequate for Our Mission:}
 
-    The Bar30 uses the MS5837-30BA pressure sensor providing 2 millimeter depth resolution and 2 meter absolute accuracy. For cable inspection missions where we maintain 2 to 5 meter altitude above the seabed, 2 meter accuracy is entirely adequate - we're not doing bathymetric surveys requiring centimeter precision. The limitation is that the sensor gel can absorb water over multi-day deployments, causing drift. Our 2-hour missions with daily topside access allow drying the sensor, eliminating this concern. Industrial alternatives like Keller PA-7LD provide 0.3 meter accuracy and superior long-term stability but cost 3 to 7 times more (200 to 500 dollars). The Bar30's I2C interface and native ArduSub support make integration trivial. At 68 dollars, it's exceptional value for short-duration applications.
+    The Bar30 uses the MS5837-30BA pressure sensor providing 2 millimeter depth resolution and 2 meter absolute accuracy. For cable inspection missions where we maintain 2 to 5 meter altitude above the seabed, 2 meter accuracy is entirely adequate - we're not doing bathymetric surveys requiring centimeter precision. The limitation is that the sensor gel can absorb water over multi-day deployments, causing drift. Our 2-hour missions with daily topside access allow drying the sensor, eliminating this concern. Industrial alternatives like Keller PA-7LD provide 0.3 meter accuracy and superior long-term stability but cost 2 to 6 times more (200 to 500 dollars). The Bar30's I2C interface and native ArduSub support make integration trivial. At 90 dollars, it's exceptional value for short-duration applications.
 
     \textbf{GPS Selection - Adequate Accuracy for Drift Reset:}
 
@@ -483,7 +483,7 @@
 
     \textbf{Baseline Navigation Cost Analysis:}
 
-    Navigator 125 plus Bar30 68 plus GPS 35 plus Raspberry Pi 4 75 equals 303 dollars total. This is approximately 3 percent of our total 10,000 dollar build budget. We achieve adequate navigation capability for cable-following missions at minimal cost. Adding the DVL upgrade increases navigation cost to 20,303 dollars - a 67-fold increase for sub-meter accuracy that's unnecessary for our operational concept.
+    Navigator 220 plus Bar30 90 plus GPS 35 plus Raspberry Pi 4 75 equals 420 dollars total. This is approximately 4.6 percent of our total 9,197 dollar build budget. We achieve adequate navigation capability for cable-following missions at minimal cost. Adding the DVL upgrade increases navigation cost to 20,420 dollars - a 49-fold increase for sub-meter accuracy that's unnecessary for our operational concept.
 
     The key insight: navigation requirements depend entirely on mission type. For cable inspection where the cable is the reference frame, baseline IMU plus depth plus GPS is sufficient. For survey missions requiring absolute positioning, invest in DVL. The modular design allows either configuration.
   }
@@ -569,7 +569,7 @@
       \toprule
       \textbf{Model}  & \textbf{Thrust (N)} & \textbf{Power (W)} & \textbf{Depth (m)} & \textbf{Mass (kg)} & \textbf{Cost (\$)} & \textbf{Thrust/Cost} \\
       \midrule
-      \textbf{T200}   & \textbf{50 fwd}     & \textbf{350 max}   & \textbf{300}       & \textbf{0.34}      & \textbf{130}       & \textbf{0.38}        \\
+      \textbf{T200}   & \textbf{51.5 fwd}   & \textbf{390 max}   & \textbf{300}       & \textbf{0.427}     & \textbf{230}       & \textbf{0.22}        \\
       SeaBotix BTD150 & 28                  & 80                 & 150                & 0.5                & 800                & 0.035                \\
       Maxon MT30      & 49                  & 180                & 6000               & 0.45               & 2,500              & 0.020                \\
       T500            & 158                 & 1000+              & 300                & 1.1                & 690                & 0.23                 \\
@@ -586,10 +586,10 @@
       \begin{itemize}
         \setlength{\itemsep}{0pt}
         \setlength{\parskip}{0pt}
-        \item Total thrust: \textbf{200 N}
+        \item Total thrust: \textbf{206 N}
         \item Required: 162 N
-        \item Propulsion cost: \$520
-        \item ESCs (4× 30A): \$145
+        \item Propulsion cost: \$920
+        \item ESCs (4× 30A): \$160
       \end{itemize}
     \end{column}
 
@@ -608,9 +608,9 @@
   \end{columns}
 
   \note{
-    Four thruster options were evaluated. SeaBotix BTD150 has good efficiency but insufficient thrust: 28 newtons versus 50 newtons for T200. Maxon MT30 has 6000 meter depth rating and costs much more than T200 - unnecessary for 250 meter requirement. T500 provides 158 newtons thrust but draws over 1 kilowatt continuously and weighs 1.1 kilograms.
+    Four thruster options were evaluated. SeaBotix BTD150 has good efficiency but insufficient thrust: 28 newtons versus 51.5 newtons for T200. Maxon MT30 has 6000 meter depth rating and costs much more than T200 - unnecessary for 250 meter requirement. T500 provides 158 newtons thrust but draws over 1 kilowatt continuously and weighs 1.1 kilograms.
 
-    T200 offers best thrust-to-cost ratio at 0.38 newtons per dollar. Four T200 thrusters provide 200 newtons total thrust for 162 newtons required - 23 percent safety margin. This margin accommodates deviation in drag coefficient calculations.
+    T200 offers best thrust-to-cost ratio at 0.22 newtons per dollar. Four T200 thrusters provide 206 newtons total thrust for 162 newtons required - 27 percent safety margin. This margin accommodates deviation in drag coefficient calculations.
 
     We also need 4 Electronic Speed Controllers. We need one for each of the four thrusters. This is the small electronic board that takes the command from our flight controller and the power from the battery, and then precisely controls the motor's speed and direction.
   }
@@ -661,7 +661,7 @@
       \toprule
       \textbf{Option}               & \textbf{Voltage} & \textbf{Capacity} & \textbf{Energy} & \textbf{Mass}    & \textbf{Cost}    \\
       \midrule
-      \textbf{Blue Robotics 3×18Ah} & \textbf{14.8V}   & \textbf{18Ah}     & \textbf{799 Wh} & \textbf{4.05 kg} & \textbf{\$1,200} \\
+      \textbf{Blue Robotics 3×18Ah} & \textbf{14.8V}   & \textbf{18Ah}     & \textbf{803 Wh} & \textbf{4.05 kg} & \textbf{\$1,275} \\
       Blue Robotics 2×18Ah          & 14.8V            & 18Ah              & 532 Wh          & 2.7 kg           & \$800            \\
       Samsung 35E (4S6P)            & 14.8V            & 21Ah              & 311 Wh          & ~1.5 kg          & \$310-590        \\
       SubCtech PowerPack            & 14-50V           & Custom            & 650-3400 Wh     & Varies           & \$3-10K+         \\
@@ -675,8 +675,8 @@
     \begin{column}{0.48\textwidth}
       \textbf{Selected: 3× Blue Robotics 18Ah}
       \begin{itemize}
-        \item Energy: 799 Wh
-        \item Endurance: 2.5 hrs @ 314W
+        \item Energy: 803 Wh
+        \item Endurance: 2.6 hrs @ 314W
         \item Proven platform (BlueROV2)
       \end{itemize}
     \end{column}
@@ -696,7 +696,7 @@
 
     Four battery options were evaluated. Two Blue Robotics 18Ah batteries provide only 532 watt-hours, insufficient for 628 watt-hour requirement. Custom Samsung 35E pack provides 311 watt-hours at lower cost, but requires self-assembly and custom pressure housing. SubCtech PowerPack offers professional-grade performance with 6000 meter depth rating but costs 2.5 to 8 times more.
 
-    Three Blue Robotics 18Ah batteries provide 799 watt-hours - 27 percent margin over requirement. This enables 2.5 hour missions at 314 watts average power. This configuration is proven in the existing BlueROV2 platform with integrated battery management system.
+    Three Blue Robotics 18Ah batteries provide 803 watt-hours - 28 percent margin over requirement. This enables 2.6 hour missions at 314 watts average power. This configuration is proven in the existing BlueROV2 platform with integrated battery management system.
   }
 \end{frame}
 
@@ -824,14 +824,14 @@
       \toprule
       \textbf{Subsystem}    & \textbf{Mass (kg)} & \textbf{Cost (\$)} & \textbf{Key Components}            \\
       \midrule
-      Propulsion            & 1.88               & 1,278              & 4× T200 + ESCs                     \\
-      Power                 & 4.55               & 1,680              & 3× 18Ah batteries + housing        \\
-      Control \& Navigation & 0.62               & 665                & RPi4 + Navigator + Bar30           \\
-      Payload               & 0.96               & 3,320              & Ping360 (\$2,750) + camera + light \\
-      Communications        & 0.12               & 410                & WiFi + Iridium                     \\
-      Structure             & 5.50               & 1,280              & Frame, foam, fairings, penetrators \\
+      Propulsion            & 1.88               & 1,080              & 4× T200 + ESCs                     \\
+      Power                 & 4.55               & 1,755              & 3× 18Ah batteries + housing        \\
+      Control \& Navigation & 0.62               & 765                & RPi4 + Navigator + Bar30 + GPS     \\
+      Payload               & 0.96               & 3,370              & Ping360 (\$2,750) + camera + light \\
+      Communications        & 0.12               & 310                & WiFi + Iridium                     \\
+      Structure             & 5.50               & 1,917              & Frame, foam, fairings, penetrators \\
       \midrule
-      \textbf{Total}        & \textbf{15.67 kg}  & \textbf{\$10640}   &                                    \\
+      \textbf{Total}        & \textbf{15.67 kg}  & \textbf{\$9,197}   &                                    \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -840,7 +840,7 @@
 
   \begin{itemize}
     \item \textbf{Mass:} 15.67 kg total, providing a 37\% margin under the 25 kg limit.
-    \item \textbf{Cost:} \$10640 base build, much cheaper
+    \item \textbf{Cost:} \$9,197 total build cost
     \item \textbf{Key Drivers:} Power/Structure are largest mass contributors; Payload (Ping360) is the largest cost.
   \end{itemize}
 
@@ -850,7 +850,7 @@
     The mass budget shows the AUV will weigh approximately 15.7 kg, well under the 25 kg limit with 37 percent margin. The largest contributors are the structure and power system . This substantial margin allows for future additions like the acoustic modem (approximately 1.5 kg) without exceeding the weight limit.
 
     \textbf{(Cost Details)}
-    The estimated build cost of 10640 dollars represents 20-25 percent of comparable commercial AUV systems (50-150K range). The Ping360 sonar is the single most expensive component at 2,750 dollars. Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes core components to minimize cost while maintaining technical performance.
+    The estimated build cost of 9,197 dollars represents 15-20 percent of comparable commercial AUV systems (50-150K range). The Ping360 sonar is the single most expensive component at 2,750 dollars. Optional additions like the EvoLogics acoustic modem (12K) or Nortek DVL (20K) would increase total cost but are not required for basic cable inspection missions. The design prioritizes core components to minimize cost while maintaining technical performance.
   }
 \end{frame}
 
@@ -957,21 +957,21 @@
     \begin{column}{0.48\textwidth}
       \textbf{Key Specifications:}
       \begin{itemize}
-        \item Thrust: 50 N fwd @ 16V
-        \item Max power: 350W
+        \item Thrust: 51.5 N fwd @ 16V
+        \item Max power: 390W
         \item Efficiency: 30\% @ light load, 55\% @ heavy load
         \item Depth rating: 300m
-        \item Mass: 156g in water
-        \item Cost: \$130
+        \item Mass: 427g air, 239g in water
+        \item Cost: \$230
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Design Rationale:}
       \begin{itemize}
-        \item 4× thrusters = 200N total
+        \item 4× thrusters = 206N total
         \item Flooded brushless motor (pressure-tolerant)
-        \item Thrust/cost: 0.38 N/\$
-        \item 6-20× cheaper than alternatives
+        \item Thrust/cost: 0.22 N/\$
+        \item 3.5-10× cheaper than alternatives
       \end{itemize}
     \end{column}
   \end{columns}
@@ -988,24 +988,24 @@
         \item Dual magnetometers
         \item 16 PWM, 4 UART
         \item RPi4 direct mount, ArduSub
-        \item Power: 10W, Cost: \$125
+        \item Power: 10W, Cost: \$220
       \end{itemize}
       \vspace{0.5em}
       \textbf{Bar30 Depth Sensor:}
       \begin{itemize}
         \item Range: 0-300m
         \item Resolution: 2mm
-        \item Cost: \$68
+        \item Cost: \$90
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{18Ah Li-ion Battery:}
       \begin{itemize}
         \item Voltage: 14.8V (4S)
-        \item Capacity: 266 Wh each
-        \item 3× = 799 Wh total
+        \item Capacity: 267.6 Wh each
+        \item 3× = 803 Wh total
         \item Mass: 1.35 kg each
-        \item Cost: \$400 each
+        \item Cost: \$425 each
       \end{itemize}
       \vspace{0.5em}
       \textbf{3" Al Enclosure:}
