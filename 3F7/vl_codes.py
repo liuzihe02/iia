@@ -1,74 +1,127 @@
 from math import log2, ceil
 
+
 def shannon_fano(p):
+    """
+    Construct a Shannon-Fano code for a given probability distribution.
+
+    The Shannon-Fano algorithm constructs a prefix-free variable-length code by:
+    1. Sorting symbols by decreasing probability
+    2. Computing cumulative probability distribution F(a)
+    3. Assigning codeword length l(a) = ceil(-log2(p(a)))
+    4. Generating binary codewords from the binary expansion of F(a)
+
+    Parameters:
+    -----------
+    p : dict
+        Probability distribution as a dictionary mapping symbols to their
+        probabilities. Symbols can be any hashable type (str, int, etc.).
+        Probabilities should sum to 1.0 (zero probabilities are filtered out).
+
+    Returns:
+    --------
+    code : dict
+        Code table mapping each symbol to its codeword (list of binary digits).
+        Each codeword is a list of integers (0 or 1).
+
+    Example:
+    --------
+    >>> p = {'a': 0.5, 'b': 0.25, 'c': 0.125, 'd': 0.125}
+    >>> c = shannon_fano(p)
+    >>> c['a']
+    [0]
+    >>> c['b']
+    [1, 0]
+    """
 
     # Begin by sorting the probabilities in decreasing order, as required
     # in Shannon's paper.
-    p = dict(sorted([(a,p[a]) for a in p if p[a]>0.0], key = lambda el: el[1], reverse = True))
+    p = dict(
+        sorted([(a, p[a]) for a in p if p[a] > 0.0], key=lambda el: el[1], reverse=True)
+    )
 
     # Compute the cumulative probability distribution
     # this can be done easily with numpy.cumsum but we will do it by hand. Note
     # that this is not a time-critical operation so efficiency is not an issue.
-    
+
     # step 1: initialise f to be a list with one element 0 (this is because Shannon
     # requires the cumulative probability to be the sum up to AND EXCLUDING the current
     # symbol, so the first element of f should be zero.
-    
-    # ... (whenever you see "..." you are expected to complete a missing command
+
+    f = [0]
 
     # step 2: compute the runninng sum
-    for a in p: # for every probability in p
+    for a in p:  # for every probability in p
         # you now want to append to f the sum of its last entry (which you can access as [-1])
         # and the probability p[a] of the current symbol
 
-        # ...
+        f.append(f[-1] + p[a])
 
     # the resulting cumulative has one too many element at the end, the sum of all probabilities
     # that should equal to one. You can use the "pop" command to delete the last element in a list.
 
-    # ...
+    f.pop()
 
     # We now convert the list you computed into a dictionary
-    f = dict([(a,mf) for a,mf in zip(p,f)])
+    f = dict([(a, mf) for a, mf in zip(p, f)])
 
     # assign the codewords
-    code = {} # initialise as an empty dictionary
-    for a in p: # for each probability
-
+    code = {}  # initialise as an empty dictionary
+    for a in p:  # for each probability
         # Compute the codeword length according to the Shannon-Fano formula
         # you want to use the functions "ceil()" and "log2()" we imported
         # from the math library
-        #...
+        length = ceil(-log2(p[a]))
         # (assign variable name "length")
 
-        codeword = [] # initialise current codeword
+        codeword = []  # initialise current codeword
         myf = f[a]
         # for each position in length, we will multiply myf by 2 and take the
         # integral part as our binary digit
         for pos in range(length):
             # multiply myf by 2 (shifting it "left" in binary)
-            #...
+            myf = myf * 2
 
             # if the resulting myf is larger than 1, append a 1 to the codeword,
             # whereas if it is smaller than 1 you should append a 0
             # If it is larger than 1, you sould also substratct 1 from myf.
-            #...
-            #...
-            #...
-            #...
-            #...
-        code[a] = codeword # assign the codeword
-        
-    return code # return the code table
+            if myf >= 1:
+                codeword.append(1)
+                myf = myf - 1
+            else:
+                codeword.append(0)
+        code[a] = codeword  # assign the codeword
+
+    return code  # return the code table
 
 
 def huffman(p):
+    """
+    Construct a Huffman code tree for a given probability distribution.
+
+    Huffman's algorithm builds an optimal prefix-free code by iteratively merging
+    the two nodes with smallest probabilities until a single tree is formed.
+
+    Parameters:
+    -----------
+    p : dict
+        Probability distribution as a dictionary mapping symbols to their
+        probabilities. Symbols can be any hashable type (str, int, etc.).
+        Probabilities should sum to 1.0 (zero probabilities are filtered out).
+
+    Returns:
+    --------
+    xt : list of lists
+        Extended tree representation where each node is [parent, children, label].
+        Leaf nodes contain the original symbols as labels.
+    """
+
     # create an xtree with all the source symbols (to be the leaves) initially orphaned
-    xt = [[-1,[], a] for a in p]
+    xt = [[-1, [], a] for a in p]
     # label the probabilities with a "pointer" to their corresponding nodes in the tree
     # in the process, we convert the probability vector from a Python dictionary to a
     # list of tuples (so we can modify it)
-    p = [(k,p[a]) for k,a in zip(range(len(p)),p)]
+    p = [(k, p[a]) for k, a in zip(range(len(p)), p)]
 
     # the leaves are labeled according to the symbols in the probability vector. We will
     # label the remaining tree nodes (mainly for visualisation purposes) with numbers
@@ -85,60 +138,60 @@ def huffman(p):
         # second entry from a tuple.) Note that the natural order of "sorted" is
         # increasing, which is as you want it in this case.
         # The output of sorted() can be written back to p (i.e. p = sorted(p, ....))
-        #...
+        p = sorted(p, key=lambda el: el[1])
 
         # Now append a new node to the tree xt with no parent (parent = -1),
         # no children (children = []) and label str(nodelabel)
-        #...
+        xt.append([-1, [], str(nodelabel)])
 
         # we incrase the variable nodelabel by 1 for its next use
         nodelabel += 1
 
-        # assign parent of the nodes pointed to by the smallest probabilities 
+        # assign parent of the nodes pointed to by the smallest probabilities
         # Note that the smallest probabilities are now p[0] and p[1], so their
         # pointers to nodes in xt are p[0][0] and p[1][0]. The corresponding
         # xt nodes should be assigned the new node you created as a parent,
         # whose index is len(xt)-1 since it has been appended at the end of xt
-        #...
-        #...
-        
+        xt[p[0][0]][0] = len(xt) - 1
+        xt[p[1][0]][0] = len(xt) - 1
+
         # assign the children of new node to be the nodes pointed to by
         # p[0] and p[1]. Note that the new node can be addressed as xt[-1]
-        #...
+        xt[-1][1] = [p[0][0], p[1][0]]
 
         # create a new entry pointing to the new node in the list of probabilities
         # This new entry should be a tuple with len(xt)-1 as its first element,
         # and the sum of the probabilities in p[0] and p[1] as its second element
-        #...
+        p.append((len(xt) - 1, p[0][1] + p[1][1]))
 
         # remove the two nodes with the smallest probability
         p.pop(0)
         p.pop(0)
         # (using pop(0) twice removes the first element of the list twice
         # and hence removes the first 2 elements.)
-        
-    return(xt)
 
+    return xt
 
 
 def bits2bytes(x):
-    n = len(x)+3
+    n = len(x) + 3
     r = (8 - n % 8) % 8
-    prefix = format(r, '03b')
-    x = ''.join(str(a) for a in x)
-    suffix = '0'*r
+    prefix = format(r, "03b")
+    x = "".join(str(a) for a in x)
+    suffix = "0" * r
     x = prefix + x + suffix
-    x = [x[k:k+8] for k in range(0,len(x),8)]
+    x = [x[k : k + 8] for k in range(0, len(x), 8)]
     y = []
     for a in x:
-        y.append(int(a,2))
+        y.append(int(a, 2))
 
     return y
 
+
 def bytes2bits(y):
-    x = [format(a, '08b') for a in y]
-    r = int(x[0][0:3],2)
-    x = ''.join(x)
+    x = [format(a, "08b") for a in y]
+    r = int(x[0][0:3], 2)
+    x = "".join(x)
     x = [int(a) for a in x]
     for k in range(3):
         x.pop(0)
@@ -156,21 +209,20 @@ def vl_encode(x, c):
 
 def vl_decode(y, xt):
     x = []
-    root = [k for k in range(len(xt)) if xt[k][0]==-1]
+    root = [k for k in range(len(xt)) if xt[k][0] == -1]
     if len(root) != 1:
-        raise NameError('Tree with no or multiple roots!')
+        raise NameError("Tree with no or multiple roots!")
     root = root[0]
     leaves = [k for k in range(len(xt)) if len(xt[k][1]) == 0]
 
     n = root
     for k in y:
         if len(xt[n][1]) < k:
-            raise NameError('Symbol exceeds alphabet size in tree node')
+            raise NameError("Symbol exceeds alphabet size in tree node")
         if xt[n][1][k] == -1:
-            raise NameError('Symbol not assigned in tree node')
+            raise NameError("Symbol not assigned in tree node")
         n = xt[n][1][k]
-        if len(xt[n][1]) == 0: # it's a leaf!
+        if len(xt[n][1]) == 0:  # it's a leaf!
             x.append(xt[n][2])
             n = root
     return x
-
