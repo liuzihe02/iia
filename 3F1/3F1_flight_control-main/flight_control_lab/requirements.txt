@@ -62,7 +62,8 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
 pycodestyle==2.9.1
 pycparser==2.21
-pygame==2.1.2
+#pygame causing some issues, let uv figure this out
+pygame
 Pygments==2.13.0
 pyparsing==3.0.9
 pyrsistent==0.19.2
