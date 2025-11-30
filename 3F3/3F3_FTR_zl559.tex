@@ -25,7 +25,7 @@
 	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
 	% unnumberedsections, % Commented to enable section numbering
 	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
-	% draft, % skips compiling images, which take FOREVER. toggle this on and off to see complete version
+	draft, % skips compiling images, which take FOREVER. toggle this on and off to see complete version
 ]{LTJournalArticle}
 
 \addbibresource{3F3_FTR_zl559.bib} % BibLaTeX bibliography file
@@ -179,16 +179,16 @@ The histogram results demonstrate good agreement with theory:
 	\item \textbf{Increasing Reliability:} As $N$ increases, relative scatter decreases proportionally to $1/\sqrt{N}$.
 \end{enumerate}
 
-\subsection{Explanation of Multinomial Distribution Form}
+\subsection{Multinomial Distribution}
 
 The multinomial distribution describes the probability of observing counts $(n_1, n_2, \ldots, n_J)$ when $N$ independent samples are distributed into $J$ bins, where each sample falls into bin $j$ with probability $p_j$:
 \begin{equation}
 	P(n_1, \ldots, n_J) = \frac{N!}{n_1! n_2! \cdots n_J!} p_1^{n_1} p_2^{n_2} \cdots p_J^{n_J}
 \end{equation}
 
-\textbf{Why the $p_j^{n_j}$ terms?} Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$.
+Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities $p_1^{n_1} \times p_2^{n_2} \times \cdots \times p_J^{n_J}$. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$.
 
-\textbf{Why the factorial terms?} The factorial coefficient counts the number of distinct arrangements that yield the same bin counts. Consider $N$ labelled samples: the number of ways to choose which $n_1$ samples go to bin 1, then which $n_2$ of the remaining go to bin 2, and so forth, is:
+The factorial coefficient counts the number of distinct arrangements that yield the same bin counts. Consider $N$ labelled samples: the number of ways to choose which $n_1$ samples go to bin 1, then which $n_2$ of the remaining go to bin 2, and so forth, is:
 \begin{equation}
 	\binom{N}{n_1}\binom{N-n_1}{n_2}\cdots\binom{n_J}{n_J} = \frac{N!}{n_1! n_2! \cdots n_J!}
 \end{equation}
