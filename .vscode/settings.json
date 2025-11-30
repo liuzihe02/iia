@@ -31,7 +31,9 @@
     "*.nav",
     "*.snm",
     "*.gz",
-    "*.log"
+    "*.log",
+    "*.bcf",
+    "*.run.xml"
   ],
   // LaTeX Workshop - View PDF in VS Code tab
   "latex-workshop.view.pdf.viewer": "tab",
