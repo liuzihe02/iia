@@ -5,6 +5,7 @@
 \usepackage{listings}
 \usepackage{float}
 \usetikzlibrary{shapes.geometric,arrows,decorations.markings}
+\graphicspath{{flight_control_lab/}}
 
 % Set the dimensions of the paper.
 \setlength{\paperwidth}{210mm}
@@ -56,132 +57,275 @@
 \end{itemize}
 \vfill\vfill\null
 
-\newpage
+\pagebreak
 
 \section*{3F1 Lab Worksheet}
 
 \begin{tabbing}
-        \textbf{2.1 Simplified Aircraft Model} \\[3mm]
-        Transfer function $= \dfrac{N}{s^2 + Ms} = \dfrac{10}{s^2 + 10s}$ \\[3mm]
+        \textbf{2.1 Simplified Aircraft Model} \\
+        Transfer function $= \dfrac{10}{s^2 + 10s}$ \\
         \verb+num = [10]+ \hspace*{2cm} \verb+den = [1, 10, 0]+\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{2.2 Modelling Manual Control}\\[3mm]
-        Controller transfer function $= K(s) = ke^{-Ds}$\\[3mm]
-        $k= 0.8$ \hspace*{2cm} $D= 1$ s\\[3mm]
-        Phase margin $= 45$ degrees\\[3mm]
-        Amount of extra time delay which can be tolerated $= \dfrac{45 \times \pi/180}{0.8} \approx 1.0$ s\\
+        \textbf{2.2 Modelling Manual Control}\\
+        Controller transfer function $= K(s) = k e^{-sD}$\\
+        $k= 0.8$ \hspace*{2cm} $D= 1$ s\\
+
+        Phase margin $= 45$ degrees\\
+
+        Amount of extra time delay which can be tolerated $= \dfrac{45 \times \pi/180}{0.8} \approx 0.98$ s (approx 1.0 s)\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{2.3 Pilot Induced Oscillation}\\[3mm]
-        Period of oscillation (observed) $= 5$ s\\[3mm]
+        \textbf{2.3 Pilot Induced Oscillation}\\
+
+        Period of oscillation (observed) $= 5$ s\\
+
         Period of oscillation (theoretical) $= \dfrac{2\pi}{\omega_{pc}} = \dfrac{2\pi}{0.8} \approx 7.85$ s\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{2.4 Sinusoidal disturbances}\\[3mm]
-        \= Maximum stabilising gain $= 4.5$\\[3mm]
-        \> Gain at 0.66 Hz $= 5.5$ dB \hspace*{2cm} \= Phase at 0.66 Hz $= -90$ degrees\\[1mm]
+        \textbf{2.4 Sinusoidal disturbances}\\
+        \= Maximum stabilising gain $= 4.5$ (Gain Margin)\\
+        \> Gain at 0.66 Hz $= 5.5$ dB \hspace*{2cm} \= Phase at 0.66 Hz $= -90$ degrees\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{2.5 Unstable Aircraft}\\[3mm]
-        Fastest pole at $T= 0.6$\\[3mm]
+        \textbf{2.5 Unstable Aircraft}\\
+        Fastest pole at $T= 0.6$\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{3.2 Autopilot with Proportional Control}\\[3mm]
+        \textbf{3.2 Autopilot with Proportional Control}\\
         \= Proportional gain $K_c= 12$ \hspace*{2cm} Period of oscillation $T_c= 2$ s\\
 \end{tabbing}
 
 \begin{tabbing}
         \textbf{3.3 Autopilot with PID Control}\\[3mm]
-        Transfer function of PID controller $= K_p \left(1 + \dfrac{1}{T_i s} + T_d s\right)$\\[3mm]
-        PID constants: $K_p = 7.2 \hspace*{1cm} T_i = 1.0 \hspace*{1cm} T_d = 0.25$\\[4mm]
+        Transfer function of PID controller $= K_p \left(1 + \dfrac{1}{T_i s} + T_d s\right)$\\
+        PID constants: $K_p = 7.2 \hspace*{1cm} T_i = 1.0 \hspace*{1cm} T_d = 0.25$\\
         Adjusted value of \,$T_d = 0.35$\\
 \end{tabbing}
 
 \begin{tabbing}
-        \textbf{3.4 Integrator Wind-up}\\[3mm]
-        Integrator bound $Q= \dfrac{d \cdot T_i}{K_p} = \dfrac{2 \times 1.0}{7.2} = \dfrac{5}{18} \approx 0.278$\\
+        \textbf{3.4 Integrator Wind-up}\\
+        Integrator bound $Q= \dfrac{d \cdot T_i}{K_p} = \dfrac{2 \times 1.0}{7.2} \approx 0.278$\\
 \end{tabbing}
 
 \pagebreak
 
 \section*{3F1 Flight Control Lab Report}
 
-\vspace{1cm}
+\noindent \textbf{Question 1.} \textit{(§2.2 Modelling Manual Control) Nyquist diagram (from Bode diagram) for controller in series with plant.}
 
-\noindent \textbf{1.} (§2.2 Modelling Manual Control) Nyquist diagram (from Bode diagram) for controller in series with plant.
+\textbf{System Model:} The simplified aircraft has transfer function $G(s) = \dfrac{N}{s^2 + Ms} = \dfrac{10}{s(s+10)}$, representing an integrator ($1/s$) in series with a first-order lag. The human controller is modelled as $K(s) = ke^{-sD}$ with proportional gain $k=0.8$ and reaction delay $D=1$s.
 
-The open-loop transfer function is $K(s)G(s) = 0.8 e^{-s} \cdot \dfrac{10}{s^2 + 10s}$.
+\textbf{Open-Loop Transfer Function:}
+$$ L(s) = K(s)G(s) = \frac{8 e^{-s}}{s(s + 10)} $$
 
-From the Bode diagram (Figure 2):
+\textbf{Frequency Response:} Substituting $s = j\omega$:
+$$ L(j\omega) = \frac{8 e^{-j\omega}}{j\omega(j\omega + 10)} = \frac{8}{j\omega \cdot \sqrt{\omega^2+100} \cdot e^{j\arctan(\omega/10)}} \cdot e^{-j\omega} $$
+
+The magnitude and phase are:
+$$ |L(j\omega)| = \frac{8}{\omega\sqrt{\omega^2+100}}, \quad \angle L(j\omega) = -\frac{\pi}{2} - \arctan\left(\frac{\omega}{10}\right) - \omega $$
+
+\textbf{Key Points from Bode Diagram (Figure~\ref{fig:bode_manual}):}
 \begin{itemize}
-        \item At low frequencies ($\omega \to 0$): magnitude $\to \infty$, phase $\to -90°$
-        \item At gain crossover ($\omega_{gc} = 0.8$ rad/s): magnitude $= 0$ dB, phase $\approx -135°$
-        \item Phase crosses $-180°$ at approximately $\omega = 1.5$ rad/s
+        \item \textbf{Low frequency} ($\omega \to 0$): $|L| \to \infty$, $\angle L \to -90^\circ$ (integrator dominates).
+        \item \textbf{Gain crossover} ($\omega_{gc} \approx 0.8$ rad/s): $|L|=1$ (0 dB). Phase at this point:
+              $$ \angle L(j \cdot 0.8) = -90^\circ - \arctan(0.08) - 0.8 \times \frac{180^\circ}{\pi} \approx -90^\circ - 4.6^\circ - 45.8^\circ \approx -140^\circ $$
+              Phase margin $= 180^\circ - 140^\circ = 40^\circ$ (approximately $45^\circ$ from graph).
+        \item \textbf{High frequency} ($\omega \to \infty$): $|L| \to 0$, $\angle L \to -\infty$ (time delay adds unbounded phase lag $-\omega$ rad).
 \end{itemize}
 
+\textbf{Constructing Nyquist from Bode:} The Nyquist plot traces $L(e^{j\theta})$ as $\omega$ varies from $0$ to $\infty$. Starting from the negative imaginary axis (phase $-90^\circ$, large magnitude), the locus spirals clockwise towards the origin as magnitude decreases and phase becomes increasingly negative. The critical point $-1$ is not encircled, confirming closed-loop stability.
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig1.png}
+                \caption{Manual control response to impulse disturbance. From the plot: $k \approx u_{max}/e_{max} = 4/5 = 0.8$, $D \approx 1$s (delay before response).}
+                \label{fig:manual_impulse}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig2.png}
+                \caption{Bode diagram: open-loop $L(s)$ with $k=0.8$, $D=1$s. Phase margin $\approx 45^\circ$ at $\omega_{gc}=0.8$ rad/s.}
+                \label{fig:bode_manual}
+        \end{minipage}
+\end{figure}
+
 \begin{center}
-        \begin{tikzpicture}[scale=1.1]
+        \begin{tikzpicture}[scale=1.0]
                 \draw[->] (-3,0) -- (3,0) node[right] {Re};
                 \draw[->] (0,-3) -- (0,3) node[above] {Im};
-                % Draw Nyquist curve - starts from negative Im axis, spirals inward
                 \draw[thick,blue,
-                        decoration={markings, mark=at position 0.3 with {\arrow{>}}, mark=at position 0.7 with {\arrow{>}}},
+                        decoration={markings, mark=at position 0.5 with {\arrow{>}}},
                         postaction={decorate}]
-                plot[smooth] coordinates {(1.5,-2.8) (1.2,-2) (0.8,-1.2) (0.3,-0.7) (0,-0.5) (-0.3,-0.3) (-0.5,-0.1) (-0.4,0.1) (-0.3,0.3) (0,0.5) (0.3,0.7) (0.8,1.2) (1.2,2) (1.5,2.8)};
-                % Mark key points
-                \node[font=\footnotesize] at (2,-2.5) {$\omega \to 0$};
-                \node[font=\footnotesize] at (-0.8,0) {$\omega_{gc}$};
-                \node[font=\footnotesize] at (2,2.5) {$\omega \to 0^-$};
-                \filldraw[red] (-1,0) circle (2pt) node[below,font=\footnotesize] {$-1$};
-                \node[align=center,font=\footnotesize] at (0,-3.5) {Nyquist diagram of $K(s)G(s)$};
+                plot[smooth] coordinates {(0.5,-2.5) (-1.5,-1.5) (-1.0, 0) (-0.2, 0.2) (0,0)};
+                \node[font=\footnotesize] at (1.5,-2.5) {$\omega \to 0$};
+                \node[font=\footnotesize] at (0.3,0.3) {$\omega \to \infty$};
+                \filldraw[red] (-1,0) circle (2pt) node[below left,font=\footnotesize] {$-1$};
+                \node[align=center,font=\footnotesize] at (0,-3.5) {Nyquist diagram of $L(s) = K(s)G(s)$};
         \end{tikzpicture}
 \end{center}
 
-\noindent \textbf{2.} (§2.2 Modelling Manual Control) Are you using any integral action? Give a brief explanation. What does this imply about the accuracy of the model of the human controller?
+\noindent \textbf{2.} (§2.2 Modelling Manual Control) Are you using any integral action?
 
-\vspace{8cm}
+Yes. In Figure~\ref{fig:step_manual}, the manual control input $u(t)$ does not return to zero but maintains a steady value to counteract the step disturbance, while $e(t) \to 0$. This implies the human controller provides integral action (``trimming'') to eliminate steady-state error. The simple model $K(s) = ke^{-sD}$ is therefore an approximation that neglects the pilot's low-frequency adaptation.
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.55\textwidth]{fig3.png}
+        \caption{Step disturbance response showing integral action: $u(t)$ maintains steady offset to drive $e(t) \to 0$.}
+        \label{fig:step_manual}
+\end{figure}
 
 \pagebreak
 
 \noindent \textbf{3.} (§2.3 Pilot Induced Oscillation) Explain the oscillation of the feedback loop.
-How does your observed period of oscillation compare to the theoretical prediction?
 
-\vspace{5cm}
+\textbf{Mechanism:} PIO occurs when the pilot's time delay introduces sufficient phase lag that the total loop phase reaches $-180^\circ$ at a frequency where the loop gain exceeds unity. The PIO aircraft has $G_1(s) = c/(Ts+1)^3$ which contributes up to $-270^\circ$ phase lag, plus the pilot delay $e^{-sD}$ adds $-\omega D$ radians.
+
+\textbf{Stability condition:} At the phase crossover frequency $\omega_{pc}$ where $\angle L(j\omega_{pc}) = -180^\circ$, if $|L(j\omega_{pc})| > 1$, the system is unstable and oscillates at frequency $\omega_{pc}$.
+
+\textbf{Period comparison:} From Bode (Figure~\ref{fig:pio_bode}), $\omega_{pc} \approx 0.8$ rad/s, giving theoretical period $T = 2\pi/\omega_{pc} \approx 7.85$s. The observed period ($\approx 5$s) is shorter, suggesting the pilot adapts their gain/delay under oscillatory conditions.
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig4.png}
+                \caption{PIO with manual control. Period $\approx 5$s.}
+                \label{fig:pio_manual}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig5.png}
+                \caption{No control: aircraft is naturally stable.}
+                \label{fig:pio_nocontrol}
+        \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.55\textwidth]{fig6.png}
+        \caption{PIO Bode diagram. Phase crossover at $\omega_{pc} \approx 0.8$ rad/s.}
+        \label{fig:pio_bode}
+\end{figure}
 
 \noindent \textbf{4.} (§2.3 Pilot Induced Oscillation) Can you give a rough guideline to the control designer to make PIO less likely?
 
-\vspace{5cm}
+To prevent PIO, ensure adequate phase margin at frequencies where the pilot is active ($< 1$ Hz):
+\begin{itemize}
+        \item Reduce total system delay (sensors, actuators, displays)
+        \item Avoid plants with high phase lag at low frequencies
+        \item Design for phase margin $> 45^\circ$ at the expected pilot crossover frequency
+        \item Consider rate limiters to prevent high-frequency pilot inputs
+\end{itemize}
 
-\noindent \textbf{5.} (§2.4 Sinusoidal Disturbances) Was your manual input able to reduce the error (as compared to providing no input)?
+\noindent \textbf{5.} (§2.4 Sinusoidal Disturbances) Was your manual input able to reduce the error?
 
-\vspace{5cm}
+No. The closed-loop response to disturbance $d$ is $y = \dfrac{G}{1+KG} d$. For disturbance rejection, we need $|1+KG| > 1$.
+
+At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \times 1 \approx -238^\circ$. Combined with plant phase ($\approx -90^\circ$ from Bode), total phase approaches $-330^\circ$, meaning $KG$ points nearly opposite to $-1$. This makes $|1+KG| < 1$, so the disturbance is actually \emph{amplified} rather than attenuated. Manual control worsens the oscillation.
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig7.png}
+                \caption{Sinusoidal + manual control.}
+                \label{fig:sin_manual}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig8.png}
+                \caption{Sinusoidal + no control.}
+                \label{fig:sin_nocontrol}
+        \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig9.png}
+                \caption{F4E Bode: gain margin 4.5; at 0.66 Hz: 5.5 dB, $-90^\circ$.}
+                \label{fig:f4e_bode}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig10.png}
+                \caption{Small movements: still ineffective.}
+                \label{fig:sin_small}
+        \end{minipage}
+\end{figure}
+
 \pagebreak
 
 \noindent \textbf{6.} (§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s).$
+
+$G_2(s) = \dfrac{2}{sT-1}$ has one unstable pole at $s=1/T > 0$. The frequency response is:
+$$ G_2(j\omega) = \frac{2}{j\omega T - 1} = \frac{-2(1 + j\omega T)}{1 + \omega^2 T^2} $$
+
+At $\omega = 0$: $G_2(0) = -2$. As $\omega \to \infty$: $G_2 \to 0$. The locus is a circle centered at $(-1, 0)$ with radius 1, traced clockwise from $-2$ to $0$.
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{fig11.png}
+        \caption{Unstable aircraft ($T=0.6$) manually stabilized. Oscillatory near stability limit.}
+        \label{fig:unstable}
+\end{figure}
+
 \begin{center}
-        \begin{tikzpicture}[scale=1.3]
-                \draw[->] (-2,0) -- (2,0) node[right] {Re};
+        \begin{tikzpicture}[scale=1.5]
+                \draw[->] (-3,0) -- (1,0) node[right] {Re};
                 \draw[->] (0,-2) -- (0,2) node[above] {Im};
+
+                % Circle for 2/(sT-1)
+                \draw[thick, blue, decoration={markings, mark=at position 0.25 with {\arrow{>}}}, postaction={decorate}]
+                (0,0) arc (90:270:1) arc (-90:90:1);
+
+                % Center of circle is (-1,0), radius 1. Starts at -2.
+                \draw[thick, blue] (-1,0) circle (1);
+
+                \node at (-2.2, 0.2) {-2};
+                \node at (-0.2, 0.2) {0};
                 \node[align=center,font=\footnotesize] at (0,-2.5) {Nyquist diagram of $G_2(s)$};
         \end{tikzpicture}
 \end{center}
 
 \noindent \textbf{7.} (§2.5 An Unstable Aircraft) Explain, using the Nyquist criterion, why the feedback system is stable with a proportional gain greater than 0.5.
 
-\vspace{5cm}
+\textbf{Nyquist Criterion:} For a system with $P$ open-loop poles in the RHP, closed-loop stability requires $N = -P$ encirclements of $-1/K$, where $N > 0$ is counter-clockwise.
 
-\noindent \textbf{8.} (§2.5 An Unstable Aircraft) Sketch of a Nyquist diagram for $G_2(s).$ with a small time delay $D$.
+Here $P = 1$ (one unstable pole), so we need $N = -1$: one \emph{clockwise} encirclement of $-1/K$.
+
+The Nyquist locus is a circle from $-2$ to $0$ on the real axis, traversed clockwise. For $-1/K$ to be encircled clockwise:
+$$ -2 < -\frac{1}{K} < 0 \implies 0 < \frac{1}{K} < 2 \implies K > 0.5 $$
+
+For $K > 0.5$, the point $-1/K$ lies inside the circle, giving the required clockwise encirclement for stability.
+
+\noindent \textbf{8.} (§2.5 An Unstable Aircraft) Sketch of a Nyquist diagram for $G_2(s)$ with a small time delay $D$.
+
+With delay, the transfer function becomes $G_2(s)e^{-sD}$. The delay contributes phase $-\omega D$ without changing magnitude:
+$$ |G_2(j\omega)e^{-j\omega D}| = |G_2(j\omega)|, \quad \angle(G_2 e^{-j\omega D}) = \angle G_2 - \omega D $$
+
+The additional phase lag causes the circular locus to spiral inward rather than close cleanly at the origin. For large $D$, the spiral may cross $-1/K$ multiple times, potentially destabilizing the system.
 \begin{center}
-        \begin{tikzpicture}[scale=1.3]
-                \draw[->] (-2,0) -- (2,0) node[right] {Re};
+        \begin{tikzpicture}[scale=1.5]
+                \draw[->] (-3,0) -- (1,0) node[right] {Re};
                 \draw[->] (0,-2) -- (0,2) node[above] {Im};
-                \node[align=center,font=\footnotesize] at (0,-2.5) {Nyquist diagram with small time delay};
+
+                % Spiraling curve
+                \draw[thick, blue] plot [smooth, tension=1] coordinates {(-2,0) (-1.5,-0.8) (-0.5,-0.5) (0,0)};
+                \draw[dashed, gray] (-1,0) circle (1);
+
+                \node at (-2.2, 0.2) {-2};
+                \node[align=center,font=\footnotesize] at (0,-2.5) {Nyquist diagram with delay (Solid)};
         \end{tikzpicture}
 \end{center}
 
@@ -189,5 +333,46 @@ How does your observed period of oscillation compare to the theoretical predicti
 
 \noindent \textbf{9.} (§3.4 Integrator Wind-up) Explain how you calculated the bound on $Q$.
 
+\textbf{PID Controller:} $u(t) = K_p \left( e + \dfrac{1}{T_i}\displaystyle\int_0^t e \, d\tau + T_d \dfrac{de}{dt} \right)$
+
+\textbf{Steady-state analysis:} After settling, $e_{ss} = 0$ and $\dot{e} = 0$. To cancel a step disturbance $d$, we need $u_{ss} = d$. Only the integral term contributes:
+$$ u_{ss} = \frac{K_p}{T_i} I_{ss} = d \implies I_{ss} = \frac{d \cdot T_i}{K_p} $$
+
+\textbf{Minimum bound:} For $d = 2$, $T_i = 1.0$, $K_p = 7.2$:
+$$ Q = \frac{2 \times 1.0}{7.2} = \frac{5}{18} \approx 0.278 $$
+
+Setting $Q$ smaller would prevent full disturbance rejection (steady-state error). Setting $Q$ larger allows more wind-up overshoot.
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig12.png}
+                \caption{Proportional control: $K_c=12$, $T_c=2$s.}
+                \label{fig:prop_control}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig13.png}
+                \caption{PID with $T_d=0.35$: reduced oscillation.}
+                \label{fig:pid_tuned}
+        \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig14.png}
+                \caption{Integrator wind-up: large overshoot.}
+                \label{fig:windup}
+        \end{minipage}\hfill
+        \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{fig15.png}
+                \caption{Wind-up fixed with $Q=0.278$.}
+                \label{fig:windup_fixed}
+        \end{minipage}
+\end{figure}
 
 \end{document}
