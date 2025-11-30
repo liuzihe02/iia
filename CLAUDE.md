@@ -11,7 +11,7 @@ Labs and coursework are equivalent.
 - Coursework comes in 2 versions (each lab report will indicate short report questions and long report questions)
   - In short coursework mode, you should ignore all long report questions
     - Certain tasks may look like long report tasks, but are actually short. Be careful of this. Note that these tasks are not in italic and most importantly do not have the starting tag `Long report:`
-  - In long coursework mode, you should consider both short and long reports
+  - In long coursework mode, you should consider both short and long report tasks
     - Long report tasks will be in italic, and have its own paragraph, and contain the starting tag `Long report:`
     - Long reports are EQUIVALENT to Full Technical Report (FTR) so these 2 terms have the same meaning. Only do FTR stuff in long coursework too
 
@@ -35,7 +35,7 @@ SHORT_COURSEWORK
 - When I reference notebooks and pdfs, start by looking locally in the repository first
 - Usually there will be a latex template provided, which contains all the core questions, math and figures that I need to produce. Always refer to this when completing tasks and guiding your working
 - You will be completing tasks from the lab handout. Each task should be labelled with `>` in markdown inside the `ipynb` file. There should be a one-to-one correspondence between tasks in the lab handout, tasks specified in the latex document, and tasks specified with `>` in the `ipynb` file
-- When you read an `ipynb`, because notebooks often have very large image files and metadeta, we should always clear outputs before feeding the ipynb to you
+- When you read an `ipynb`, because notebooks often have very large image files and metadeta, we should always try to clear outputs before feeding the ipynb to you. If the ipynb is unneccesarily large because of media/metadata, hence consuming much of the context window, please stop and alert the user
   - In VSCode, this should be very easy to do as there should already be a default `clear all outputs` button. If you see a very large `ipynb` file with alot of unneccessary data, please stop the session and prompt the user
 - ALWAYS write simple, clear and concise code with appropriate documentation (don't overdo)
 - PDFLatex cannot handle unicode characters, so NEVER have any emojis and NEVER have weird unicode characters

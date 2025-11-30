@@ -23,37 +23,38 @@
 \documentclass[
 	a4paper, % Paper size, use either a4paper or letterpaper
 	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
-	unnumberedsections, % Comment to enable section numbering
+	% unnumberedsections, % Commented to enable section numbering
 	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
 ]{LTJournalArticle}
 
 \addbibresource{3F3_FTR_zl559.bib} % BibLaTeX bibliography file
 
-\runninghead{Shortened Running Article Title} % A shortened article title to appear in the running head, leave this command empty for no running head
+\usepackage{amsmath} % For align environment, \text, \implies
 
-\footertext{\textit{Journal of Biological Sampling} (2024) 12:533-684} % Text to appear in the footer, leave this command empty for no footer text
+\runninghead{Random Variables and Random Number Generation} % A shortened article title to appear in the running head
 
-\setcounter{page}{1} % The page number of the first page, set this to a higher number if the article is to be part of an issue or larger work
+\footertext{\textit{3F3 Module Experiment} -- CRSID: zl559} % Text to appear in the footer
+
+\setcounter{page}{1} % The page number of the first page
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\title{An Article Title That Spans Multiple\\ Lines to Show Line Wrapping} % Article title, use manual lines breaks (\\) to beautify the layout
+\title{Random Variables and Random Number Generation} % Article title
 
 % Authors are listed in a comma-separated list with superscript numbers indicating affiliations
-% \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
 \author{%
-	John Smith\textsuperscript{1,2}, Robert Smith\textsuperscript{3} and Jane Smith\textsuperscript{1}\thanks{Corresponding author: \href{mailto:jane@smith.com}{jane@smith.com}\\ \textbf{Received:} October 20, 2023, \textbf{Published:} December 14, 2023}
+	Liu Zihe\textsuperscript{1}\thanks{Lab Group: Wednesday 5th November, CRSID: zl559}
 }
 
 % Affiliations are output in the \date{} command
-\date{\footnotesize\textsuperscript{\textbf{1}}School of Chemistry, The University of Michigan\\ \textsuperscript{\textbf{2}}Physics Department, The University of Wisconsin\\ \textsuperscript{\textbf{3}}Biological Sciences Department, The University of Minnesota}
+\date{\footnotesize\textsuperscript{\textbf{1}}Homerton College, University of Cambridge}
 
 % Full-width abstract
 \renewcommand{\maketitlehookd}{%
 	\begin{abstract}
-		\noindent Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit. Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor.
+		\noindent This report explores random number generation and density estimation techniques. We compare histogram and kernel density estimation (KDE) methods, demonstrating their trade-offs in accuracy and smoothness. Probability transformations using the Jacobian formula are applied to derive distributions for linear and quadratic functions of normal random variables. The inverse CDF method is implemented to generate exponential random variates. Finally, the alpha-stable distribution is explored, demonstrating heavy-tailed random variable generation with varying stability and skewness parameters.
 	\end{abstract}
 }
 
@@ -67,156 +68,240 @@
 %	ARTICLE CONTENTS
 %----------------------------------------------------------------------------------------
 
-\section{Introduction}
+\section{Uniform and Normal Random Variables}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
+\subsection{Kernel Density Estimation}
 
-Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor. Donec laoreet nisl vel risus lacinia elementum non nec lacus. Nullam luctus, nulla volutpat ultricies ultrices, quam massa placerat augue, ut fringilla urna lectus nec nibh. Vestibulum efficitur condimentum orci a semper. Pellentesque ut metus pretium lacus maximus semper.
-
-Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et. Donec finibus dolor quis dolor tempus consequat. Mauris fringilla dui id libero egestas, ut mattis neque ornare. Ut condimentum urna pharetra ipsum consequat, eu interdum elit cursus. Vivamus scelerisque tortor et nunc ultricies, id tincidunt libero pharetra. Aliquam eu imperdiet leo. Morbi a massa volutpat velit condimentum convallis et facilisis dolor.
-
+The kernel density estimator is defined as
 \begin{equation}
-	\cos^3 \theta =\frac{1}{4}\cos\theta+\frac{3}{4}\cos 3\theta
-	\label{eq:example}
+	\hat{p}(x) = \frac{1}{N}\sum_{i=1}^{N} \frac{1}{\sigma}\mathcal{K}\left(\frac{x - x^{(i)}}{\sigma}\right)
+\end{equation}
+where $N$ is the number of samples, $x^{(i)}$ are the observed data points, $\mathcal{K}(u)$ is the kernel function, and $\sigma$ is the bandwidth. The Gaussian kernel is:
+\begin{equation}
+	\mathcal{K}_{\text{Gauss}}(u) = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{u^2}{2}\right)
 \end{equation}
 
-Automatically referencing an equation number using its label: Equation \ref{eq:example}.
+\subsection{Histogram and KDE of Gaussian Random Numbers}
 
-In hac habitasse platea dictumst. Curabitur mattis elit sit amet justo luctus vestibulum. In hac habitasse platea dictumst. Pellentesque lobortis justo enim, a condimentum massa tempor eu. Ut quis nulla a quam pretium eleifend nec eu nisl. Nam cursus porttitor eros, sed luctus ligula convallis quis. Nam convallis, ligula in auctor euismod, ligula mauris fringilla tellus, et egestas mauris odio eget diam. Praesent sodales in ipsum eu dictum. Aenean vel enim ipsum. Fusce ut felis at eros sagittis bibendum mollis lobortis libero.
-
-Maecenas consectetur metus at tellus finibus condimentum. Proin arcu lectus, ultrices non tincidunt et, tincidunt ut quam. Integer luctus posuere est, non maximus ante dignissim quis. Nunc a cursus erat. Curabitur suscipit nibh in tincidunt sagittis. Nam malesuada vestibulum quam id gravida. Proin ut dapibus velit. Vestibulum eget quam quis ipsum semper convallis. Duis consectetur nibh ac diam dignissim, id condimentum enim dictum. Nam aliquet ligula eu magna pellentesque, nec sagittis leo lobortis. Aenean tincidunt dignissim egestas.
-
-%------------------------------------------------
-
-\section{Methodologies}
-
-\subsection{Sample Sites \& Processing}
-
-This line shows how to use a footnote to further explain or cite text\footnote{Example footnote text.}.
-
-This is a bullet point list:
-
-\begin{itemize}
-	\item Arcu eros accumsan lorem, at posuere mi diam sit amet tortor
-	\item Fusce fermentum, mi sit amet euismod rutrum
-	\item Sem lorem molestie diam, iaculis aliquet sapien tortor non nisi
-	\item Pellentesque bibendum pretium aliquet
-\end{itemize}
-
-Mauris interdum porttitor fringilla. Proin tincidunt sodales leo at ornare. Donec tempus magna non mauris gravida luctus. Cras vitae arcu vitae mauris eleifend scelerisque. Nam sem sapien, vulputate nec felis eu, blandit convallis risus. Pellentesque sollicitudin venenatis tincidunt. In et ipsum libero. Nullam tempor ligula a massa convallis pellentesque.
-
-This is a numbered list:
-
-\begin{enumerate}
-	\item Donec dolor arcu, rutrum id molestie in, viverra sed diam
-	\item Curabitur feugiat
-	\item Turpis sed auctor facilisis
-\end{enumerate}
-
-\subsection{Species Identification}
-
-Proin lobortis efficitur dictum. Pellentesque vitae pharetra eros, quis dignissim magna. Sed tellus leo, semper non vestibulum vel, tincidunt eu mi. Aenean pretium ut velit sed facilisis. Ut placerat urna facilisis dolor suscipit vehicula. Ut ut auctor nunc. Nulla non massa eros. Proin rhoncus arcu odio, eu lobortis metus sollicitudin eu. Duis maximus ex dui, id bibendum diam dignissim id. Aliquam quis lorem lorem. Phasellus sagittis aliquet dolor, vulputate cursus dolor convallis vel. Suspendisse eu tellus feugiat, bibendum lectus quis, fermentum nunc. Nunc euismod condimentum magna nec bibendum. Curabitur elementum nibh eu sem cursus, eu aliquam leo rutrum. Sed bibendum augue sit amet pharetra ullamcorper. Aenean congue sit amet tortor vitae feugiat.
-
-Mauris interdum porttitor fringilla. Proin tincidunt sodales leo at ornare. Donec tempus magna non mauris gravida luctus. Cras vitae arcu vitae mauris eleifend scelerisque. Nam sem sapien, vulputate nec felis eu, blandit convallis risus. Pellentesque sollicitudin venenatis tincidunt. In et ipsum libero. Nullam tempor ligula a massa convallis pellentesque.
-
-\subsection{Data Analysis}
-
-Vestibulum sodales orci a nisi interdum tristique. In dictum vehicula dui, eget bibendum purus elementum eu. Pellentesque lobortis mattis mauris, non feugiat dolor vulputate a. Cras porttitor dapibus lacus at pulvinar. Praesent eu nunc et libero porttitor malesuada tempus quis massa. Aenean cursus ipsum a velit ultricies sagittis. Sed non leo ullamcorper, suscipit massa ut, pulvinar erat. Aliquam erat volutpat. Nulla non lacus vitae mi placerat tincidunt et ac diam. Aliquam tincidunt augue sem, ut vestibulum est volutpat eget. Suspendisse potenti. Integer condimentum, risus nec maximus elementum, lacus purus porta arcu, at ultrices diam nisl eget urna. Curabitur sollicitudin diam quis sollicitudin varius. Ut porta erat ornare laoreet euismod. In tincidunt purus dui, nec egestas dui convallis non. In vestibulum ipsum in dictum scelerisque.
-
-Mauris interdum porttitor fringilla. Proin tincidunt sodales leo at ornare. Donec tempus magna non mauris gravida luctus. Cras vitae arcu vitae mauris eleifend scelerisque. Nam sem sapien, vulputate nec felis eu, blandit convallis risus. Pellentesque sollicitudin venenatis tincidunt. In et ipsum libero. Nullam tempor ligula a massa convallis pellentesque. Mauris interdum porttitor fringilla. Proin tincidunt sodales leo at ornare. Donec tempus magna non mauris gravida luctus. Cras vitae arcu vitae mauris eleifend scelerisque. Nam sem sapien, vulputate nec felis eu, blandit convallis risus. Pellentesque sollicitudin venenatis tincidunt. In et ipsum libero. Nullam tempor ligula a massa convallis pellentesque.
-
-%------------------------------------------------
-
-\section{Results}
-
-\begin{table} % Single column table
-	\caption{Example single column table.}
-	\centering
-	\begin{tabular}{l l r}
-		\toprule
-		\multicolumn{2}{c}{Location}          \\
-		\cmidrule(r){1-2}
-		East Distance & West Distance & Count \\
-		\midrule
-		100km         & 200km         & 422   \\
-		350km         & 1000km        & 1833  \\
-		600km         & 1200km        & 890   \\
-		\bottomrule
-	\end{tabular}
-	\label{tab:distcounts}
-\end{table}
-
-Referencing a table using its label: Table \ref{tab:distcounts}.
-
-\begin{table*} % Full width table (notice the starred environment)
-	\caption{Example two column table with fixed-width columns.}
-	\centering % Horizontally center the table
-	\begin{tabular}{L{0.2\linewidth} L{0.2\linewidth} R{0.15\linewidth}} % Manually specify column alignments with L{}, R{} or C{} and widths as a fixed amount, usually as a proportion of \linewidth
-		\toprule
-		\multicolumn{2}{c}{Location}          \\
-		\cmidrule(r){1-2}
-		East Distance & West Distance & Count \\
-		\midrule
-		100km         & 200km         & 422   \\
-		350km         & 1000km        & 1833  \\
-		600km         & 1200km        & 890   \\
-		\bottomrule
-	\end{tabular}
-\end{table*}
-
-Aenean feugiat pellentesque venenatis. Sed faucibus tristique tortor vel ultrices. Donec consequat tellus sapien. Nam bibendum urna mauris, eget sagittis justo gravida vel. Mauris nisi lacus, malesuada sit amet neque ut, venenatis tempor orci. Curabitur feugiat sagittis molestie. Duis euismod arcu vitae quam scelerisque facilisis. Praesent volutpat eleifend tortor, in malesuada dui egestas id. Donec finibus ac risus sed pellentesque. Donec malesuada non magna nec feugiat. Mauris eget nibh nec orci congue porttitor vitae eu erat. Sed commodo ipsum ipsum, in elementum neque gravida euismod. Cras mi lacus, pulvinar ut sapien ut, rutrum sagittis dui. Donec non est a metus varius finibus. Pellentesque rutrum pellentesque ligula, vitae accumsan nulla hendrerit ut.
-
-\begin{figure} % Single column figure
-	\includegraphics[width=\linewidth]{Tolmukapea.jpg}
-	\caption{Anther of thale cress (Arabidopsis thaliana), fluorescence micrograph. Source: Heiti Paves, \href{https://commons.wikimedia.org/wiki/File:Tolmukapea.jpg}{https://commons.wiki-\\media.org/wiki/File:Tolmukapea.jpg}.}
-	\label{fig:tcanther}
-\end{figure}
-
-Referencing a figure using its label: Figure \ref{fig:tcanther}.
-
-Aenean porttitor eros non pharetra congue. Proin in odio in dolor luctus auctor ac et mi. Etiam euismod mi sed lectus fringilla pretium. Phasellus tristique maximus lectus et sodales. Mauris feugiat ligula quis semper luctus. Nam sit amet felis sed leo fermentum aliquet. Mauris arcu dui, posuere id sem eget, cursus pulvinar mi. Donec nec lacus non lectus fermentum scelerisque et at nibh. Sed tristique, metus ac vestibulum porta, tortor lectus placerat lorem, et convallis tellus dolor eget ante. Pellentesque dui ligula, hendrerit a purus et, volutpat tempor lectus. Mauris nec purus nec mauris rhoncus pellentesque. Quisque quis diam sed est lacinia congue. Donec magna est, hendrerit sed metus vel, accumsan rutrum nibh.
-
-\begin{figure*} % Two column figure (notice the starred environment)
-	\includegraphics[width=\linewidth]{Fibroblastid.jpg}
-	\caption{Bovine pulmonary artery endothelial cells in culture. Blue: nuclei; red: mitochondria; green: microfilaments. Computer generated image from a 3D model based on a confocal laser scanning microscopy using fluorescent marker dyes. Source: Heiti Paves, \href{https://commons.wikimedia.org/wiki/File:Fibroblastid.jpg}{https://commons.wikimedia.org/wiki/File:Fibroblastid.jpg}.}
-	\label{fig:bpartery}
+\begin{figure*} % Full width figure
+	\includegraphics[width=\linewidth]{img/normal_histogram_kde.png}
+	\caption{Normal distribution: histogram (left) and KDE (right) compared with theoretical $\mathcal{N}(0,1)$ PDF. The histogram exhibits discontinuities at bin boundaries while KDE ($\sigma=0.2$) produces a smooth estimate.}
+	\label{fig:normal}
 \end{figure*}
 
-Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam cursus lectus purus, tempus iaculis quam dictum tristique. Nam interdum sapien nec tempor mattis. Quisque id sapien nisi. Mauris vehicula ornare eros vel efficitur. Nulla consectetur, turpis quis fringilla tincidunt, mi neque iaculis lectus, vel commodo elit odio non ex. Duis facilisis, purus ac viverra iaculis, turpis lectus ultrices ante, ac vestibulum ligula magna in libero. Etiam tristique maximus lacinia. Vestibulum hendrerit, lacus malesuada laoreet blandit, sapien velit sollicitudin nunc, eu porttitor urna ligula at lorem. Aliquam faucibus eros in fermentum venenatis. Fusce consectetur congue pellentesque. Suspendisse at nisi sit amet est porttitor cursus. Cras placerat faucibus nunc, a laoreet justo dignissim sit amet.
+The histogram (blue bars) and KDE (blue curve) both capture the bell-shaped Gaussian profile. The histogram exhibits discontinuities at bin boundaries while the KDE produces a smooth estimate that closely follows the theoretical PDF (red curve).
 
-\subsection{International Support}
+\subsection{Histogram and KDE of Uniform Random Numbers}
 
-\noindent àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšž
+\begin{figure*} % Full width figure
+	\includegraphics[width=\linewidth]{img/uniform_histogram_kde.png}
+	\caption{Uniform distribution: histogram (left) and KDE (right) compared with theoretical $\mathcal{U}(0,1)$ PDF. KDE extends beyond $[0,1]$ due to boundary effects.}
+	\label{fig:uniform}
+\end{figure*}
 
-\noindent ÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑ
+The histogram shows approximately equal heights across bins, consistent with uniform density. The KDE ($\sigma=0.05$) is smoother but extends beyond $[0,1]$ due to boundary effects.
 
-\noindent ßÇŒÆČŠŽ
+\subsection{Comparison of Methods}
 
-\subsection{Links}
+Both methods have similar bias-variance structure but differ in asymptotic convergence. From statistical theory \autocite{UW_STAT425}:
 
-This is a clickable URL link: \href{https://www.latextemplates.com}{LaTeX Templates}. This is a clickable email link: \href{mailto:vel@latextemplates.com}{vel@latextemplates.com}. This is a clickable monospaced URL link: \url{https://www.LaTeXTemplates.com}.
+\textbf{Histogram:} Optimal convergence rate $O(N^{-2/3})$
+
+\textbf{KDE:} Optimal convergence rate $O(N^{-4/5})$ (faster)
+
+\begin{table}[h] % Single column table
+	\caption{Comparison of histogram and KDE methods.}
+	\centering
+	\footnotesize
+	\begin{tabular}{@{}lcc@{}}
+		\toprule
+		\textbf{Aspect} & \textbf{Histogram} & \textbf{KDE}  \\
+		\midrule
+		Visual Form     & Discrete bars      & Smooth curve  \\
+		Interpretation  & Bin counts         & Smoothed est. \\
+		Param. Sens.    & High               & Lower         \\
+		Boundary        & Respects           & May exceed    \\
+		Convergence     & $O(N^{-2/3})$      & $O(N^{-4/5})$ \\
+		Comp. Cost      & Trivial            & $O(N)$        \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:comparison}
+\end{table}
+
+\textbf{Histogram advantages:} Directly represents sample counts per bin (intuitive), respects finite support of distributions, computationally simple.
+
+\textbf{Histogram disadvantages:} Sensitive to bin width and position, artificial discontinuities between bins.
+
+\textbf{KDE advantages:} Smooth, continuous estimate revealing density structure, superior convergence rate, less sensitive to bandwidth selection.
+
+\textbf{KDE disadvantages:} Less intuitive, boundary effects for finite support distributions, computationally more expensive.
+
+\subsection{Theoretical Analysis of Uniform Density}
+
+When histogramming $N$ samples from $\mathcal{U}(0,1)$ into $J$ bins, each bin has width $\delta = 1/J$ and probability $p_j = 1/J$. Each marginal count follows:
+\begin{equation}
+	n_j \sim \text{Binomial}\left(N, p_j = \frac{1}{J}\right)
+\end{equation}
+
+Therefore:
+\begin{align}
+	E[n_j]          & = \frac{N}{J}             \\
+	\text{Var}(n_j) & = \frac{N(J-1)}{J^2}      \\
+	\sigma_{n_j}    & = \frac{\sqrt{N(J-1)}}{J}
+\end{align}
+
+The coefficient of variation is $\text{CV} = \sqrt{(J-1)/N} \approx \sqrt{J/N}$. As $N \to \infty$, CV $\to 0$, so histogram estimates become increasingly reliable.
+
+\begin{figure*} % Full width figure
+	\includegraphics[width=\linewidth]{img/multinomial_bounds.png}
+	\caption{Histograms for $N=100, 1000, 10000$ with theoretical mean (red) and $\pm 3\sigma$ bounds (green). As $N$ increases, relative scatter decreases proportionally to $1/\sqrt{N}$.}
+	\label{fig:multinomial}
+\end{figure*}
+
+The histogram results are consistent with multinomial theory: observed counts match expected mean $N/J$, and approximately 95--100\% of bins fall within $\pm 3\sigma$ bounds.
 
 %------------------------------------------------
 
-\section{Discussion}
+\section{Functions of Random Variables}
 
-This statement requires citation \autocite{Smith:2023qr}. This statement requires multiple citations \autocite{Smith:2023qr, Smith:2024jd}. This statement contains an in-text citation, for directly referring to a citation like so: \textcite{Smith:2024jd}.
+\subsection{Linear Transformation}
 
-\subsection{Subsection One}
+For $x \sim \mathcal{N}(0,1)$ and $y = ax + b$, the inverse is $x = (y-b)/a$ with Jacobian $|dx/dy| = 1/|a|$. Applying the transformation formula:
+\begin{align}
+	p(y) & = p(x)\left|\frac{dx}{dy}\right| \nonumber                                                   \\
+	     & = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{(y-b)^2}{2a^2}\right) \cdot \frac{1}{|a|}  \nonumber \\
+	     & = \frac{1}{\sqrt{2\pi a^2}}\exp\left(-\frac{(y-b)^2}{2a^2}\right) \nonumber                  \\
+	     & = \mathcal{N}(y|b, a^2)
+\end{align}
 
-Suspendisse potenti. Vivamus suscipit dapibus metus. Proin auctor iaculis ex, id fermentum lectus dapibus tristique. Nullam maximus eros eget leo pretium dapibus. Nunc in auctor erat, id interdum risus. Suspendisse aliquet vehicula accumsan. In vestibulum efficitur dictum. Sed ultrices, libero nec fringilla feugiat, elit massa auctor ligula, vehicula tempor ligula felis in lectus. Suspendisse sem dui, pharetra ut sodales eu, suscipit sit amet felis. Donec pretium viverra ante, ac pulvinar eros. Suspendisse gravida consectetur urna. Pellentesque vitae leo porta, imperdiet eros eget, posuere sem. Praesent eget leo efficitur odio bibendum condimentum sit amet vel ex. Nunc maximus quam orci, quis pulvinar nibh eleifend ac. Quisque consequat lacus magna, eu posuere tellus iaculis ac. Sed vitae tortor tincidunt ante sagittis iaculis.
+This demonstrates that a linear transformation of standard normal produces $\mathcal{N}(\mu, \sigma^2)$ with $\mu = b$ and $\sigma^2 = a^2$. Any normal distribution can be generated from $\mathcal{N}(0,1)$ using $Y = \sigma X + \mu$.
 
-\subsection{Subsection Two}
+\begin{figure}[h] % Single column figure
+	\includegraphics[width=\linewidth]{img/linear_transform_verification.png}
+	\caption{Verification of linear transformation $y = 3x + 5$ where $x \sim \mathcal{N}(0,1)$. The histogram matches theoretical $\mathcal{N}(5, 9)$.}
+	\label{fig:linear}
+\end{figure}
 
-Nullam mollis tellus lorem, sed congue ipsum euismod a. Donec pulvinar neque sed ligula ornare sodales. Nulla sagittis vel lectus nec laoreet. Nulla volutpat malesuada turpis at ultricies. Ut luctus velit odio, sagittis volutpat erat aliquet vel. Donec ac neque eget neque volutpat mollis. Vestibulum viverra ligula et sapien bibendum, vel vulputate ex euismod. Curabitur nec velit velit. Aliquam vulputate lorem elit, id tempus nisl finibus sit amet. Curabitur ex turpis, consequat at lectus id, imperdiet molestie augue. Curabitur eu eros molestie purus commodo hendrerit. Quisque auctor ipsum nec mauris malesuada, non fringilla nibh viverra. Quisque gravida, metus quis semper pulvinar, dolor nisl suscipit leo, vestibulum volutpat ante justo ultrices diam. Sed id facilisis turpis, et aliquet eros.
+\subsection{Quadratic Transformation}
 
-\subsubsection{Subsubsection Example}
+For $x \sim \mathcal{N}(0,1)$ and $y = x^2$ ($y \geq 0$), there are two inverses: $x_1(y) = \sqrt{y}$ and $x_2(y) = -\sqrt{y}$. The Jacobian is $|dx/dy| = 1/(2\sqrt{y})$. Applying the formula:
+\begin{align}
+	p(y) & = 2 \cdot \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{y}{2}\right) \cdot \frac{1}{2\sqrt{y}} \nonumber \\
+	     & = \frac{1}{\sqrt{2\pi y}}\exp\left(-\frac{y}{2}\right), \quad y \geq 0
+\end{align}
 
-Duis venenatis eget lectus a aliquet. Integer vulputate ante suscipit felis feugiat rutrum. Aliquam eget dolor eu augue elementum ornare. Nulla fringilla interdum volutpat. Sed tincidunt, neque quis imperdiet hendrerit, turpis sapien ornare justo, ac blandit felis sem quis diam. Proin luctus urna sit amet felis tincidunt, sed congue nunc pellentesque. Ut faucibus a magna faucibus finibus. Etiam id mi euismod, auctor nisi eget, pretium metus. Proin tincidunt interdum mi non interdum. Donec semper luctus dolor at elementum. Aenean eu congue tortor, sed hendrerit magna. Quisque a dolor ante. Mauris semper id urna id gravida. Vestibulum mi tortor, finibus eu felis in, vehicula aliquam mi.
+This is the chi-squared distribution with 1 degree of freedom, $\chi^2_1$.
 
-Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh.
+\begin{figure}[h] % Single column figure
+	\includegraphics[width=\linewidth]{img/quadratic_transform_verification.png}
+	\caption{Verification of quadratic transformation $y = x^2$. Sample mean $\approx 1.0$ and variance $\approx 2.0$ match theoretical $\chi^2_1$ moments.}
+	\label{fig:quadratic}
+\end{figure}
 
-Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor. Nam vitae suscipit mi. Pellentesque ex tellus, iaculis vel libero at, cursus pretium sapien. Curabitur accumsan velit sit amet nulla lobortis, ut pretium ex aliquam. Proin eget volutpat orci. Morbi eu aliquet turpis. Vivamus molestie urna quis tempor tristique. Proin hendrerit sem nec tempor sollicitudin.
+%------------------------------------------------
+
+\section{Inverse CDF Method}
+
+\subsection{Theory}
+
+If $U \sim \mathcal{U}(0,1)$ and $Y = F^{-1}(U)$ where $F$ is any CDF, then $Y$ has distribution with CDF $F$. The algorithm:
+\begin{enumerate}
+	\item Generate $u^{(i)} \sim \mathcal{U}(0,1)$
+	\item Compute $y^{(i)} = F^{-1}(u^{(i)})$
+\end{enumerate}
+
+\subsection{Exponential Distribution}
+
+For the exponential distribution with PDF $p(y) = \exp(-y)$ for $y \geq 0$:
+
+\textbf{CDF:}
+\begin{equation}
+	F(y) = \int_{0}^{y} \exp(-t)\, dt = 1 - \exp(-y)
+\end{equation}
+
+\textbf{Inverse CDF:} Solving $u = F(y)$ for $y$:
+\begin{align}
+	u = 1 - \exp(-y) \implies y = -\ln(1 - u) = F^{-1}(u)
+\end{align}
+
+Since $(1-u) \sim \mathcal{U}(0,1)$ when $u \sim \mathcal{U}(0,1)$, we can use $F^{-1}(u) = -\ln(u)$.
+
+\subsection{Implementation}
+
+\begin{verbatim}
+def generate_exponential(n, mean=1.0):
+    u = np.random.rand(n)
+    return -mean * np.log(u)
+\end{verbatim}
+
+\begin{figure*} % Full width figure
+	\includegraphics[width=\linewidth]{img/exponential_inverse_cdf.png}
+	\caption{Exponential distribution via inverse CDF method. Histogram (left) matches theoretical PDF. KDE (right) shows boundary effects: peak underestimated ($\approx 0.65$ vs 1.0) due to Gaussian kernels extending into $y < 0$.}
+	\label{fig:exponential}
+\end{figure*}
+
+The histogram shows excellent agreement with the theoretical exponential density. The KDE exhibits boundary effects near $y = 0$ where Gaussian kernels extend beyond the valid support $[0,\infty)$.
+
+%------------------------------------------------
+
+\section{Alpha-Stable Distribution}
+
+\subsection{Generation Algorithm}
+
+The $\alpha$-stable distribution models heavy-tailed phenomena in communications and signal processing. To generate samples with $\alpha \in (0,2)$, $\alpha \neq 1$ and $\beta \in [-1,+1]$:
+
+\begin{enumerate}
+	\item Calculate auxiliary parameters:
+	      \begin{align}
+		      b & = \frac{1}{\alpha}\arctan\left(\beta\tan\frac{\pi\alpha}{2}\right) \\
+		      s & = \left(1 + \beta^2\tan^2\frac{\pi\alpha}{2}\right)^{1/(2\alpha)}
+	      \end{align}
+
+	\item Generate $U \sim \mathcal{U}(-\pi/2, +\pi/2)$ and $V \sim \mathcal{E}(1)$
+
+	\item Calculate:
+	      \begin{equation}
+		      X = s \frac{\sin(\alpha(U + b))}{(\cos U)^{1/\alpha}}\left(\frac{\cos(U - \alpha(U + b))}{V}\right)^{\frac{1-\alpha}{\alpha}}
+	      \end{equation}
+\end{enumerate}
+
+\subsection{Implementation}
+
+\begin{verbatim}
+def generate_stable(alpha, beta, n):
+    b = (1/alpha) * np.arctan(
+        beta * np.tan(np.pi*alpha/2))
+    s = (1 + beta**2 * np.tan(
+        np.pi*alpha/2)**2)**(1/(2*alpha))
+    U = np.random.uniform(
+        -np.pi/2, np.pi/2, n)
+    V = np.random.exponential(1.0, n)
+    num = np.sin(alpha*(U+b)) / \
+          np.cos(U)**(1/alpha)
+    den = (np.cos(U-alpha*(U+b))/V) \
+          **((1-alpha)/alpha)
+    return s * num * den
+\end{verbatim}
+
+\begin{figure*} % Full width figure
+	\includegraphics[width=\linewidth]{img/stable_distribution_grid.png}
+	\caption{Alpha-stable distributions for $\alpha = 0.5$ (top, heavy tails) and $\alpha = 1.5$ (bottom, lighter tails) with varying $\beta$ (skewness). Heavy-tailed distributions ($\alpha = 0.5$) produce extreme outliers requiring plot clipping.}
+	\label{fig:stable}
+\end{figure*}
+
+\subsection{Parameter Interpretation}
+
+\textbf{Stability parameter $\alpha \in (0,2)$:} Controls tail heaviness. At $\alpha = 0.5$, tails are extremely heavy with massive outliers. At $\alpha = 1.5$, tails are lighter but still heavier than Gaussian. As $\alpha \to 2$, the distribution approaches Gaussian.
+
+\textbf{Skewness parameter $\beta \in [-1,+1]$:} Controls asymmetry. At $\beta = 0$, the distribution is symmetric. Positive $\beta$ produces right skewness; negative $\beta$ produces left skewness.
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+
+\section{Conclusion}
+
+This report explored fundamental random number generation and density estimation techniques. Histogram and KDE methods offer complementary trade-offs: histograms are intuitive and respect bounded support, while KDE provides smoother estimates with faster convergence. Jacobian transformations enable derivation of transformed variable distributions, as demonstrated for linear ($y = ax + b \Rightarrow \mathcal{N}(b, a^2)$) and quadratic ($y = x^2 \Rightarrow \chi^2_1$) cases. The inverse CDF method provides a general framework for generating samples from any distribution with invertible CDF. Finally, alpha-stable distributions demonstrate flexible modeling of heavy-tailed phenomena beyond Gaussian assumptions.
 
 %----------------------------------------------------------------------------------------
 %	 REFERENCES
