@@ -43,6 +43,9 @@
 \setlength{\floatsep}{6pt}
 \setlength{\textfloatsep}{6pt}
 
+% Reduce spacing in itemize/enumerate lists
+\setlist{noitemsep, topsep=3pt}
+
 \thispagestyle{empty}
 
 \begin{center}
@@ -167,7 +170,7 @@ Substituting experimental values ($M=N=10$, $k=0.8$, $D=1$s):
 $$ L(j\omega) = \frac{8 e^{-j\omega}}{j\omega(j\omega + 10)} $$
 
 From the Bode diagram (Figure~\ref{fig:bode_manual}), the gain crossover frequency $\omega_{gc} \approx 0.8$ rad/s. At this frequency:
-$$ \angle L(j \cdot 0.8) = -90^\circ - \arctan(0.08) - 0.8 \times \frac{180^\circ}{\pi} \approx -90^\circ - 4.6^\circ - 45.8^\circ \approx -140^\circ $$
+$$ \angle L(j \cdot 0.8) \approx -140^\circ $$
 The phase margin is $\text{PM} = 180^\circ - 140^\circ = 40^\circ$ (approximately $45^\circ$ from graph).
 
 \begin{figure}[H]
@@ -256,9 +259,7 @@ To prevent PIO, ensure adequate phase margin at frequencies where the pilot is a
 
 \vspace{1em}
 
-\textbf{No.} The closed-loop response to disturbance $d$ is $y = \dfrac{G}{1+KG} d$. For disturbance rejection, we need $|1+KG| > 1$.
-
-At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \times 1 \approx -238^\circ$. Combined with plant phase ($\approx -90^\circ$ from Bode), total phase approaches $-330^\circ$, meaning $KG$ points nearly opposite to $-1$. This makes $|1+KG| < 1$, so the disturbance is actually \emph{amplified} rather than attenuated. Manual control worsens the oscillation.
+\textbf{No.} The closed-loop response to disturbance $d$ is $y = \dfrac{G}{1+KG} d$. For disturbance rejection, we need $|1+KG| > 1$. At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \times 1 \approx -238^\circ$. Combined with plant phase ($\approx -90^\circ$ from Bode), total phase approaches $-330^\circ$, meaning $KG$ points nearly opposite to $-1$. This makes $|1+KG| < 1$, so the disturbance is actually \emph{amplified} rather than attenuated. Manual control worsens the oscillation.
 
 \begin{figure}[H]
         \centering
@@ -295,40 +296,29 @@ At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \t
 \pagebreak
 
 \textbf{Question 6.} \textit{(§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s)$.}
-
-\vspace{1em}
-
-The unstable aircraft has transfer function:
-$$ G_2(s) = \frac{2}{sT-1} $$
-with one unstable (RHP) pole at $s = 1/T > 0$.
-
-\textbf{Frequency Response Derivation:} Substituting $s = j\omega$:
-$$ G_2(j\omega) = \frac{2}{j\omega T - 1} $$
-
-To find real and imaginary parts, multiply by conjugate:
-$$ G_2(j\omega) = \frac{2}{-(1 - j\omega T)} = \frac{-2(1 + j\omega T)}{(1 - j\omega T)(1 + j\omega T)} = \frac{-2(1 + j\omega T)}{1 + \omega^2 T^2} $$
-
-Therefore:
-$$ \text{Re}[G_2(j\omega)] = \frac{-2}{1 + \omega^2 T^2}, \quad \text{Im}[G_2(j\omega)] = \frac{-2\omega T}{1 + \omega^2 T^2} $$
-
-\textbf{Geometric Interpretation:} Letting $x = \text{Re}$ and $y = \text{Im}$:
-$$ (x+1)^2 + y^2 = \left(\frac{-2}{1+\omega^2T^2} + 1\right)^2 + \left(\frac{-2\omega T}{1+\omega^2T^2}\right)^2 = 1 $$
-This is a circle centered at $(-1, 0)$ with radius 1.
-
-\textbf{Boundary Points:}
-\begin{itemize}
-        \item At $\omega = 0$: $G_2(0) = -2$ (leftmost point on real axis)
-        \item As $\omega \to \infty$: $G_2 \to 0$ (approaches origin)
-\end{itemize}
-
-The locus is traced clockwise as $\omega$ increases from $0$ to $\infty$.
-
 \begin{figure}[H]
         \centering
         \includegraphics[width=0.5\textwidth]{fig11.png}
         \caption{Unstable aircraft ($T=0.6$) manually stabilized. Oscillatory near stability limit.}
         \label{fig:unstable}
 \end{figure}
+
+The unstable aircraft has transfer function:
+$$ G_2(s) = \frac{2}{sT-1} $$
+with one unstable (RHP) pole at $s = 1/T > 0$.
+
+\textbf{Frequency Response Derivation:} Substituting $s = j\omega$:
+$$ G_2(j\omega) = \frac{2}{j\omega T - 1} = \frac{2}{-(1 - j\omega T)} = \frac{-2(1 + j\omega T)}{(1 - j\omega T)(1 + j\omega T)} = \frac{-2(1 + j\omega T)}{1 + \omega^2 T^2} $$
+Therefore: $\text{Re}[G_2(j\omega)] = \dfrac{-2}{1 + \omega^2 T^2}, \quad \text{Im}[G_2(j\omega)] = \dfrac{-2\omega T}{1 + \omega^2 T^2}$
+
+\textbf{Geometric Interpretation:} Letting $x = \text{Re}$ and $y = \text{Im}$:
+$$ (x+1)^2 + y^2 = \left(\frac{-2}{1+\omega^2T^2} + 1\right)^2 + \left(\frac{-2\omega T}{1+\omega^2T^2}\right)^2 = 1 $$
+This is a circle centered at $(-1, 0)$ with radius 1.
+\begin{itemize}
+        \item At $\omega = 0$: $G_2(0) = -2$ (leftmost point on real axis)
+        \item As $\omega \to \infty$: $G_2 \to 0$ (approaches origin)
+\end{itemize}
+The locus is traced clockwise as $\omega$ increases from $0$ to $\infty$.
 
 \begin{center}
         \includegraphics[width=0.55\textwidth]{nyquist_q6.png}
@@ -339,11 +329,7 @@ The locus is traced clockwise as $\omega$ increases from $0$ to $\infty$.
 
 \vspace{1em}
 
-\textbf{Nyquist Criterion:} For a system with $P$ open-loop poles in the RHP, closed-loop stability requires $N = -P$ encirclements of $-1/K$, where $N > 0$ is counter-clockwise.
-
-Here $P = 1$ (one unstable pole), so we need $N = -1$: one \emph{clockwise} encirclement of $-1/K$.
-
-The Nyquist locus is a circle from $-2$ to $0$ on the real axis, traversed clockwise. For $-1/K$ to be encircled clockwise:
+\textbf{Nyquist Criterion:} For a system with $P$ open-loop poles in the RHP, closed-loop stability requires $N = -P$ encirclements of $-1/K$, where $N > 0$ is counter-clockwise. Here $P = 1$ (one unstable pole), so we need $N = -1$: one \emph{clockwise} encirclement of $-1/K$.The Nyquist locus is a circle from $-2$ to $0$ on the real axis, traversed clockwise. For $-1/K$ to be encircled clockwise:
 $$ -2 < -\frac{1}{K} < 0 \implies 0 < \frac{1}{K} < 2 \implies K > 0.5 $$
 
 For $K > 0.5$, the point $-1/K$ lies inside the circle, giving the required clockwise encirclement for stability.
