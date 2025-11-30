@@ -14,6 +14,7 @@ Labs and coursework are equivalent.
   - In long coursework mode, you should consider both short and long report tasks
     - Long report tasks will be in italic, and have its own paragraph, and contain the starting tag `Long report:`
     - Long reports are EQUIVALENT to Full Technical Report (FTR) so these 2 terms have the same meaning. Only do FTR stuff in long coursework too
+    - The Long report is an *extension* of the short report, NOT a separate report
 
 Our usual workflow is to use the ipynb as a scratchpad, to store all the core code, core math, and answers to the lab report questions. Then, we'll write a latex report using a provided template and the lab handout/ipynb.
 
