@@ -25,6 +25,7 @@
 	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
 	% unnumberedsections, % Commented to enable section numbering
 	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
+	draft, % skips compiling images, which take FOREVER. toggle this on and off to see complete version
 ]{LTJournalArticle}
 
 \addbibresource{3F3_FTR_zl559.bib} % BibLaTeX bibliography file
@@ -33,7 +34,7 @@
 
 \runninghead{Random Variables and Random Number Generation} % A shortened article title to appear in the running head
 
-\footertext{\textit{3F3 Module Experiment} -- CRSID: zl559} % Text to appear in the footer
+\footertext{3F3 Full Technical Report} % Text to appear in the footer
 
 \setcounter{page}{1} % The page number of the first page
 
@@ -45,11 +46,11 @@
 
 % Authors are listed in a comma-separated list with superscript numbers indicating affiliations
 \author{%
-	Liu Zihe\textsuperscript{1}\thanks{Lab Group: Wednesday 5th November, CRSID: zl559}
+	Liu Zihe\textsuperscript{1}\thanks{CRSID: zl559. Date: 30th November 2025}
 }
 
 % Affiliations are output in the \date{} command
-\date{\footnotesize\textsuperscript{\textbf{1}}Homerton College, University of Cambridge}
+\date{\footnotesize\textsuperscript{\textbf{1}}University of Cambridge}
 
 % Full-width abstract
 \renewcommand{\maketitlehookd}{%
@@ -79,6 +80,10 @@ The kernel density estimator is defined as
 where $N$ is the number of samples, $x^{(i)}$ are the observed data points, $\mathcal{K}(u)$ is the kernel function, and $\sigma$ is the bandwidth. The Gaussian kernel is:
 \begin{equation}
 	\mathcal{K}_{\text{Gauss}}(u) = \frac{1}{\sqrt{2\pi}}\exp\left(-\frac{u^2}{2}\right)
+\end{equation}
+resulting in the KDE:
+\begin{equation}
+	\hat{p}(x) = \frac{1}{N\sigma}\sum_{i=1}^{N}\exp\left(-\frac{(x - x^{(i)})^2}{2\sigma^2}\right)
 \end{equation}
 
 \subsection{Histogram and KDE of Gaussian Random Numbers}
@@ -158,7 +163,12 @@ The coefficient of variation is $\text{CV} = \sqrt{(J-1)/N} \approx \sqrt{J/N}$.
 	\label{fig:multinomial}
 \end{figure*}
 
-The histogram results are consistent with multinomial theory: observed counts match expected mean $N/J$, and approximately 95--100\% of bins fall within $\pm 3\sigma$ bounds.
+The histogram results demonstrate good agreement with theory:
+\begin{enumerate}
+	\item \textbf{Bin Count Distribution:} Expected mean $E[n_j] = N/J$ closely matches observed counts across all $N$ values.
+	\item \textbf{Confidence Bounds:} Approximately 95--100\% of bins fall within $\pm 3\sigma$ bounds, consistent with the $\sim 99.7\%$ theoretical expectation from CLT.
+	\item \textbf{Increasing Reliability:} As $N$ increases, relative scatter decreases proportionally to $1/\sqrt{N}$.
+\end{enumerate}
 
 %------------------------------------------------
 
