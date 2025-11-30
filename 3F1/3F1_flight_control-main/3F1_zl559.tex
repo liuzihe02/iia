@@ -4,6 +4,7 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{float}
+\usepackage{caption}
 \usetikzlibrary{shapes.geometric,arrows,decorations.markings}
 \graphicspath{{flight_control_lab/}}
 
@@ -119,27 +120,39 @@
 
 \noindent \textbf{Question 1.} \textit{(§2.2 Modelling Manual Control) Nyquist diagram (from Bode diagram) for controller in series with plant.}
 
-\textbf{System Model:} The simplified aircraft has transfer function $G(s) = \dfrac{N}{s^2 + Ms} = \dfrac{10}{s(s+10)}$, representing an integrator ($1/s$) in series with a first-order lag. The human controller is modelled as $K(s) = ke^{-sD}$ with proportional gain $k=0.8$ and reaction delay $D=1$s.
+\textbf{System Model:} The simplified aircraft dynamics satisfy
+$$ \ddot{y}(t) + M\dot{y}(t) = Nx(t) $$
+Taking the Laplace transform (with zero initial conditions), the plant transfer function is:
+$$ G(s) = \frac{N}{s^2 + Ms} = \frac{N}{s(s+M)} $$
+This represents an integrator ($1/s$) in series with a first-order lag ($1/(s+M)$). The human controller is modelled as a proportional gain $k$ with pure time delay $D$:
+$$ K(s) = ke^{-sD} $$
 
-\textbf{Open-Loop Transfer Function:}
-$$ L(s) = K(s)G(s) = \frac{8 e^{-s}}{s(s + 10)} $$
+\textbf{Open-Loop Transfer Function:} The loop transfer function is:
+$$ L(s) = K(s)G(s) = \frac{kN \cdot e^{-sD}}{s(s + M)} $$
 
-\textbf{Frequency Response:} Substituting $s = j\omega$:
-$$ L(j\omega) = \frac{8 e^{-j\omega}}{j\omega(j\omega + 10)} = \frac{8}{j\omega \cdot \sqrt{\omega^2+100} \cdot e^{j\arctan(\omega/10)}} \cdot e^{-j\omega} $$
+\textbf{Frequency Response Analysis:} Substituting $s = j\omega$:
+$$ L(j\omega) = \frac{kN \cdot e^{-j\omega D}}{j\omega(j\omega + M)} $$
 
-The magnitude and phase are:
-$$ |L(j\omega)| = \frac{8}{\omega\sqrt{\omega^2+100}}, \quad \angle L(j\omega) = -\frac{\pi}{2} - \arctan\left(\frac{\omega}{10}\right) - \omega $$
+The denominator can be written as:
+$$ j\omega(j\omega + M) = j\omega \cdot |j\omega + M| \cdot e^{j\arctan(\omega/M)} = \omega\sqrt{\omega^2+M^2} \cdot e^{j(\pi/2 + \arctan(\omega/M))} $$
 
-\textbf{Key Points from Bode Diagram (Figure~\ref{fig:bode_manual}):}
+Therefore, the magnitude and phase are:
+$$ |L(j\omega)| = \frac{kN}{\omega\sqrt{\omega^2+M^2}}, \quad \angle L(j\omega) = -\frac{\pi}{2} - \arctan\left(\frac{\omega}{M}\right) - \omega D $$
+
+\textbf{Asymptotic Behaviour:}
 \begin{itemize}
-        \item \textbf{Low frequency} ($\omega \to 0$): $|L| \to \infty$, $\angle L \to -90^\circ$ (integrator dominates).
-        \item \textbf{Gain crossover} ($\omega_{gc} \approx 0.8$ rad/s): $|L|=1$ (0 dB). Phase at this point:
-              $$ \angle L(j \cdot 0.8) = -90^\circ - \arctan(0.08) - 0.8 \times \frac{180^\circ}{\pi} \approx -90^\circ - 4.6^\circ - 45.8^\circ \approx -140^\circ $$
-              Phase margin $= 180^\circ - 140^\circ = 40^\circ$ (approximately $45^\circ$ from graph).
-        \item \textbf{High frequency} ($\omega \to \infty$): $|L| \to 0$, $\angle L \to -\infty$ (time delay adds unbounded phase lag $-\omega$ rad).
+        \item \textbf{Low frequency} ($\omega \to 0$): $|L| \to \infty$, $\angle L \to -\pi/2$ (integrator dominates).
+        \item \textbf{High frequency} ($\omega \to \infty$): $|L| \to 0$, $\angle L \to -\infty$ (time delay adds unbounded phase lag $-\omega D$).
 \end{itemize}
 
-\textbf{Constructing Nyquist from Bode:} The Nyquist plot traces $L(e^{j\theta})$ as $\omega$ varies from $0$ to $\infty$. Starting from the negative imaginary axis (phase $-90^\circ$, large magnitude), the locus spirals clockwise towards the origin as magnitude decreases and phase becomes increasingly negative. The critical point $-1$ is not encircled, confirming closed-loop stability.
+\textbf{Substituting experimental values} ($M=N=10$, $k=0.8$, $D=1$s):
+$$ L(j\omega) = \frac{8 e^{-j\omega}}{j\omega(j\omega + 10)} $$
+
+From the Bode diagram (Figure~\ref{fig:bode_manual}), the gain crossover frequency $\omega_{gc} \approx 0.8$ rad/s. At this frequency:
+$$ \angle L(j \cdot 0.8) = -90^\circ - \arctan(0.08) - 0.8 \times \frac{180^\circ}{\pi} \approx -90^\circ - 4.6^\circ - 45.8^\circ \approx -140^\circ $$
+The phase margin is $\text{PM} = 180^\circ - 140^\circ = 40^\circ$ (approximately $45^\circ$ from graph).
+
+\textbf{Constructing Nyquist from Bode:} The Nyquist plot traces $L(j\omega)$ as $\omega$ varies from $0$ to $\infty$. Starting from the negative imaginary axis (phase $-90^\circ$, large magnitude), the locus spirals clockwise towards the origin. The critical point $-1$ is not encircled, confirming closed-loop stability.
 
 \begin{figure}[H]
         \centering
@@ -158,18 +171,8 @@ $$ |L(j\omega)| = \frac{8}{\omega\sqrt{\omega^2+100}}, \quad \angle L(j\omega) =
 \end{figure}
 
 \begin{center}
-        \begin{tikzpicture}[scale=1.0]
-                \draw[->] (-3,0) -- (3,0) node[right] {Re};
-                \draw[->] (0,-3) -- (0,3) node[above] {Im};
-                \draw[thick,blue,
-                        decoration={markings, mark=at position 0.5 with {\arrow{>}}},
-                        postaction={decorate}]
-                plot[smooth] coordinates {(0.5,-2.5) (-1.5,-1.5) (-1.0, 0) (-0.2, 0.2) (0,0)};
-                \node[font=\footnotesize] at (1.5,-2.5) {$\omega \to 0$};
-                \node[font=\footnotesize] at (0.3,0.3) {$\omega \to \infty$};
-                \filldraw[red] (-1,0) circle (2pt) node[below left,font=\footnotesize] {$-1$};
-                \node[align=center,font=\footnotesize] at (0,-3.5) {Nyquist diagram of $L(s) = K(s)G(s)$};
-        \end{tikzpicture}
+        \includegraphics[width=0.6\textwidth]{nyquist_q1.png}
+        \captionof*{figure}{Nyquist diagram of $L(s) = K(s)G(s)$. The locus spirals clockwise from the negative imaginary axis toward the origin. The critical point $-1$ (red) is not encircled.}
 \end{center}
 
 \noindent \textbf{2.} (§2.2 Modelling Manual Control) Are you using any integral action?
@@ -268,10 +271,30 @@ At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \t
 
 \noindent \textbf{6.} (§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s).$
 
-$G_2(s) = \dfrac{2}{sT-1}$ has one unstable pole at $s=1/T > 0$. The frequency response is:
-$$ G_2(j\omega) = \frac{2}{j\omega T - 1} = \frac{-2(1 + j\omega T)}{1 + \omega^2 T^2} $$
+The unstable aircraft has transfer function:
+$$ G_2(s) = \frac{2}{sT-1} $$
+with one unstable (RHP) pole at $s = 1/T > 0$.
 
-At $\omega = 0$: $G_2(0) = -2$. As $\omega \to \infty$: $G_2 \to 0$. The locus is a circle centered at $(-1, 0)$ with radius 1, traced clockwise from $-2$ to $0$.
+\textbf{Frequency Response Derivation:} Substituting $s = j\omega$:
+$$ G_2(j\omega) = \frac{2}{j\omega T - 1} $$
+
+To find real and imaginary parts, multiply by conjugate:
+$$ G_2(j\omega) = \frac{2}{-(1 - j\omega T)} = \frac{-2(1 + j\omega T)}{(1 - j\omega T)(1 + j\omega T)} = \frac{-2(1 + j\omega T)}{1 + \omega^2 T^2} $$
+
+Therefore:
+$$ \text{Re}[G_2(j\omega)] = \frac{-2}{1 + \omega^2 T^2}, \quad \text{Im}[G_2(j\omega)] = \frac{-2\omega T}{1 + \omega^2 T^2} $$
+
+\textbf{Geometric Interpretation:} Letting $x = \text{Re}$ and $y = \text{Im}$:
+$$ (x+1)^2 + y^2 = \left(\frac{-2}{1+\omega^2T^2} + 1\right)^2 + \left(\frac{-2\omega T}{1+\omega^2T^2}\right)^2 = 1 $$
+This is a circle centered at $(-1, 0)$ with radius 1.
+
+\textbf{Boundary Points:}
+\begin{itemize}
+        \item At $\omega = 0$: $G_2(0) = -2$ (leftmost point on real axis)
+        \item As $\omega \to \infty$: $G_2 \to 0$ (approaches origin)
+\end{itemize}
+
+The locus is traced clockwise as $\omega$ increases from $0$ to $\infty$.
 
 \begin{figure}[H]
         \centering
@@ -281,21 +304,8 @@ At $\omega = 0$: $G_2(0) = -2$. As $\omega \to \infty$: $G_2 \to 0$. The locus i
 \end{figure}
 
 \begin{center}
-        \begin{tikzpicture}[scale=1.5]
-                \draw[->] (-3,0) -- (1,0) node[right] {Re};
-                \draw[->] (0,-2) -- (0,2) node[above] {Im};
-
-                % Circle for 2/(sT-1)
-                \draw[thick, blue, decoration={markings, mark=at position 0.25 with {\arrow{>}}}, postaction={decorate}]
-                (0,0) arc (90:270:1) arc (-90:90:1);
-
-                % Center of circle is (-1,0), radius 1. Starts at -2.
-                \draw[thick, blue] (-1,0) circle (1);
-
-                \node at (-2.2, 0.2) {-2};
-                \node at (-0.2, 0.2) {0};
-                \node[align=center,font=\footnotesize] at (0,-2.5) {Nyquist diagram of $G_2(s)$};
-        \end{tikzpicture}
+        \includegraphics[width=0.55\textwidth]{nyquist_q6.png}
+        \captionof*{figure}{Nyquist diagram of $G_2(s) = 2/(0.6s-1)$. Circle centered at $(-1,0)$ with radius 1.}
 \end{center}
 
 \noindent \textbf{7.} (§2.5 An Unstable Aircraft) Explain, using the Nyquist criterion, why the feedback system is stable with a proportional gain greater than 0.5.
@@ -311,22 +321,24 @@ For $K > 0.5$, the point $-1/K$ lies inside the circle, giving the required cloc
 
 \noindent \textbf{8.} (§2.5 An Unstable Aircraft) Sketch of a Nyquist diagram for $G_2(s)$ with a small time delay $D$.
 
-With delay, the transfer function becomes $G_2(s)e^{-sD}$. The delay contributes phase $-\omega D$ without changing magnitude:
+With delay, the transfer function becomes $G_2(s)e^{-sD}$. The frequency response is:
+$$ G_2(j\omega)e^{-j\omega D} = \frac{2}{j\omega T - 1} \cdot e^{-j\omega D} $$
+
+The delay contributes phase $-\omega D$ without changing magnitude:
 $$ |G_2(j\omega)e^{-j\omega D}| = |G_2(j\omega)|, \quad \angle(G_2 e^{-j\omega D}) = \angle G_2 - \omega D $$
 
-The additional phase lag causes the circular locus to spiral inward rather than close cleanly at the origin. For large $D$, the spiral may cross $-1/K$ multiple times, potentially destabilizing the system.
+\textbf{Effect on Nyquist Locus:}
+\begin{itemize}
+        \item At $\omega = 0$: No change; still starts at $G_2(0) = -2$.
+        \item As $\omega$ increases: Additional clockwise rotation by $\omega D$ radians.
+        \item The circular locus becomes a spiral curving inward toward the origin.
+\end{itemize}
+
+For large $D$, the spiral may cross $-1/K$ multiple times, potentially destabilizing the system. This explains why manual stabilization becomes impossible when pilot delay $D$ exceeds the system time constant $T$.
+
 \begin{center}
-        \begin{tikzpicture}[scale=1.5]
-                \draw[->] (-3,0) -- (1,0) node[right] {Re};
-                \draw[->] (0,-2) -- (0,2) node[above] {Im};
-
-                % Spiraling curve
-                \draw[thick, blue] plot [smooth, tension=1] coordinates {(-2,0) (-1.5,-0.8) (-0.5,-0.5) (0,0)};
-                \draw[dashed, gray] (-1,0) circle (1);
-
-                \node at (-2.2, 0.2) {-2};
-                \node[align=center,font=\footnotesize] at (0,-2.5) {Nyquist diagram with delay (Solid)};
-        \end{tikzpicture}
+        \includegraphics[width=0.55\textwidth]{nyquist_q8.png}
+        \captionof*{figure}{Nyquist diagram with time delay. Dashed: original $G_2(j\omega)$. Solid: with delay $e^{-j\omega D}$. The spiral deviates from the circle due to phase lag.}
 \end{center}
 
 \pagebreak
