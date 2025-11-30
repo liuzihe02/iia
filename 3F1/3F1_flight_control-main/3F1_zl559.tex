@@ -216,11 +216,7 @@ The integral term accumulates past error, allowing $u_{ss} \neq 0$ even when $e_
 
 \vspace{1em}
 
-\textbf{Mechanism:} PIO occurs when the pilot's time delay introduces sufficient phase lag that the total loop phase reaches $-180^\circ$ at a frequency where the loop gain exceeds unity. The PIO aircraft has $G_1(s) = c/(Ts+1)^3$ which contributes up to $-270^\circ$ phase lag, plus the pilot delay $e^{-sD}$ adds $-\omega D$ radians.
-
-\textbf{Stability condition:} At the phase crossover frequency $\omega_{pc}$ where $\angle L(j\omega_{pc}) = -180^\circ$, if $|L(j\omega_{pc})| > 1$, the system is unstable and oscillates at frequency $\omega_{pc}$.
-
-\textbf{Period comparison:} From Bode (Figure~\ref{fig:pio_bode}), $\omega_{pc} \approx 0.8$ rad/s, giving theoretical period $T = 2\pi/\omega_{pc} \approx 7.85$s. The observed period ($\approx 5$s) is shorter, suggesting the pilot adapts their gain/delay under oscillatory conditions.
+PIO occurs when the pilot controller's time delay introduces sufficient phase lag that the total loop phase reaches $-180^\circ$ at a frequency where the loop gain exceeds unity. The PIO aircraft has $G_1(s) = c/(Ts+1)^3$ which contributes up to $-270^\circ$ phase lag, plus the pilot delay $e^{-sD}$ adds $-\omega D$ radians. At the phase crossover frequency $\omega_{pc}$ where $\angle L(j\omega_{pc}) = -180^\circ$, if $|L(j\omega_{pc})| > 1$, the system is unstable and oscillates at frequency $\omega_{pc}$. From Bode (Figure~\ref{fig:pio_bode}), $\omega_{pc} \approx 0.8$ rad/s, giving theoretical period $T = 2\pi/\omega_{pc} \approx 7.85$s. The observed period ($\approx 5$s) is shorter, suggesting the pilot controller adapts their gain/delay under oscillatory conditions.
 
 \begin{figure}[H]
         \centering
@@ -251,7 +247,6 @@ The integral term accumulates past error, allowing $u_{ss} \neq 0$ even when $e_
 
 To prevent PIO, ensure adequate phase margin at frequencies where the pilot is active ($< 1$ Hz):
 \begin{itemize}
-        \item Reduce total system delay (sensors, actuators, displays)
         \item Avoid plants with high phase lag at low frequencies
         \item Design for phase margin $> 45^\circ$ at the expected pilot crossover frequency
         \item Consider rate limiters to prevent high-frequency pilot inputs
