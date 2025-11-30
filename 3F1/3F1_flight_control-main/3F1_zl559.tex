@@ -293,8 +293,6 @@ To prevent PIO, ensure adequate phase margin at frequencies where the pilot is a
         \end{minipage}
 \end{figure}
 
-\pagebreak
-
 \textbf{Question 6.} \textit{(§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s)$.}
 \begin{figure}[H]
         \centering
@@ -344,7 +342,7 @@ $$ G_2(j\omega)e^{-j\omega D} = \frac{2}{j\omega T - 1} \cdot e^{-j\omega D} $$
 The delay contributes phase $-\omega D$ without changing magnitude:
 $$ |G_2(j\omega)e^{-j\omega D}| = |G_2(j\omega)|, \quad \angle(G_2 e^{-j\omega D}) = \angle G_2 - \omega D $$
 
-\textbf{Effect on Nyquist Locus:}
+The effects on Nyquist locus:
 \begin{itemize}
         \item At $\omega = 0$: No change; still starts at $G_2(0) = -2$.
         \item As $\omega$ increases: Additional clockwise rotation by $\omega D$ radians.
@@ -357,8 +355,6 @@ For large $D$, the spiral may cross $-1/K$ multiple times, potentially destabili
         \includegraphics[width=0.55\textwidth]{nyquist_q8.png}
         \captionof*{figure}{Nyquist diagram with time delay. Dashed: original $G_2(j\omega)$. Solid: with delay $e^{-j\omega D}$. The spiral deviates from the circle due to phase lag.}
 \end{center}
-
-\pagebreak
 
 \textbf{Question 9.} \textit{(§3.4 Integrator Wind-up) Explain how you calculated the bound on $Q$.}
 
