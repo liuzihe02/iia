@@ -11,6 +11,6 @@ The actual report is @3F1/3F1_flight_control-main/3F1_zl559.tex
 - Keep the report clear and concise, but make sure to explain the results and math theory clearly and sufficiently
 - I have also attached a sample latex report (from xl402) that someone else did. You can use this as reference for how you want to structure the lab report.
 
-Make sure to ingest all relevant documents and ultrathink of the plan first before acting. The 3F1 notes (chapter 4-7) and the sample latex should already be in your context window; I have uploaded them directly. A draft version of the zl559 report has been written, but it is not complete.
+- Make sure to ingest all relevant documents and ultrathink of the plan first before acting. The 3F1 notes (chapter 4-7) and the sample latex should already be in your context window; I have uploaded them directly. A draft version of the zl559 report has been written, but it is not complete.
 
-I think the mathematical content in the zl559 report is not adequate. Include the core math theory and explanations?
+- I think the mathematical content in the zl559 report may not be adequate. Include the core math theory and explanations, but don't overdo this. A good example of this being done is question 1

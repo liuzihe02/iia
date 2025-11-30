@@ -5,6 +5,8 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{lmodern} % Scalable fonts (required for microtype)
+\usepackage{microtype} % Improves text justification and reduces spacing issues
 \usetikzlibrary{shapes.geometric,arrows,decorations.markings}
 \graphicspath{{flight_control_lab/}}
 
@@ -26,7 +28,21 @@
 
 \markright{Experiment 3F1: Flight Control}
 
+% Disable paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5ex}
+
 \begin{document}
+
+% Reduce spacing around display equations (must be after \begin{document})
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+
+% Reduce spacing around figures
+\setlength{\intextsep}{6pt}
+\setlength{\floatsep}{6pt}
+\setlength{\textfloatsep}{6pt}
+
 \thispagestyle{empty}
 
 \begin{center}
@@ -118,7 +134,9 @@
 
 \section*{3F1 Flight Control Lab Report}
 
-\noindent \textbf{Question 1.} \textit{(§2.2 Modelling Manual Control) Nyquist diagram (from Bode diagram) for controller in series with plant.}
+\textbf{Question 1.} \textit{(§2.2 Modelling Manual Control) Nyquist diagram (from Bode diagram) for controller in series with plant.}
+
+\vspace{1em}
 
 \textbf{System Model:} The simplified aircraft dynamics satisfy
 $$ \ddot{y}(t) + M\dot{y}(t) = Nx(t) $$
@@ -127,7 +145,7 @@ $$ G(s) = \frac{N}{s^2 + Ms} = \frac{N}{s(s+M)} $$
 This represents an integrator ($1/s$) in series with a first-order lag ($1/(s+M)$). The human controller is modelled as a proportional gain $k$ with pure time delay $D$:
 $$ K(s) = ke^{-sD} $$
 
-\textbf{Open-Loop Transfer Function:} The loop transfer function is:
+\textbf{Open-Loop Transfer Function:}
 $$ L(s) = K(s)G(s) = \frac{kN \cdot e^{-sD}}{s(s + M)} $$
 
 \textbf{Frequency Response Analysis:} Substituting $s = j\omega$:
@@ -141,18 +159,16 @@ $$ |L(j\omega)| = \frac{kN}{\omega\sqrt{\omega^2+M^2}}, \quad \angle L(j\omega) 
 
 \textbf{Asymptotic Behaviour:}
 \begin{itemize}
-        \item \textbf{Low frequency} ($\omega \to 0$): $|L| \to \infty$, $\angle L \to -\pi/2$ (integrator dominates).
-        \item \textbf{High frequency} ($\omega \to \infty$): $|L| \to 0$, $\angle L \to -\infty$ (time delay adds unbounded phase lag $-\omega D$).
+        \item \textbf{Low frequency} ($\omega \to 0$): $|L| \to \infty$, $\angle L \to -\pi/2$
+        \item \textbf{High frequency} ($\omega \to \infty$): $|L| \to 0$, $\angle L \to -\infty$
 \end{itemize}
 
-\textbf{Substituting experimental values} ($M=N=10$, $k=0.8$, $D=1$s):
+Substituting experimental values ($M=N=10$, $k=0.8$, $D=1$s):
 $$ L(j\omega) = \frac{8 e^{-j\omega}}{j\omega(j\omega + 10)} $$
 
 From the Bode diagram (Figure~\ref{fig:bode_manual}), the gain crossover frequency $\omega_{gc} \approx 0.8$ rad/s. At this frequency:
 $$ \angle L(j \cdot 0.8) = -90^\circ - \arctan(0.08) - 0.8 \times \frac{180^\circ}{\pi} \approx -90^\circ - 4.6^\circ - 45.8^\circ \approx -140^\circ $$
 The phase margin is $\text{PM} = 180^\circ - 140^\circ = 40^\circ$ (approximately $45^\circ$ from graph).
-
-\textbf{Constructing Nyquist from Bode:} The Nyquist plot traces $L(j\omega)$ as $\omega$ varies from $0$ to $\infty$. Starting from the negative imaginary axis (phase $-90^\circ$, large magnitude), the locus spirals clockwise towards the origin. The critical point $-1$ is not encircled, confirming closed-loop stability.
 
 \begin{figure}[H]
         \centering
@@ -170,25 +186,35 @@ The phase margin is $\text{PM} = 180^\circ - 140^\circ = 40^\circ$ (approximatel
         \end{minipage}
 \end{figure}
 
+\textbf{Constructing Nyquist from Bode:} The Nyquist plot traces $L(j\omega)$ as $\omega$ varies from $0$ to $\infty$. Starting from the negative imaginary axis (phase $-90^\circ$, large magnitude), the locus spirals clockwise towards the origin. The critical point $-1$ is not encircled, confirming closed-loop stability.
+
 \begin{center}
         \includegraphics[width=0.6\textwidth]{nyquist_q1.png}
         \captionof*{figure}{Nyquist diagram of $L(s) = K(s)G(s)$. The locus spirals clockwise from the negative imaginary axis toward the origin. The critical point $-1$ (red) is not encircled.}
 \end{center}
 
-\noindent \textbf{2.} (§2.2 Modelling Manual Control) Are you using any integral action?
+\pagebreak
 
-Yes. In Figure~\ref{fig:step_manual}, the manual control input $u(t)$ does not return to zero but maintains a steady value to counteract the step disturbance, while $e(t) \to 0$. This implies the human controller provides integral action (``trimming'') to eliminate steady-state error. The simple model $K(s) = ke^{-sD}$ is therefore an approximation that neglects the pilot's low-frequency adaptation.
+\textbf{Question 2.} \textit{(§2.2 Modelling Manual Control) Are you using any integral action? Give a brief explanation. What does this imply about the accuracy of the model of the human controller?}
+
+\vspace{1em}
+
+\textbf{Yes.} In Figure~\ref{fig:step_manual}, after the step disturbance, the error signal $e(t) \to 0$ while the control input $u(t)$ settles to a non-zero constant. For a purely proportional controller $u = ke$, this would be impossible---zero error implies zero output. The sustained $u \neq 0$ when $e = 0$ indicates integral action:
+$$ u(t) = k_p e(t) + k_i \int_0^t e(\tau) \, d\tau $$
+The integral term accumulates past error, allowing $u_{ss} \neq 0$ even when $e_{ss} = 0$.
+
+\textbf{Model accuracy:} The simple model $K(s) = ke^{-sD}$ is purely proportional and neglects this low-frequency integral behaviour. It captures fast reactions but not the pilot's adaptive error accumulation.
 
 \begin{figure}[H]
         \centering
         \includegraphics[width=0.55\textwidth]{fig3.png}
-        \caption{Step disturbance response showing integral action: $u(t)$ maintains steady offset to drive $e(t) \to 0$.}
+        \caption{Step disturbance response showing integral action}
         \label{fig:step_manual}
 \end{figure}
 
-\pagebreak
+\textbf{Question 3.} \textit{(§2.3 Pilot Induced Oscillation) Explain the oscillation of the feedback loop. How does your observed period of oscillation compare to the theoretical prediction?}
 
-\noindent \textbf{3.} (§2.3 Pilot Induced Oscillation) Explain the oscillation of the feedback loop.
+\vspace{1em}
 
 \textbf{Mechanism:} PIO occurs when the pilot's time delay introduces sufficient phase lag that the total loop phase reaches $-180^\circ$ at a frequency where the loop gain exceeds unity. The PIO aircraft has $G_1(s) = c/(Ts+1)^3$ which contributes up to $-270^\circ$ phase lag, plus the pilot delay $e^{-sD}$ adds $-\omega D$ radians.
 
@@ -219,7 +245,9 @@ Yes. In Figure~\ref{fig:step_manual}, the manual control input $u(t)$ does not r
         \label{fig:pio_bode}
 \end{figure}
 
-\noindent \textbf{4.} (§2.3 Pilot Induced Oscillation) Can you give a rough guideline to the control designer to make PIO less likely?
+\textbf{Question 4.} \textit{(§2.3 Pilot Induced Oscillation) Can you give a rough guideline to the control designer to make PIO less likely?}
+
+\vspace{1em}
 
 To prevent PIO, ensure adequate phase margin at frequencies where the pilot is active ($< 1$ Hz):
 \begin{itemize}
@@ -229,9 +257,11 @@ To prevent PIO, ensure adequate phase margin at frequencies where the pilot is a
         \item Consider rate limiters to prevent high-frequency pilot inputs
 \end{itemize}
 
-\noindent \textbf{5.} (§2.4 Sinusoidal Disturbances) Was your manual input able to reduce the error?
+\textbf{Question 5.} \textit{(§2.4 Sinusoidal Disturbances) Was your manual input able to reduce the error (as compared to providing no input)?}
 
-No. The closed-loop response to disturbance $d$ is $y = \dfrac{G}{1+KG} d$. For disturbance rejection, we need $|1+KG| > 1$.
+\vspace{1em}
+
+\textbf{No.} The closed-loop response to disturbance $d$ is $y = \dfrac{G}{1+KG} d$. For disturbance rejection, we need $|1+KG| > 1$.
 
 At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \times 1 \approx -238^\circ$. Combined with plant phase ($\approx -90^\circ$ from Bode), total phase approaches $-330^\circ$, meaning $KG$ points nearly opposite to $-1$. This makes $|1+KG| < 1$, so the disturbance is actually \emph{amplified} rather than attenuated. Manual control worsens the oscillation.
 
@@ -269,7 +299,9 @@ At 0.66 Hz ($\omega = 4.15$ rad/s), pilot delay adds phase $-\omega D = -4.15 \t
 
 \pagebreak
 
-\noindent \textbf{6.} (§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s).$
+\textbf{Question 6.} \textit{(§2.5 An Unstable Aircraft) Nyquist diagram for $G_2(s)$.}
+
+\vspace{1em}
 
 The unstable aircraft has transfer function:
 $$ G_2(s) = \frac{2}{sT-1} $$
@@ -308,7 +340,9 @@ The locus is traced clockwise as $\omega$ increases from $0$ to $\infty$.
         \captionof*{figure}{Nyquist diagram of $G_2(s) = 2/(0.6s-1)$. Circle centered at $(-1,0)$ with radius 1.}
 \end{center}
 
-\noindent \textbf{7.} (§2.5 An Unstable Aircraft) Explain, using the Nyquist criterion, why the feedback system is stable with a proportional gain greater than 0.5.
+\textbf{Question 7.} \textit{(§2.5 An Unstable Aircraft) Explain, using the Nyquist criterion, why the feedback system is stable with a proportional gain greater than 0.5.}
+
+\vspace{1em}
 
 \textbf{Nyquist Criterion:} For a system with $P$ open-loop poles in the RHP, closed-loop stability requires $N = -P$ encirclements of $-1/K$, where $N > 0$ is counter-clockwise.
 
@@ -319,7 +353,9 @@ $$ -2 < -\frac{1}{K} < 0 \implies 0 < \frac{1}{K} < 2 \implies K > 0.5 $$
 
 For $K > 0.5$, the point $-1/K$ lies inside the circle, giving the required clockwise encirclement for stability.
 
-\noindent \textbf{8.} (§2.5 An Unstable Aircraft) Sketch of a Nyquist diagram for $G_2(s)$ with a small time delay $D$.
+\textbf{Question 8.} \textit{(§2.5 An Unstable Aircraft) Sketch of a Nyquist diagram for $G_2(s)$ with a small time delay $D$.}
+
+\vspace{1em}
 
 With delay, the transfer function becomes $G_2(s)e^{-sD}$. The frequency response is:
 $$ G_2(j\omega)e^{-j\omega D} = \frac{2}{j\omega T - 1} \cdot e^{-j\omega D} $$
@@ -343,7 +379,9 @@ For large $D$, the spiral may cross $-1/K$ multiple times, potentially destabili
 
 \pagebreak
 
-\noindent \textbf{9.} (§3.4 Integrator Wind-up) Explain how you calculated the bound on $Q$.
+\textbf{Question 9.} \textit{(§3.4 Integrator Wind-up) Explain how you calculated the bound on $Q$.}
+
+\vspace{1em}
 
 \textbf{PID Controller:} $u(t) = K_p \left( e + \dfrac{1}{T_i}\displaystyle\int_0^t e \, d\tau + T_d \dfrac{de}{dt} \right)$
 
