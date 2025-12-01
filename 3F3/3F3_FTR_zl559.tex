@@ -83,7 +83,7 @@ We begin by examining density estimation methods, quantifying histogram uncertai
 \section{Uniform and Normal Random Variables}
 \label{sec:uniform_normal}
 
-Density estimation forms the foundation for understanding random variable distributions. This section compares histogram and kernel density estimation (KDE) methods, demonstrating their statistical properties through multinomial distribution theory.
+This section compares histogram and kernel density estimation methods, using multinomial distribution theory to quantify histogram uncertainty.
 
 \subsection{Kernel Density Estimation}
 
@@ -373,7 +373,7 @@ When $\sin(x) = 0.7$, we have $|dy/dx| = |\cos(x)| \to \sqrt{1-0.7^2} \approx 0.
 \section{Inverse CDF Method}
 \label{sec:inverse_cdf}
 
-The inverse CDF method transforms uniform random variables into arbitrary target distributions, providing a universal sampling framework. We implement this technique for exponential random variable generation and analyze the resulting Monte Carlo estimator. The characteristic $O(1/\sqrt{N})$ convergence rate emerges from variance analysis, demonstrating the fundamental trade-off between sample size and estimation accuracy.
+The inverse CDF method provides a universal framework for generating samples from arbitrary distributions by transforming uniform random variables.
 
 \subsection{Theory}
 
@@ -475,7 +475,7 @@ Figure~\ref{fig:mc_convergence} demonstrates the $1/N$ variance decay. While ind
 \section{Alpha-Stable Distribution}
 \label{sec:stable}
 
-Heavy-tailed distributions arise in communications, finance, and signal processing. The $\alpha$-stable family generalizes the normal distribution, exhibiting power-law tail decay rather than exponential. We empirically verify the relationship between stability parameter $\alpha$ and tail exponent $\gamma = -\alpha$. As $\alpha \to 2$, the distribution converges to Gaussian.
+The $\alpha$-stable family generalizes the Gaussian distribution with power-law tails, providing a model for heavy-tailed phenomena in communications, finance, and signal processing.
 
 \subsection{Algorithm}
 
@@ -585,15 +585,9 @@ Figure~\ref{fig:stable_convergence} illustrates this convergence visually. At $\
 
 \section{Conclusion}
 
-This report investigated random number generation and density estimation techniques across four main topics.
+This work develops a comprehensive analysis on random variables. Beginning with histogram analysis, multinomial distribution theory reveals that estimation uncertainty scales as $\sqrt{J/N}$ for uniform distributions but diverges in low-probability regions, motivating kernel density estimation with its superior convergence rates. The Jacobian transformation formula then shows how functional mappings reshape probability distributions. The inverse CDF method provides universal sampling from arbitrary distributions by inverting the transformation $U = F(Y)$ for uniform $U$.
 
-\textbf{Density estimation:} Histogram and KDE methods offer complementary trade-offs. Histograms are intuitive, respect bounded support, and directly represent bin counts, while KDE provides smoother estimates with faster asymptotic convergence ($O(N^{-4/5})$ versus $O(N^{-2/3})$). The multinomial distribution provides the theoretical foundation for histogram bin count variability, with the factorial terms counting distinct arrangements and the power terms arising from independent trials.
-
-\textbf{Jacobian transformations:} The change-of-variables formula enables derivation of transformed variable distributions.
-
-\textbf{Inverse CDF method:} This general framework generates samples from any distribution with invertible CDF, as demonstrated for the exponential distribution. The Monte Carlo mean estimator $\hat{\mu}$ is unbiased ($E[\hat{\mu}] = \mu$) with variance $\text{Var}(\hat{\mu}) = \sigma^2/N$, yielding the characteristic $O(1/\sqrt{N})$ convergence rate.
-
-\textbf{Alpha-stable distributions:} These model heavy-tailed phenomena with power-law tail decay $P(|X| > t) \sim t^{-\alpha}$, in contrast to the exponential decay of Gaussians. The stability parameter $\alpha$ controls tail heaviness, with $\alpha \to 2$ recovering the Gaussian as a limiting case.
+The practical limitations of these techniques emerge through variance analysis and tail behavior. Monte Carlo estimation exhibits fundamental $O(1/\sqrt{N})$ convergence, meaning quadrupled sample sizes merely halve estimation error regardless of algorithmic sophistication. While Gaussian tails decay exponentially as $\exp(-t^2/2)$, $\alpha$-stable tails follow power laws $t^{-\alpha}$, producing extreme values orders of magnitude more frequently. The stability parameter $\alpha$ directly governs this tail heaviness, with the Gaussian recovered as the limiting case $\alpha \to 2$. These tools collectively enable practitioners to generate, analyze, and understand random phenomena beyond standard distributional assumptions.
 
 %----------------------------------------------------------------------------------------
 %	 REFERENCES
