@@ -115,11 +115,7 @@ Figure~\ref{fig:uniform} shows the histogram with approximately equal heights ac
 
 \subsection{Comparison of Methods}
 
-Both methods have similar bias-variance structure but differ in asymptotic convergence. From statistical theory \autocite{UW_STAT425}:
-
-\textbf{Histogram:} Optimal convergence rate $O(N^{-2/3})$
-
-\textbf{KDE:} Optimal convergence rate $O(N^{-4/5})$ (faster)
+Both methods have similar bias-variance structure but differ in asymptotic convergence. From statistical theory \autocite{UW_STAT425}: Histogram has an optimal convergence rate of $O(N^{-2/3})$ whereas KDE has an optimal convergence rate of $O(N^{-4/5})$ (faster).
 
 \begin{table}[h] % Single column table
 	\caption{Comparison of histogram and KDE methods.}
@@ -148,7 +144,23 @@ Both methods have similar bias-variance structure but differ in asymptotic conve
 
 \textbf{KDE disadvantages:} Less intuitive, boundary effects for finite support distributions, computationally more expensive.
 
-\subsection{Theoretical Analysis of Uniform Density}
+\subsection{Multinomial Distribution}
+
+The multinomial distribution describes the probability of observing counts $(n_1, n_2, \ldots, n_J)$ when $N$ independent samples are distributed into $J$ bins, where each sample falls into bin $j$ with probability $p_j$:
+\begin{equation}
+	P(n_1, \ldots, n_J) = \frac{N!}{n_1! n_2! \cdots n_J!} p_1^{n_1} p_2^{n_2} \cdots p_J^{n_J}
+	\label{eq:multinomial}
+\end{equation}
+
+Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities $p_1^{n_1} \times p_2^{n_2} \times \cdots \times p_J^{n_J}$.
+
+The factorial coefficient counts the number of distinct arrangements that yield the same bin counts. Consider $N$ labelled samples: the number of ways to choose which $n_1$ samples go to bin 1, then which $n_2$ of the remaining go to bin 2, and so forth, is:
+\begin{equation}
+	\binom{N}{n_1}\binom{N-n_1}{n_2}\cdots\binom{n_J}{n_J} = \frac{N!}{n_1! n_2! \cdots n_J!}
+\end{equation}
+This multinomial coefficient counts the number of ways to partition $N$ distinct objects into $J$ groups of sizes $n_1, \ldots, n_J$. Equation~\eqref{eq:multinomial} thus gives the probability of observing a specific pattern of bin counts.
+
+\subsection{Multinomial Analysis of Uniform Distribution}
 
 When histogramming $N$ samples from $\mathcal{U}(0,1)$ into $J$ bins, each bin has width $\delta = 1/J$. The probability that a sample falls in bin $j$ is:
 \begin{equation}
@@ -195,23 +207,7 @@ Figure~\ref{fig:multinomial} also demonstrates good agreement of hisogram result
 	\item \textbf{Increasing Reliability:} As $N$ increases, relative scatter decreases proportionally to $1/\sqrt{N}$.
 \end{enumerate}
 
-\subsection{Multinomial Distribution}
-
-The multinomial distribution describes the probability of observing counts $(n_1, n_2, \ldots, n_J)$ when $N$ independent samples are distributed into $J$ bins, where each sample falls into bin $j$ with probability $p_j$:
-\begin{equation}
-	P(n_1, \ldots, n_J) = \frac{N!}{n_1! n_2! \cdots n_J!} p_1^{n_1} p_2^{n_2} \cdots p_J^{n_J}
-	\label{eq:multinomial}
-\end{equation}
-
-Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities $p_1^{n_1} \times p_2^{n_2} \times \cdots \times p_J^{n_J}$.
-
-The factorial coefficient counts the number of distinct arrangements that yield the same bin counts. Consider $N$ labelled samples: the number of ways to choose which $n_1$ samples go to bin 1, then which $n_2$ of the remaining go to bin 2, and so forth, is:
-\begin{equation}
-	\binom{N}{n_1}\binom{N-n_1}{n_2}\cdots\binom{n_J}{n_J} = \frac{N!}{n_1! n_2! \cdots n_J!}
-\end{equation}
-This multinomial coefficient counts the number of ways to partition $N$ distinct objects into $J$ groups of sizes $n_1, \ldots, n_J$. Equation~\eqref{eq:multinomial} thus gives the probability of observing a specific pattern of bin counts.
-
-\subsection{Multinomial Analysis for Normal Distribution}
+\subsection{Multinomial Analysis for Gaussian (Normal) Distribution}
 
 For normally distributed data $X \sim \mathcal{N}(0, 1)$, the bin probabilities $p_j$ are non-uniform. They must be calculated using the CDF:
 \begin{equation}
@@ -297,12 +293,70 @@ For $x \sim \mathcal{N}(0,1)$ and $y = x^2$ ($y \geq 0$), there are two inverses
 	     & = \frac{1}{\sqrt{2\pi y}}\exp\left(-\frac{y}{2}\right), \quad y \geq 0
 \end{align}
 
-This is the chi-squared distribution with 1 degree of freedom, $\chi^2_1$, as verified in Figure~\ref{fig:quadratic}.
+We verify this in Figure~\ref{fig:quadratic}.
 
 \begin{figure}[h] % Single column figure
 	\includegraphics[width=\linewidth]{img/quadratic_transform_verification.png}
 	\caption{Verification of quadratic transformation $y = x^2$. Sample mean $\approx 1.0$ and variance $\approx 2.0$ match theoretical $\chi^2_1$ moments.}
 	\label{fig:quadratic}
+\end{figure}
+
+\subsection{Sinusoidal Transformation}
+
+For $x \sim \mathcal{U}(0, 2\pi)$ and $y = \sin(x)$, the equation $\sin(x) = y$ has two solutions:
+
+\begin{equation}
+	x_1 = \sin^{-1}(y), \quad x_2 = \pi - \sin^{-1}(y)
+\end{equation}
+
+The Jacobian is:
+\begin{equation}
+	\left|\frac{dx}{dy}\right| = \frac{1}{|\cos(x)|} = \frac{1}{\sqrt{1-y^2}}
+\end{equation}
+
+Applying the multi-valued transformation formula with $p(x) = 1/(2\pi)$:
+\begin{align}
+	p(y) & = 2 \times \frac{1}{2\pi} \times \frac{1}{\sqrt{1-y^2}} \nonumber \\
+	     & = \frac{1}{\pi\sqrt{1-y^2}}, \quad y \in (-1, 1)
+\end{align}
+
+This is the \textbf{arcsine distribution}, which has infinite density at $y = \pm 1$. Physically, a sinusoid spends more time near its peaks and troughs (where the rate of change is slowest) than near zero (where the rate of change is fastest). Figure~\ref{fig:sin} verifies this result.
+
+\begin{figure}[h]
+	\includegraphics[width=\linewidth]{img/sin_transform_arcsine.png}
+	\caption{Sinusoidal transformation $y = \sin(x)$ where $x \sim \mathcal{U}(0, 2\pi)$. The histogram matches the theoretical arcsine distribution.}
+	\label{fig:sin}
+\end{figure}
+
+\subsection{Clipped Sinusoid}
+
+Consider the clipped sinusoid $y = \min(\sin(x), 0.7)$, an idealised model of electronic saturation or clipping. The transformation has two regions:
+
+\textbf{Region 1: No clipping} ($\sin(x) < 0.7$):
+\begin{equation}
+	p(y) = \frac{1}{\pi\sqrt{1-y^2}}, \quad -1 < y < 0.7
+\end{equation}
+
+\textbf{Region 2: Clipping} ($\sin(x) \geq 0.7$):
+All $x$ values where $\sin(x) \geq 0.7$ map to $y = 0.7$, creating a point mass. The clipped interval $[\sin^{-1}(0.7), \pi - \sin^{-1}(0.7)]$ has length $\pi - 2\sin^{-1}(0.7)$, giving:
+\begin{equation}
+	P(y = 0.7) = \frac{\pi - 2\sin^{-1}(0.7)}{2\pi} \approx 0.253
+\end{equation}
+
+The complete PDF is:
+\begin{equation}
+	p(y) = \begin{cases}
+		\frac{1}{\pi\sqrt{1-y^2}}   & -1 < y < 0.7 \\
+		\delta(y - 0.7) \cdot 0.253 & y = 0.7
+	\end{cases}
+\end{equation}
+
+When $\sin(x) = 0.7$, we have $|dy/dx| = |\cos(x)| \to \sqrt{1-0.7^2} \approx 0.71$. However, the key insight is that a finite range of $x$ values (approximately 25.3\% of the input domain) all map to the single output value $y = 0.7$, concentrating probability mass into a delta function. Figure~\ref{fig:clipped} shows the characteristic spike at $y = 0.7$.
+
+\begin{figure}[h]
+	\includegraphics[width=\linewidth]{img/clipped_sin_transform.png}
+	\caption{Clipped sinusoid $y = \min(\sin(x), 0.7)$. The spike at $y = 0.7$ represents approximately 25.3\% of samples where saturation occurs.}
+	\label{fig:clipped}
 \end{figure}
 
 %------------------------------------------------
@@ -403,7 +457,7 @@ The $\alpha$-stable distribution models heavy-tailed phenomena in communications
 \begin{enumerate}
 	\item Calculate auxiliary parameters:
 	      \begin{align}
-		      b & = \frac{1}{\alpha}\arctan\left(\beta\tan\frac{\pi\alpha}{2}\right) \\
+		      b & = \frac{1}{\alpha}\tan^{-1}\left(\beta\tan\frac{\pi\alpha}{2}\right) \\
 		      s & = \left(1 + \beta^2\tan^2\frac{\pi\alpha}{2}\right)^{1/(2\alpha)}
 	      \end{align}
 
