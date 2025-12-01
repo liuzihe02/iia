@@ -68,6 +68,8 @@
 
 \linespread{1.05} % Increase line spacing slightly
 
+% \setlength{\parskip}{0.3\baselineskip} % Add space between paragraphs
+
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 
 %----------------------------------------------------------------------------------------
@@ -207,9 +209,9 @@
 
 \hypersetup{
 	colorlinks=true, % Whether to color the text of links
-	urlcolor=black, % Color for \url and \href links
-	linkcolor=black, % Color for \nameref links
-	citecolor=black, % Color of reference citations
+	urlcolor=blue, % Color for \url and \href links
+	linkcolor=blue, % Color for \nameref links
+	citecolor=blue, % Color of reference citations
 }
 
 %----------------------------------------------------------------------------------------

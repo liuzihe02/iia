@@ -73,8 +73,6 @@
 
 Random number generation is fundamental to Monte Carlo methods, statistical simulation, and probabilistic modelling. This report investigates the generation and characterisation of random variables, addressing four core topics: (1) density estimation via histograms and kernel density estimation (KDE), (2) probability transformations using the Jacobian formula, (3) the inverse CDF method for generating non-uniform random variables, and (4) the $\alpha$-stable distribution for modelling heavy-tailed phenomena.
 
-Section~\ref{sec:uniform_normal} compares histogram and KDE methods for density estimation, analysing their theoretical convergence properties and practical trade-offs. The multinomial distribution provides the statistical foundation for understanding histogram bin count variability. Section~\ref{sec:functions} applies the Jacobian transformation formula to derive distributions of linear and quadratic functions of Gaussian random variables. Section~\ref{sec:inverse_cdf} develops the inverse CDF method, demonstrating exponential variate generation and proving key properties of Monte Carlo estimators. Finally, Section~\ref{sec:stable} explores the $\alpha$-stable distribution, characterising its heavy-tailed behaviour and relationship to the Gaussian distribution.
-
 %------------------------------------------------
 
 \section{Uniform and Normal Random Variables}
@@ -103,7 +101,7 @@ resulting in the KDE:
 	\label{fig:normal}
 \end{figure*}
 
-The histogram (blue bars) and KDE (blue curve) both capture the bell-shaped Gaussian profile. The histogram exhibits discontinuities at bin boundaries while the KDE produces a smooth estimate that closely follows the theoretical PDF (red curve).
+Figure~\ref{fig:normal} shows that both the histogram (blue bars) and KDE (blue curve) capture the bell-shaped Gaussian profile. The histogram exhibits discontinuities at bin boundaries while the KDE produces a smooth estimate that closely follows the theoretical PDF (red curve).
 
 \subsection{Histogram and KDE of Uniform Random Numbers}
 
@@ -113,7 +111,7 @@ The histogram (blue bars) and KDE (blue curve) both capture the bell-shaped Gaus
 	\label{fig:uniform}
 \end{figure*}
 
-The histogram shows approximately equal heights across bins, consistent with uniform density. The KDE ($\sigma=0.05$) is smoother but extends beyond $[0,1]$ due to boundary effects.
+Figure~\ref{fig:uniform} shows the histogram with approximately equal heights across bins, consistent with uniform density. The KDE ($\sigma=0.05$) is smoother but extends beyond $[0,1]$ due to boundary effects.
 
 \subsection{Comparison of Methods}
 
@@ -152,19 +150,37 @@ Both methods have similar bias-variance structure but differ in asymptotic conve
 
 \subsection{Theoretical Analysis of Uniform Density}
 
-When histogramming $N$ samples from $\mathcal{U}(0,1)$ into $J$ bins, each bin has width $\delta = 1/J$ and probability $p_j = 1/J$. Each marginal count follows:
+When histogramming $N$ samples from $\mathcal{U}(0,1)$ into $J$ bins, each bin has width $\delta = 1/J$. The probability that a sample falls in bin $j$ is:
+\begin{equation}
+	p_j = \int_{(j-1)/J}^{j/J} p(x)\,dx = \int_{(j-1)/J}^{j/J} 1\,dx = \frac{1}{J}
+\end{equation}
+
+Each marginal count follows a binomial distribution:
 \begin{equation}
 	n_j \sim \text{Binomial}\left(N, p_j = \frac{1}{J}\right)
 \end{equation}
 
-Therefore:
+Using the binomial mean formula $E[X] = Np$:
+\begin{equation}
+	E[n_j] = N \cdot p_j = N \cdot \frac{1}{J} = \frac{N}{J}
+\end{equation}
+
+Using the binomial variance formula $\text{Var}(X) = Np(1-p)$:
 \begin{align}
-	E[n_j]          & = \frac{N}{J}             \\
-	\text{Var}(n_j) & = \frac{N(J-1)}{J^2}      \\
-	\sigma_{n_j}    & = \frac{\sqrt{N(J-1)}}{J}
+	\text{Var}(n_j) & = N \cdot p_j \cdot (1 - p_j) = \frac{N(J-1)}{J^2}
 \end{align}
 
-The coefficient of variation is $\text{CV} = \sqrt{(J-1)/N} \approx \sqrt{J/N}$. As $N \to \infty$, CV $\to 0$, so histogram estimates become increasingly reliable.
+\begin{equation}
+	\sigma_{n_j} = \sqrt{\text{Var}(n_j)} = \sqrt{\frac{N(J-1)}{J^2}} = \frac{\sqrt{N(J-1)}}{J}
+\end{equation}
+
+The coefficient of variation (relative uncertainty) is:
+\begin{align}
+	\text{CV} & = \frac{\sigma_{n_j}}{E[n_j]} = \frac{\sqrt{N(J-1)}/J}{N/J} \nonumber       \\
+	          & = \frac{\sqrt{N(J-1)}}{N} = \sqrt{\frac{J-1}{N}} \approx \sqrt{\frac{J}{N}}
+\end{align}
+
+As $N \to \infty$ with $J$ fixed, $\text{CV} \sim 1/\sqrt{N} \to 0$, so histogram estimates become increasingly reliable. By the Law of Large Numbers, observed bin counts $n_j/N \to p_j = 1/J$.
 
 \begin{figure*} % Full width figure
 	\includegraphics[width=\linewidth]{img/multinomial_bounds.png}
@@ -172,10 +188,10 @@ The coefficient of variation is $\text{CV} = \sqrt{(J-1)/N} \approx \sqrt{J/N}$.
 	\label{fig:multinomial}
 \end{figure*}
 
-The histogram results demonstrate good agreement with theory:
+Figure~\ref{fig:multinomial} also demonstrates good agreement of hisogram results with multinomial distribution theory:
 \begin{enumerate}
 	\item \textbf{Bin Count Distribution:} Expected mean $E[n_j] = N/J$ closely matches observed counts across all $N$ values.
-	\item \textbf{Confidence Bounds:} Approximately 95--100\% of bins fall within $\pm 3\sigma$ bounds, consistent with the $\sim 99.7\%$ theoretical expectation from CLT.
+	\item \textbf{Confidence Bounds:} Most of the bins fall within $\pm 3\sigma$ bounds, consistent with the $\sim 99.7\%$ theoretical expectation from CLT.
 	\item \textbf{Increasing Reliability:} As $N$ increases, relative scatter decreases proportionally to $1/\sqrt{N}$.
 \end{enumerate}
 
@@ -184,15 +200,16 @@ The histogram results demonstrate good agreement with theory:
 The multinomial distribution describes the probability of observing counts $(n_1, n_2, \ldots, n_J)$ when $N$ independent samples are distributed into $J$ bins, where each sample falls into bin $j$ with probability $p_j$:
 \begin{equation}
 	P(n_1, \ldots, n_J) = \frac{N!}{n_1! n_2! \cdots n_J!} p_1^{n_1} p_2^{n_2} \cdots p_J^{n_J}
+	\label{eq:multinomial}
 \end{equation}
 
-Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities $p_1^{n_1} \times p_2^{n_2} \times \cdots \times p_J^{n_J}$. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$.
+Each sample is an independent trial. For a specific sample to land in bin $j$, the probability is $p_j$. If exactly $n_j$ samples land in bin $j$, these contribute a factor of $p_j^{n_j}$. Since all $N$ samples are independent, the probability of a specific sequence of outcomes is the product of individual probabilities $p_1^{n_1} \times p_2^{n_2} \times \cdots \times p_J^{n_J}$.
 
 The factorial coefficient counts the number of distinct arrangements that yield the same bin counts. Consider $N$ labelled samples: the number of ways to choose which $n_1$ samples go to bin 1, then which $n_2$ of the remaining go to bin 2, and so forth, is:
 \begin{equation}
 	\binom{N}{n_1}\binom{N-n_1}{n_2}\cdots\binom{n_J}{n_J} = \frac{N!}{n_1! n_2! \cdots n_J!}
 \end{equation}
-This multinomial coefficient counts the number of ways to partition $N$ distinct objects into $J$ groups of sizes $n_1, \ldots, n_J$.
+This multinomial coefficient counts the number of ways to partition $N$ distinct objects into $J$ groups of sizes $n_1, \ldots, n_J$. Equation~\eqref{eq:multinomial} thus gives the probability of observing a specific pattern of bin counts.
 
 \subsection{Multinomial Analysis for Normal Distribution}
 
@@ -200,14 +217,48 @@ For normally distributed data $X \sim \mathcal{N}(0, 1)$, the bin probabilities 
 \begin{equation}
 	p_j = \Phi(b_{j+1}) - \Phi(b_j)
 \end{equation}
-where $\Phi(x)$ is the standard normal CDF and $[b_j, b_{j+1})$ defines bin $j$.
+where $\Phi(x)$ is the standard normal CDF and $[b_j, b_{j+1})$ defines bin $j$. Central bins (near $x = 0$) have high $p_j$ because the PDF is peaked there, while edge bins (large $|x|$) have low $p_j$ due to exponential decay.
 
-Central bins (near $x = 0$) have high probability because the PDF is peaked there, while edge bins (large $|x|$) have low probability due to exponential decay. The variance of bin counts depends on bin probability:
+Each bin count still follows a binomial distribution:
+\begin{equation}
+	n_j \sim \text{Binomial}(N, p_j)
+\end{equation}
+
+\begin{equation}
+	E[n_j] = N p_j
+\end{equation}
+
 \begin{equation}
 	\text{Var}(n_j) = N p_j (1 - p_j)
 \end{equation}
+This is maximised when $p_j = 0.5$ and minimised when $p_j \to 0$ or $p_j \to 1$.
 
-This variance is maximised when $p_j = 0.5$ (intermediate) and minimised when $p_j \to 0$ or $p_j \to 1$. For histograms of normal data, edge bins have the highest \textit{relative} uncertainty $\sigma_{n_j}/E[n_j] = \sqrt{(1-p_j)/(Np_j)}$, making histogram estimates in the tails less reliable.
+\begin{equation}
+	\sigma_{n_j} = \sqrt{N p_j (1 - p_j)}
+\end{equation}
+
+\begin{align}
+	\text{CV}_j & = \frac{\sigma_{n_j}}{E[n_j]} = \frac{\sqrt{N p_j (1 - p_j)}}{N p_j} = \sqrt{\frac{1 - p_j}{N p_j}}
+\end{align}
+
+For edge bins where $p_j \to 0$, we have $(1-p_j) \to 1$, so $\text{CV}_j \approx 1/\sqrt{Np_j} \to \infty$. Thus edge bins have the highest relative uncertainty, making histogram estimates in the tails less reliable. Table~\ref{tab:normal_variance} illustrates this for bins at 0, 1, 2, and 3 standard deviations from the mean with $N = 1000$ samples. Although absolute variance decreases in the tails, the coefficient of variation increases from 0.07 at the centre to 0.73 at 3 standard deviations.
+
+\begin{table}[h]
+	\caption{Variance and CV for bins at different distances from the mean ($N=1000$, bin width $= 0.4$).}
+	\centering
+	\footnotesize
+	\begin{tabular}{@{}cccccc@{}}
+		\toprule
+		\textbf{Position} & $p_j$ & $E[n_j]$ & $\text{Var}(n_j)$ & $\sigma_{n_j}$ & \textbf{CV} \\
+		\midrule
+		0 sd              & 0.159 & 158.5    & 133.4             & 11.55          & 0.07        \\
+		1 sd              & 0.097 & 96.8     & 87.4              & 9.35           & 0.10        \\
+		2 sd              & 0.022 & 22.0     & 21.5              & 4.64           & 0.21        \\
+		3 sd              & 0.002 & 1.9      & 1.9               & 1.37           & 0.73        \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:normal_variance}
+\end{table}
 
 \begin{figure*}
 	\includegraphics[width=\linewidth]{img/normal_multinomial_bounds.png}
@@ -230,7 +281,7 @@ For $x \sim \mathcal{N}(0,1)$ and $y = ax + b$, the inverse is $x = (y-b)/a$ wit
 	     & = \mathcal{N}(y|b, a^2)
 \end{align}
 
-This demonstrates that a linear transformation of standard normal produces $\mathcal{N}(\mu, \sigma^2)$ with $\mu = b$ and $\sigma^2 = a^2$. Any normal distribution can be generated from $\mathcal{N}(0,1)$ using $Y = \sigma X + \mu$.
+This demonstrates that a linear transformation of standard normal produces $\mathcal{N}(\mu, \sigma^2)$ with $\mu = b$ and $\sigma^2 = a^2$. Any normal distribution can be generated from $\mathcal{N}(0,1)$ using $Y = \sigma X + \mu$. Figure~\ref{fig:linear} verifies this result empirically.
 
 \begin{figure}[h] % Single column figure
 	\includegraphics[width=\linewidth]{img/linear_transform_verification.png}
@@ -246,7 +297,7 @@ For $x \sim \mathcal{N}(0,1)$ and $y = x^2$ ($y \geq 0$), there are two inverses
 	     & = \frac{1}{\sqrt{2\pi y}}\exp\left(-\frac{y}{2}\right), \quad y \geq 0
 \end{align}
 
-This is the chi-squared distribution with 1 degree of freedom, $\chi^2_1$.
+This is the chi-squared distribution with 1 degree of freedom, $\chi^2_1$, as verified in Figure~\ref{fig:quadratic}.
 
 \begin{figure}[h] % Single column figure
 	\includegraphics[width=\linewidth]{img/quadratic_transform_verification.png}
@@ -297,7 +348,7 @@ def generate_exponential(n, mean=1.0):
 	\label{fig:exponential}
 \end{figure*}
 
-The histogram shows excellent agreement with the theoretical exponential density. The KDE exhibits boundary effects near $y = 0$ where Gaussian kernels extend beyond the valid support $[0,\infty)$.
+Figure~\ref{fig:exponential} shows excellent agreement between the histogram and theoretical exponential density. The KDE exhibits boundary effects near $y = 0$ where Gaussian kernels extend beyond the valid support $[0,\infty)$.
 
 \subsection{Monte Carlo Estimation of Moments}
 
@@ -392,7 +443,7 @@ def generate_stable(alpha, beta, n):
 
 \textbf{Stability parameter $\alpha \in (0,2)$:} Controls tail heaviness. At $\alpha = 0.5$, tails are extremely heavy with massive outliers. At $\alpha = 1.5$, tails are lighter but still heavier than Gaussian. As $\alpha \to 2$, the distribution approaches Gaussian.
 
-\textbf{Skewness parameter $\beta \in [-1,+1]$:} Controls asymmetry. At $\beta = 0$, the distribution is symmetric. Positive $\beta$ produces right skewness; negative $\beta$ produces left skewness.
+\textbf{Skewness parameter $\beta \in [-1,+1]$:} Controls asymmetry. At $\beta = 0$, the distribution is symmetric. Positive $\beta$ produces right skewness; negative $\beta$ produces left skewness. Figure~\ref{fig:stable} illustrates these effects for different $\alpha$ and $\beta$ combinations.
 
 \subsection{Tail Probability Analysis}
 
