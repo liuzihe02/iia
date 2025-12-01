@@ -25,12 +25,15 @@
 	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
 	% unnumberedsections, % Commented to enable section numbering
 	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
-	draft, % skips compiling images, which take FOREVER. toggle this on and off to see complete version
+	% draft, % skips compiling images, which take FOREVER. toggle this on and off to see complete version
 ]{LTJournalArticle}
 
 \addbibresource{3F3_FTR_zl559.bib} % BibLaTeX bibliography file
 
 \usepackage{amsmath} % For align environment, \text, \implies
+
+% Custom image width for single-column figures
+\newcommand{\singlecolwidth}{0.85\linewidth}
 
 \runninghead{Random Variables and Random Number Generation} % A shortened article title to appear in the running head
 
@@ -55,7 +58,7 @@
 % Full-width abstract
 \renewcommand{\maketitlehookd}{%
 	\begin{abstract}
-		\noindent This report explores random number generation and density estimation techniques. We compare histogram and kernel density estimation (KDE) methods, demonstrating their trade-offs in accuracy and smoothness. Probability transformations using the Jacobian formula are applied to derive distributions for linear and quadratic functions of normal random variables. The inverse CDF method is implemented to generate exponential random variates. Finally, the alpha-stable distribution is explored, demonstrating heavy-tailed random variable generation with varying stability and skewness parameters.
+		\noindent This report investigates random number generation and statistical density estimation. We develop theoretical foundations for histogram uncertainty using multinomial distribution theory, implement the inverse CDF transformation method for generating non-uniform random variables, and characterize heavy-tailed $\alpha$-stable distributions. Empirical validation demonstrates convergence rates for Monte Carlo estimation and the advantage of kernel density estimation over histograms.
 	\end{abstract}
 }
 
@@ -71,12 +74,16 @@
 
 \section{Introduction}
 
-Random number generation is fundamental to Monte Carlo methods, statistical simulation, and probabilistic modelling. This report investigates the generation and characterisation of random variables, addressing four core topics: (1) density estimation via histograms and kernel density estimation (KDE), (2) probability transformations using the Jacobian formula, (3) the inverse CDF method for generating non-uniform random variables, and (4) the $\alpha$-stable distribution for modelling heavy-tailed phenomena.
+Random number generation underpins modern computational statistics. While pseudorandom number generators readily produce uniform variates, most applications require samples from complex probability distributions. This report develops practical techniques for generating and analyzing non-uniform random variables.
+
+We begin by examining density estimation methods, quantifying histogram uncertainty and how kernel methods achieve better convergence. Probability transformations demonstrate how complex distributions arise from simple ones through functional relationships. The inverse CDF method provides a general framework for sampling arbitrary distributions. Finally, we characterize $\alpha$-stable distributions, whose heavy tails model phenomena beyond Gaussian assumptions.
 
 %------------------------------------------------
 
 \section{Uniform and Normal Random Variables}
 \label{sec:uniform_normal}
+
+Density estimation forms the foundation for understanding random variable distributions. This section compares histogram and kernel density estimation (KDE) methods, demonstrating their statistical properties through multinomial distribution theory.
 
 \subsection{Kernel Density Estimation}
 
@@ -267,6 +274,8 @@ For edge bins where $p_j \to 0$, we have $(1-p_j) \to 1$, so $\text{CV}_j \appro
 \section{Functions of Random Variables}
 \label{sec:functions}
 
+Random variable transformations reveal how probability distributions change under functional mappings. Using the Jacobian formula, we derive output distributions for linear, quadratic, and sinusoidal transformations.
+
 \subsection{Linear Transformation}
 
 For $x \sim \mathcal{N}(0,1)$ and $y = ax + b$, the inverse is $x = (y-b)/a$ with Jacobian $|dx/dy| = 1/|a|$. Applying the transformation formula:
@@ -297,7 +306,7 @@ We verify this in Figure~\ref{fig:quadratic}.
 
 \begin{figure}[h] % Single column figure
 	\includegraphics[width=\linewidth]{img/quadratic_transform_verification.png}
-	\caption{Verification of quadratic transformation $y = x^2$. Sample mean $\approx 1.0$ and variance $\approx 2.0$ match theoretical $\chi^2_1$ moments.}
+	\caption{Verification of quadratic transformation $y = x^2$. Sample mean $\approx 1.0$ and variance $\approx 2.0$}
 	\label{fig:quadratic}
 \end{figure}
 
@@ -364,12 +373,25 @@ When $\sin(x) = 0.7$, we have $|dy/dx| = |\cos(x)| \to \sqrt{1-0.7^2} \approx 0.
 \section{Inverse CDF Method}
 \label{sec:inverse_cdf}
 
+The inverse CDF method transforms uniform random variables into arbitrary target distributions, providing a universal sampling framework. We implement this technique for exponential random variable generation and analyze the resulting Monte Carlo estimator. The characteristic $O(1/\sqrt{N})$ convergence rate emerges from variance analysis, demonstrating the fundamental trade-off between sample size and estimation accuracy.
+
 \subsection{Theory}
 
-If $U \sim \mathcal{U}(0,1)$ and $Y = F^{-1}(U)$ where $F$ is any CDF, then $Y$ has distribution with CDF $F$. The algorithm:
+If $U \sim \mathcal{U}(0,1)$ and $Y = F^{-1}(U)$ where $F$ is any CDF, then $Y$ has distribution with CDF $F$.
+
+\textbf{Proof:} For any $y$,
+\begin{align}
+	\Pr(Y \leq y) & = \Pr(F^{-1}(U) \leq y) \nonumber \\
+	              & = \Pr(U \leq F(y)) \nonumber      \\
+	              & = F(y)
+\end{align}
+where the last step uses $\Pr(U \leq u) = u$ for $U \sim \mathcal{U}(0,1)$.
+
+\textbf{Algorithm:}
 \begin{enumerate}
 	\item Generate $u^{(i)} \sim \mathcal{U}(0,1)$
 	\item Compute $y^{(i)} = F^{-1}(u^{(i)})$
+	\item Then $y^{(i)}$ has distribution with CDF $F$
 \end{enumerate}
 
 \subsection{Exponential Distribution}
@@ -383,10 +405,9 @@ For the exponential distribution with PDF $p(y) = \exp(-y)$ for $y \geq 0$:
 
 \textbf{Inverse CDF:} Solving $u = F(y)$ for $y$:
 \begin{align}
-	u = 1 - \exp(-y) \implies y = -\ln(1 - u) = F^{-1}(u)
+	y & = -\ln(1 - u)
 \end{align}
-
-Since $(1-u) \sim \mathcal{U}(0,1)$ when $u \sim \mathcal{U}(0,1)$, we can use $F^{-1}(u) = -\ln(u)$.
+Thus $F^{-1}(u) = -\ln(1 - u)$ for $u \in (0,1)$. Since $U \sim \mathcal{U}(0,1)$ implies $(1-U) \sim \mathcal{U}(0,1)$, we can generate samples using $Y = -\ln(U)$ instead.
 
 \subsection{Implementation}
 
@@ -396,24 +417,26 @@ def generate_exponential(n, mean=1.0):
     return -mean * np.log(u)
 \end{verbatim}
 
-\begin{figure*} % Full width figure
-	\includegraphics[width=\linewidth]{img/exponential_inverse_cdf.png}
-	\caption{Exponential distribution via inverse CDF method. Histogram (left) matches theoretical PDF. KDE (right) shows boundary effects: peak underestimated ($\approx 0.65$ vs 1.0) due to Gaussian kernels extending into $y < 0$.}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\singlecolwidth]{img/exponential_inverse_cdf_hist.png}\\[0.5em]
+	\includegraphics[width=\singlecolwidth]{img/exponential_inverse_cdf_kde.png}
+	\caption{Exponential distribution via inverse CDF method. Histogram (top) matches theoretical PDF. KDE (bottom) shows boundary effects: peak underestimated ($\approx 0.65$ vs 1.0) due to Gaussian kernels extending into $y < 0$.}
 	\label{fig:exponential}
-\end{figure*}
+\end{figure}
 
 Figure~\ref{fig:exponential} shows excellent agreement between the histogram and theoretical exponential density. The KDE exhibits boundary effects near $y = 0$ where Gaussian kernels extend beyond the valid support $[0,\infty)$.
 
-\subsection{Monte Carlo Estimation of Moments}
+\subsection{Monte Carlo Estimation}
 
 Given $N$ i.i.d.\ samples $y^{(1)}, \ldots, y^{(N)}$ from a distribution with mean $\mu$ and variance $\sigma^2$, we define the sample mean estimator:
 \begin{equation}
 	\hat{\mu} = \frac{1}{N}\sum_{i=1}^{N} y^{(i)}
 \end{equation}
 
-For the exponential distribution with $\lambda = 1$, the theoretical mean is $E[Y] = 1$ and variance is $\text{Var}(Y) = 1$. Experimental verification with $N = 10000$ samples yields $\hat{\mu} \approx 1.00$ and $\hat{\sigma}^2 \approx 1.00$, confirming the inverse CDF method correctly generates exponential variates.
+For the exponential distribution with $\lambda = 1$, the theoretical mean is $E[Y] = 1$ and variance is $\text{Var}(Y) = 1$. Experimental verification with $N = 10000$ samples yields $\hat{\mu} = 1.021$ and $\hat{\sigma}^2 = 1.025$, confirming the inverse CDF method correctly generates exponential variates.
 
-\subsection{Unbiasedness of the Mean Estimator}
+\subsection{Bias of the Mean Estimator}
 
 The sample mean $\hat{\mu}$ is an unbiased estimator of the true mean $\mu$. To prove this, we compute the expectation over all possible samples:
 \begin{align}
@@ -437,11 +460,13 @@ The standard error is $\text{SE}(\hat{\mu}) = \sigma/\sqrt{N}$, implying that do
 
 \subsection{Monte Carlo Convergence}
 
-\begin{figure*}
-	\includegraphics[width=\linewidth]{img/mc_convergence.png}
-	\caption{Monte Carlo convergence for exponential distribution. Left: Single run showing squared error $(\hat{\mu} - \mu)^2$ versus $N$ with theoretical variance $\sigma^2/N$ (dashed). Right: Averaged squared error over 100 runs confirms $1/N$ decay rate.}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\singlecolwidth]{img/mc_convergence_single.png}\\[0.5em]
+	\includegraphics[width=\singlecolwidth]{img/mc_convergence_avg.png}
+	\caption{Monte Carlo convergence for exponential distribution. Top: Single run showing squared error $(\hat{\mu} - \mu)^2$ versus $N$ with theoretical variance $\sigma^2/N$ (dashed). Bottom: Averaged squared error over 100 runs confirms $1/N$ decay rate.}
 	\label{fig:mc_convergence}
-\end{figure*}
+\end{figure}
 
 Figure~\ref{fig:mc_convergence} demonstrates the $1/N$ variance decay. While individual runs show fluctuations, the averaged squared error closely follows the theoretical $\sigma^2/N$ bound. This confirms that the Monte Carlo estimator is consistent: as $N \to \infty$, $\hat{\mu} \to \mu$ by the Law of Large Numbers.
 
@@ -450,9 +475,11 @@ Figure~\ref{fig:mc_convergence} demonstrates the $1/N$ variance decay. While ind
 \section{Alpha-Stable Distribution}
 \label{sec:stable}
 
-\subsection{Generation Algorithm}
+Heavy-tailed distributions arise in communications, finance, and signal processing. The $\alpha$-stable family generalizes the normal distribution, exhibiting power-law tail decay rather than exponential. We empirically verify the relationship between stability parameter $\alpha$ and tail exponent $\gamma = -\alpha$. As $\alpha \to 2$, the distribution converges to Gaussian.
 
-The $\alpha$-stable distribution models heavy-tailed phenomena in communications and signal processing. To generate samples with $\alpha \in (0,2)$, $\alpha \neq 1$ and $\beta \in [-1,+1]$:
+\subsection{Algorithm}
+
+To generate samples with $\alpha \in (0,2)$, $\alpha \neq 1$ and $\beta \in [-1,+1]$:
 
 \begin{enumerate}
 	\item Calculate auxiliary parameters:
@@ -526,23 +553,23 @@ In contrast, the Gaussian has exponentially decaying tails: $P(|Z| > t) \sim e^{
 
 Table~\ref{tab:tail_probs} demonstrates the dramatic difference: at $t = 6$, the Gaussian tail probability is essentially zero ($\sim 10^{-9}$), while the $\alpha$-stable with $\alpha = 0.5$ still has $P(|X| > 6) \approx 0.21$. This explains why heavy-tailed distributions produce extreme outliers.
 
-\begin{figure*}
-	\includegraphics[width=\linewidth]{img/power_law_tail_fit.png}
-	\caption{Power law tail fitting for $\alpha$-stable distributions. Log-log plots of $P(|X| > t)$ versus $t$ show linear decay with slope $\gamma \approx -\alpha$, confirming the theoretical prediction.}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\singlecolwidth]{img/power_law_tail_fit_05.png}\\[0.5em]
+	\includegraphics[width=\singlecolwidth]{img/power_law_tail_fit_15.png}
+	\caption{Power law tail fitting for $\alpha$-stable distributions. Log-log plots of $P(|X| > t)$ versus $t$ show linear decay with slope $\gamma \approx -\alpha$, confirming the theoretical prediction. As $\alpha$ approaches 2, the log-log plot for the $\alpha$-stable distribution is also closer to that for the gaussian distribution.}
 	\label{fig:tail_fit}
-\end{figure*}
+\end{figure}
 
 Figure~\ref{fig:tail_fit} confirms that $P(|X| > t) \propto t^{\gamma}$ with $\gamma \approx -\alpha$. Linear regression on the log-log plot yields $\gamma = -0.50$ for $\alpha = 0.5$ and $\gamma = -1.50$ for $\alpha = 1.5$, validating the general formula $\gamma = -\alpha$.
 
-\subsection{Convergence to Gaussian as $\alpha \to 2$}
+\subsection{Convergence to Gaussian}
 
 As the stability parameter $\alpha$ approaches 2, the $\alpha$-stable distribution converges to a Gaussian. This transition involves fundamental changes in the distribution's properties:
 
 \textbf{Tail behaviour:} For $\alpha < 2$, tails follow a power law with infinite variance. At $\alpha = 2$, tails decay exponentially with finite variance.
 
 \textbf{Characteristic function:} The $\alpha$-stable characteristic function is $\phi(t) = \exp(-|t|^\alpha)$. As $\alpha \to 2$, this approaches $\exp(-t^2)$, the Gaussian characteristic function.
-
-\textbf{Central Limit Theorem connection:} The Gaussian is the unique stable distribution ($\alpha = 2$) that arises as the limit of standardised sums by the CLT. For $\alpha < 2$, sums of i.i.d.\ heavy-tailed variables converge to $\alpha$-stable distributions instead.
 
 \begin{figure*}
 	\includegraphics[width=\linewidth]{img/stable_gaussian_convergence.png}
@@ -562,11 +589,11 @@ This report investigated random number generation and density estimation techniq
 
 \textbf{Density estimation:} Histogram and KDE methods offer complementary trade-offs. Histograms are intuitive, respect bounded support, and directly represent bin counts, while KDE provides smoother estimates with faster asymptotic convergence ($O(N^{-4/5})$ versus $O(N^{-2/3})$). The multinomial distribution provides the theoretical foundation for histogram bin count variability, with the factorial terms counting distinct arrangements and the power terms arising from independent trials.
 
-\textbf{Jacobian transformations:} The change-of-variables formula enables derivation of transformed variable distributions. Linear transformations of standard normals yield general Gaussians ($y = ax + b \Rightarrow \mathcal{N}(b, a^2)$), while quadratic transformations produce chi-squared distributions ($y = x^2 \Rightarrow \chi^2_1$).
+\textbf{Jacobian transformations:} The change-of-variables formula enables derivation of transformed variable distributions.
 
 \textbf{Inverse CDF method:} This general framework generates samples from any distribution with invertible CDF, as demonstrated for the exponential distribution. The Monte Carlo mean estimator $\hat{\mu}$ is unbiased ($E[\hat{\mu}] = \mu$) with variance $\text{Var}(\hat{\mu}) = \sigma^2/N$, yielding the characteristic $O(1/\sqrt{N})$ convergence rate.
 
-\textbf{Alpha-stable distributions:} These model heavy-tailed phenomena with power-law tail decay $P(|X| > t) \sim t^{-\alpha}$, in contrast to the exponential decay of Gaussians. The stability parameter $\alpha$ controls tail heaviness, with $\alpha \to 2$ recovering the Gaussian as a limiting case. This connection to the Central Limit Theorem highlights the Gaussian as the unique finite-variance stable distribution.
+\textbf{Alpha-stable distributions:} These model heavy-tailed phenomena with power-law tail decay $P(|X| > t) \sim t^{-\alpha}$, in contrast to the exponential decay of Gaussians. The stability parameter $\alpha$ controls tail heaviness, with $\alpha \to 2$ recovering the Gaussian as a limiting case.
 
 %----------------------------------------------------------------------------------------
 %	 REFERENCES
