@@ -57,7 +57,6 @@ The limitation of all three methods in the short lab was the assumption that tex
 
 \section{Coding for Discrete Stationary Sources}
 
-
 \subsection{Theoretical Background}
 
 We model natural language text as a sequence of random variables, specifically a \textit{discrete stochastic process}, $\mathcal{X} = \{X_i\}_{i=1}^\infty$. We distinguish between two primary classes of sources:
@@ -77,7 +76,7 @@ Natural languages like English are not memoryless; the letter 'h' is much more l
 Stationarity implies that marginal probabilities are constant $H(X_i) = H(X_1)$ and conditional probabilities depend only on the relative history, not the absolute time.
 
 \textbf{Entropy Rate:}
-For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$, defined as the asymptotic per-symbol entropy:
+For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$, defined as the asymptotic per-symbol entropy \cite[Def 4.1]{cover}:
 \begin{equation}
     \Hrate = \lim_{n \to \infty} \frac{1}{n} H(X_1, \dots, X_n).
 \end{equation}
@@ -89,25 +88,23 @@ This rate represents the \textit{irreducible randomness} of the process after al
 
 \subsection{Convergence of Entropy Rates (Theorem 1)}
 
-For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \inf$. We provide proofs for the properties stated in the guidance, referencing Cover \& Thomas \cite{cover}.
+For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the properties stated in the FTR handout, referencing Cover \& Thomas \cite[Chap 4]{cover}.
 
 \textbf{Statement 1: $H_{n+1}^* \le H_n^*$} (Conditional entropy is non-increasing). \\
 \textit{Proof:}
 \begin{align*}
-    H_{n+1}^* & = H(X_{n+1} | X_n, \dots, X_1)                                               \\
-              & = H(X_{n+1} | X_n, \dots, X_2, X_1)                                          \\
+    H_{n+1}^* & = H(X_{n+1} | X_n, \dots, X_2, X_1)                                          \\
               & \le H(X_{n+1} | X_n, \dots, X_2) \quad \text{(Conditioning reduces entropy)} \\
               & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(By Stationarity)}                \\
               & = H_n^* \quad \square
 \end{align*}
 
 \textbf{Statement 2: $H_{n+1} \le H_n$} (Per-symbol entropy is non-increasing). \\
-\textit{Proof:} By the chain rule, $H(X_1, \dots, X_{n+1}) = H(X_1, \dots, X_n) + H(X_{n+1} | X^n)$.
-Dividing by $n+1$:
+\textit{Proof:} By the chain rule, $H(X_1, \dots, X_{n+1}) = H(X_1, \dots, X_n) + H(X_{n+1} | X_1, \dots, X_n)$. Then
 \begin{equation}
-    H_{n+1} = \frac{n H_n + H_{n+1}^*}{n+1}.
+    H_{n+1} = \frac{H(X_1, \dots, X_{n+1})}{n+1} = \frac{n H_n + H_{n+1}^*}{n+1}
 \end{equation}
-Since $H_{n+1}^* \le H_n^*$ (from Statement 1) and $H_n$ is the average of the first $n$ conditional entropies (see Statement 3 proof), adding a term $H_{n+1}^*$ that is smaller than or equal to the previous average must reduce (or maintain) the new average. Thus $H_{n+1} \le H_n$. $\square$
+Since $H_{n+1}^* \le H_n^*$ (from Statement 1), $H_n^* \le H_n$ (from statement 3), then $H_{n+1}^* \le H_n^* \le H_n$ where $H_n$ is the average of joint entropy across the $n$ terms. Adding a term $H_{n+1}^*$ that is smaller than or equal to the previous average must reduce (or maintain) the new average. Thus $H_{n+1} \le H_n$. $\square$
 
 \textbf{Statement 3: $H_n^* \le H_n$.} \\
 \textit{Proof:} From the Chain Rule for entropy,
@@ -121,16 +118,10 @@ Dividing by $n$:
 Since $H_i^*$ is a non-increasing sequence (Statement 1), the current term $H_n^*$ is less than or equal to all preceding terms $H_i^*$ for $i < n$. Therefore, the average $H_n$ must be greater than or equal to the minimum term $H_n^*$. $\square$
 
 \textbf{Statement 4: $\lim_{n \to \infty} H_n = \lim_{n \to \infty} H_n^* = \Hrate$.} \\
-\textit{Proof:} Since $H_n^*$ is non-increasing (Statement 1) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$, by the \textbf{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit. This limit is defined as the entropy rate $\Hrate$. $\square$
+\textit{Proof:} Since $H_n^*$ is non-increasing (Statement 1) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
 
-\subsection{Experimental Results: The Sparse Data Problem}
 
-We measured $H_n$ and $H_n^*$ for \texttt{hamlet.txt} up to $n=15$ (Fig. \ref{fig:entropy_rate}).
-\begin{itemize}
-    \item For small $n$ ($n=1, 2, 3$), $H_n$ decreases ($4.2 \to 3.7 \to \dots$), confirming the source has memory.
-    \item For large $n$, the estimates plunge towards 0.
-\end{itemize}
-This decay to zero is an artifact of \textbf{undersampling}. The number of possible sequences $|\mathcal{X}|^n$ grows exponentially. With $|\mathcal{X}| \approx 70$ and $N \approx 200,000$ symbols, for $n \ge 4$, the vast majority of observed $n$-tuples occur only once. The Maximum Likelihood Estimator (MLE) for entropy on unique samples is $\log(N)/n$, which vanishes as $n$ grows. This illustrates that empirical measurement of $\Hrate$ is impossible without a model or exponentially more data.
+\subsection{Experimental Results: Entropy Rate Convergence}
 
 \begin{figure}[htbp]
     \centering
@@ -139,11 +130,45 @@ This decay to zero is an artifact of \textbf{undersampling}. The number of possi
     \label{fig:entropy_rate}
 \end{figure}
 
+We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X^n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 \dot 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator operating in a high-dimensional regime with insufficient data (the "curse of dimensionality").
+
+Let $N$ be the total length of the text ($\approx 200000$) and $|\mathcal{X}|$ be the alphabet size ($\approx 70$). The number of possible sequences $|\mathcal{X}|^n$ grows exponentially. When $|\mathcal{X}|^n \gg N$, the vast majority of observed $n$-tuples appear only once.
+In this "sparse" regime, the empirical distribution $\hat{p}(x^n)$ becomes uniform over the $N$ observed unique sequences, with probability $1/N$ for each. The estimated block entropy becomes:
+$$
+    \hat{H}(X^n) = - \sum_{i=1}^N \frac{1}{N} \log_2 \left(\frac{1}{N}\right) = \log_2 N
+$$
+Consequently, the estimated entropy rate per symbol behaves as:
+$$
+    \hat{h}_n = \frac{\hat{H}(X^n)}{n} \approx \frac{\log_2 N}{n}
+$$
+As $n \to \infty$, this term vanishes ($\lim_{n \to \infty} \frac{\text{const}}{n} = 0$). This proves that the observed decay is a bias of the estimator, not a property of the source. Measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
+
+\subsection{Implications for Static Coding}
+
+The failure of the entropy estimator highlights a critical limitation in static source coding (e.g., Static Huffman or Static Arithmetic). To approach the entropy rate of a stationary source, we must exploit context. In a static framework, this implies constructing a code for blocks of length $n$ (or using a conditional probability model of order $n$).
+
+However, for a static code, the encoder must transmit the model (the codebook or frequency table) to the decoder as side information. The size of this model is proportional to the number of possible contexts $|\mathcal{X}|^n$.
+\begin{itemize}
+    \item \textbf{Exploding Overhead:} As we increase $n$ to capture more dependencies, the model overhead grows exponentially ($70^n$), quickly exceeding the size of the data itself.
+    \item \textbf{The Trade-off:} There is an optimal finite $n$ that balances the reduction in coding rate (better compression) against the increase in model overhead. We cannot simply let $n \to \infty$.
+\end{itemize}
+
+\subsection{Practical Techniques for Large $n$: Lempel-Ziv}
+
+The handout asks if there is a technique where $n$ can be made large to approach the entropy rate. The answer is **universal source coding**, specifically **Lempel-Ziv (LZ)** algorithms (e.g., LZ77, LZ78).
+
+Unlike Huffman or Arithmetic coding, LZ does not rely on explicit probability estimates or frequency tables. Instead, it operates by replacing variable-length phrases in the source with pointers to previous occurrences of those phrases.
+\begin{itemize}
+    \item \textbf{Mechanism:} As the algorithm processes more text, it builds a dictionary of longer and longer substrings. A pointer $(d, l)$ representing a match of length $l$ at distance $d$ effectively exploits a context of length $l$.
+    \item \textbf{Asymptotic Optimality:} As the file length $N \to \infty$, the average match length $l$ grows. This allows LZ to implicitly exploit dependencies of arbitrary length ($n$) without the overhead of transmitting an exponential probability table. It is asymptotically optimal for stationary ergodic sources, meaning it approaches $H_\infty$ as $N \to \infty$.
+\end{itemize}
+
+
 \section{Adaptive Coding}
 
 \subsection{Bayesian Derivation of the Laplace Estimator}
 
-In adaptive coding, we face the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding, as the code length $-\log_2(0)$ is infinite. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty.
+In adaptive coding, we face the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty \cite[p. 97]{godsill}.
 
 \subsubsection{The Beta Prior and Posterior}
 Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with \textbf{Bayes' Theorem}:
@@ -153,7 +178,7 @@ Consider a binary version of the problem where we simply estimate the probabilit
 where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit{prior} belief, and $P(D|\theta)$ is the \textit{likelihood} of the data.
 
 \textbf{1. The Prior (Before Data):}
-Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the \textbf{Uniform Distribution}, also known as the $Beta(1,1)$ distribution:
+Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the \textbf{Uniform Distribution}, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
 \begin{equation}
     P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1.
 \end{equation}
@@ -178,7 +203,7 @@ To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most prob
 \begin{equation}
     P(X_{n+1} = x | D) = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta.
 \end{equation}
-Since $P(X_{n+1} = x | \theta) = \theta$ by definition, this integral calculates the \textbf{expected value} (mean) of the posterior Beta distribution. The mean of a $Beta(\alpha, \beta)$ distribution is $\frac{\alpha}{\alpha+\beta}$. Substituting our posterior parameters $\alpha = n_x+1$ and $\beta = n_y+1$:
+Since $P(X_{n+1} = x | \theta) = \theta$ by definition, this integral calculates the \textbf{expected value} (mean) of the posterior Beta distribution. This corresponds to the Minimum Mean-Squared Error (MMSE) estimator in Bayesian theory, which is defined as the expectation of the posterior \cite[p. 129]{godsill}. The mean of a $Beta(\alpha, \beta)$ distribution is $\frac{\alpha}{\alpha+\beta}$ \cite{mackay}. Substituting our posterior parameters $\alpha = n_x+1$ and $\beta = n_y+1$:
 \begin{equation}
     \hat{p}(x) = \mathbb{E}[\theta | D] = \frac{n_x + 1}{(n_x + 1) + (n_y + 1)} = \frac{n_x + 1}{n + 2}.
 \end{equation}
@@ -186,16 +211,17 @@ Since $P(X_{n+1} = x | \theta) = \theta$ by definition, this integral calculates
 This result is the famous \textbf{Laplace's Rule of Succession}. It provides a rigorous justification for "add-one smoothing": we are not arbitrarily adding 1, but rather including the "pseudocounts" from our uniform prior.
 
 \subsubsection{Generalization to Text (Dirichlet Distribution)}
-For an alphabet of size $K$ (e.g., $K=256$ for ASCII), the Beta distribution generalizes to the \textbf{Dirichlet distribution}. The uniform prior corresponds to a Dirichlet distribution with parameter vector $\boldsymbol{\alpha} = (1, 1, \dots, 1)$. The predictive probability for any symbol $x$ becomes:
+For an alphabet of size $K$ (e.g., $K=256$ for ASCII), the Beta distribution generalizes to the \textbf{Dirichlet distribution} \cite[Ch 3]{mackay}. The uniform prior corresponds to a Dirichlet distribution with parameter vector $\boldsymbol{\alpha} = (1, 1, \dots, 1)$. The predictive probability for any symbol $x$ becomes:
 \begin{equation}
     \hat{p}(x) = \frac{n_x + 1}{\sum_{i=1}^K (n_i + 1)} = \frac{n_x + 1}{n + K}.
 \end{equation}
 This is the estimator we implemented in the laboratory. It ensures that every symbol always has a non-zero probability of at least $1/(n+K)$, preventing the infinite code length problem while converging to the true frequency $n_x/n$ as $n \to \infty$.
+
 \subsection{Experimental Performance}
 
 We implemented an adaptive arithmetic coder using this estimator.
 
-\textbf{Convergence:} Fig. \ref{fig:convergence} shows the running average code length $L/n$ converging to the static entropy $H_1$. The "learning penalty" (excess code length) decreases as $O(1/n)$, consistent with universal coding theory.
+\textbf{Convergence:} Fig. \ref{fig:convergence} shows the running average code length $L/n$ converging to the static entropy $H_1$. The "learning penalty" (excess code length) decreases as $O(1/n)$, consistent with universal coding theory \cite[Sec 13.2]{cover}.
 
 \textbf{Bias Parameter $\delta$:} We varied $\delta$ (Fig. \ref{fig:delta}) and found the optimal range $\delta \in [0.5, 1.0]$.
 \begin{itemize}
@@ -241,6 +267,9 @@ This report demonstrated that while English text is a stationary source with mem
 
     \bibitem{mackay}
     D. J. C. MacKay, \textit{Information Theory, Inference, and Learning Algorithms}. Cambridge University Press, 2003.
+
+    \bibitem{godsill}
+    S. Godsill, \textit{Estimation Theory and Inference Methods}, Lecture Notes (3F3), University of Cambridge, 2023
 
 \end{thebibliography}
 
