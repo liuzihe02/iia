@@ -7,6 +7,7 @@
 \usepackage{mathpazo} % Palatino font
 \usepackage{microtype}
 \usepackage{url}
+\usepackage{parskip} %removes indentation and spacing between paras
 
 % Custom macros for notation
 \newcommand{\E}{\mathbb{E}}
@@ -30,7 +31,7 @@
 
 \title{3F7 Information Theory and Coding \\ \textit{Full Technical Report}}
 \author{Liu Zihe \\ zl559}
-\date{University of Cambridge --- \today}
+\date{University of Cambridge \\ December 6 2025}
 
 \begin{document}
 
@@ -38,29 +39,49 @@
 
 \section{Introduction}
 
-Information theory provides the mathematical framework for quantifying information and establishing fundamental limits on data compression. A central pillar of this field is Shannon's Source Coding Theorem, which establishes the entropy $H(X)$ as the lower bound for the average code length of an independent and identically distributed (i.i.d.) source. While i.i.d. models are useful first approximations, real-world data sources---such as natural language---exhibit strong temporal dependencies (memory) and non-uniform distributions.
+Information theory provides the mathematical framework for quantifying information and establishing fundamental limits on data compression. Shannon's Source Coding Theorem establishes the entropy $H(X)$ as the lower bound for the average code length of an independent and identically distributed (i.i.d.) source. While i.i.d. models are useful first approximations, real-world data sources---such as natural language---exhibit strong temporal dependencies (memory) and non-uniform distributions.
 
-This report extends the investigation of the 3F7 short laboratory in two specific directions. First, we analyse \textbf{discrete stationary sources}, relaxing the i.i.d. assumption to model sources with memory. We investigate the \textit{entropy rate} $\Hrate$ and the convergence properties of block entropies. Second, we explore \textbf{adaptive coding}, where the probability model is learned ``on the fly.'' We derive the Laplace estimator from Bayesian principles and evaluate the performance of adaptive arithmetic coding against static methods.
+This report extends the investigation of the 3F7 short laboratory in two directions. First, we analyse \textbf{discrete stationary sources}, relaxing the i.i.d. assumption to model sources with memory. We investigate the \textit{entropy rate} $\Hrate$ of a stochastic process and the convergence properties of block entropies. Second, we explore \textbf{adaptive coding}, where the probability model is learned online instead of 2 separate phases (building the probability model from the complete text and encoding). We derive the Laplace estimator from Bayesian principles and evaluate the performance of adaptive arithmetic coding against static methods.
 
 \section{Overview of Short Lab}
 
-The short laboratory focused on compressing \texttt{hamlet.txt} (approx. 207kB) using three classical techniques designed for i.i.d. sources.
+The short laboratory focused on compressing \texttt{hamlet.txt} (approx. 207kB using fixed-length ASCII encoding) using three classical techniques designed for i.i.d. sources.
 
-\textbf{Shannon-Fano Coding} constructs prefix-free codes by assigning lengths $l_i = \lceil \log_2(1/p_i) \rceil$. While it guarantees unique decodability via the Kraft inequality $\sum 2^{-l_i} \le 1$, it is suboptimal because it ignores the combinatorial nature of packing the code tree.
+\textbf{Shannon-Fano Coding} constructs prefix-free codes by assigning lengths $l_i = \lceil \log_2(1/p_i) \rceil$. While it guarantees unique decodability (via the Kraft inequality $\sum 2^{-l_i} \le 1$), it is suboptimal because it ignores the combinatorial nature of packing the prefix-free code tree (codewords can still be placed at shorter leaf nodes, hence optimizing our encoding)
 
-\textbf{Huffman Coding} is the optimal symbol-by-symbol prefix code. It builds a binary tree bottom-up by iteratively merging the two least probable symbols. Our experiments confirmed that its expected length $L$ satisfies $H(X) \le L < H(X) + 1$. However, its performance is bounded by the requirement that each symbol must use an integer number of bits.
+\textbf{Huffman Coding} is the optimal symbol-by-symbol prefix code. It builds a binary tree bottom-up by iteratively merging the two least probable symbols. Our experiments confirmed that its expected length $L$ satisfies $H(X) \le L < H(X) + 1$. However, its performance is constrained by the requirement that each symbol must use an integer number of bits.
 
-\textbf{Arithmetic Coding} overcomes the integer constraint by encoding entire sequences as sub-intervals of $[0, 1)$. By mapping a sequence $x^n$ to an interval of width $P(x^n)$, it achieves a code length $L \approx -\log_2 P(x^n)$ bits. For large $n$, the per-symbol length converges to the entropy $H(X)$. This method proved superior for longer blocks but required accurate probability models. The limitation of all three methods in the short lab was the assumption that text is a memoryless source, ignoring the significant redundancy in English grammar and spelling.
+\textbf{Arithmetic Coding} overcomes the integer constraint by encoding entire sequences as sub-intervals of $[0, 1)$. By mapping a sequence $x^n$ to an interval of width $P(x^n)$, it achieves a code length $L \approx -\log_2 P(x^n)$ bits. For large $n$, the per-symbol length converges to the entropy $H(X)$. This method proved superior for longer blocks but required accurate probability models.
+
+The limitation of all three methods in the short lab was the assumption that text is a memoryless source, ignoring the significant redundancy in English grammar and spelling.
 
 \section{Coding for Discrete Stationary Sources}
 
+
 \subsection{Theoretical Background}
 
-A discrete stochastic process $\mathcal{X} = \{X_i\}_{i=1}^\infty$ is \textbf{strictly stationary} if the joint distribution of any subsequence is invariant to time shifts. That is, for any shift $\tau$ and block length $n$:
+We model natural language text as a sequence of random variables, specifically a \textit{discrete stochastic process}, $\mathcal{X} = \{X_i\}_{i=1}^\infty$. We distinguish between two primary classes of sources:
+
+\textbf{Memoryless Sources (i.i.d.):}
+The simplest model assumes that successive symbols are i.i.d. A source is \textit{memoryless} if the joint probability of a sequence factorizes completely into the product of its components:
+\begin{equation}
+    \Prob(X_1, \dots, X_n) = \prod_{i=1}^n \Prob(X_i).
+\end{equation}
+For such a source, the information content is additive, and the entropy of a block is simply $H(X^n) = n H(X)$. The optimal code length per symbol is thus fixed at the marginal entropy $H(X)$. The fixed-length ASCII and standard Huffman coding (without blocking) implicitly assume this model.
+
+\textbf{Stationary Sources (Sources with Memory):}
+Natural languages like English are not memoryless; the letter 'h' is much more likely to follow 't' than 'q'. To capture this, we relax the independence assumption while retaining time-invariance. A process is \textit{strictly stationary} if the joint distribution of any subsequence is invariant to time shifts. That is, for any shift $\tau$ and block length $n$:
 \begin{equation}
     \Prob(X_1 = x_1, \dots, X_n = x_n) = \Prob(X_{1+\tau} = x_1, \dots, X_{n+\tau} = x_n).
 \end{equation}
-Stationarity implies that marginal probabilities are constant ($H(X_i) = H(X_1)$) and conditional probabilities depend only on the relative history. We define two entropy sequences to characterize such sources:
+Stationarity implies that marginal probabilities are constant $H(X_i) = H(X_1)$ and conditional probabilities depend only on the relative history, not the absolute time.
+
+\textbf{Entropy Rate:}
+For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$, defined as the asymptotic per-symbol entropy:
+\begin{equation}
+    \Hrate = \lim_{n \to \infty} \frac{1}{n} H(X_1, \dots, X_n).
+\end{equation}
+This rate represents the \textit{irreducible randomness} of the process after all past history is accounted for. To estimate $\Hrate$, we define two sequences of block entropies:
 \begin{align}
     H_n   & = \frac{1}{n} H(X_1, \dots, X_n) \quad \text{(Entropy per symbol of $n$-block)} \\
     H_n^* & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(Conditional entropy)}
@@ -68,7 +89,7 @@ Stationarity implies that marginal probabilities are constant ($H(X_i) = H(X_1)$
 
 \subsection{Convergence of Entropy Rates (Theorem 1)}
 
-For stationary sources, these sequences converge to the \textit{entropy rate} $\Hrate$. We provide proofs for the properties stated in the guidance, referencing Cover \& Thomas.
+For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \inf$. We provide proofs for the properties stated in the guidance, referencing Cover \& Thomas \cite{cover}.
 
 \textbf{Statement 1: $H_{n+1}^* \le H_n^*$} (Conditional entropy is non-increasing). \\
 \textit{Proof:}
@@ -122,26 +143,54 @@ This decay to zero is an artifact of \textbf{undersampling}. The number of possi
 
 \subsection{Bayesian Derivation of the Laplace Estimator}
 
-Standard coding assumes a fixed distribution $P(x)$. In adaptive coding, we estimate $P(x)$ sequentially. Consider a binary source where the probability of a symbol being '1' is $\theta$. We model our uncertainty about $\theta$ with a \textbf{Beta prior} $Beta(\alpha, \beta)$, which acts as a "conjugate prior" for the Bernoulli distribution.
+In adaptive coding, we face the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding, as the code length $-\log_2(0)$ is infinite. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty.
 
-The prior probability density function is:
+\subsubsection{The Beta Prior and Posterior}
+Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with \textbf{Bayes' Theorem}:
 \begin{equation}
-    P(\theta) \propto \theta^{\alpha-1} (1-\theta)^{\beta-1}
+    P(\theta | D) = \frac{P(D | \theta) P(\theta)}{P(D)}
 \end{equation}
-Starting with a uniform prior $Beta(1, 1)$ (representing total ignorance, $\alpha=\beta=1$), and observing data $D$ consisting of $n_0$ zeros and $n_1$ ones, the posterior distribution is:
-\begin{equation}
-    P(\theta | D) \propto \theta^{n_1 + \alpha - 1} (1-\theta)^{n_0 + \beta - 1} = \theta^{n_1} (1-\theta)^{n_0}
-\end{equation}
-which is a $Beta(n_1+1, n_0+1)$ distribution. The predictive probability for the next symbol being '1' is the expected value of $\theta$ under this posterior:
-\begin{equation}
-    \hat{\theta} = \E[\theta | D] = \int_0^1 \theta P(\theta|D) d\theta = \frac{n_1 + 1}{(n_1+1) + (n_0+1)} = \frac{n_1+1}{n+2}.
-\end{equation}
-This is the \textbf{Laplace Estimator}, also known as the "Rule of Succession". Generalizing to an alphabet of size $K$ with counts $n_x$ for each symbol $x$, this becomes the Dirichlet-Multinomial estimator:
-\begin{equation}
-    \hat{p}(x) = \frac{n_x + \delta}{n + K\delta}
-\end{equation}
-where $\delta$ is the bias parameter. $\delta=1$ corresponds to the uniform prior.
+where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit{prior} belief, and $P(D|\theta)$ is the \textit{likelihood} of the data.
 
+\textbf{1. The Prior (Before Data):}
+Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the \textbf{Uniform Distribution}, also known as the $Beta(1,1)$ distribution:
+\begin{equation}
+    P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1.
+\end{equation}
+
+This implies that before we start reading, we consider every possible value for the probability of 'x' to be equally likely.
+
+\textbf{2. The Likelihood (The Data):}
+Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence given $\theta$, the probability of seeing this specific sequence is:
+\begin{equation}
+    P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
+\end{equation}
+
+\textbf{3. The Posterior (Updated Belief):}
+Multiplying the prior and likelihood gives us the posterior distribution (proportionality ignores the normalizing constant $P(D)$):
+\begin{equation}
+    P(\theta | D) \propto \theta^{n_x} (1-\theta)^{n_y} \cdot 1.
+\end{equation}
+This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
+
+\subsubsection{The Rule of Succession (Prediction)}
+To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability. This process is called \textbf{marginalization}:
+\begin{equation}
+    P(X_{n+1} = x | D) = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta.
+\end{equation}
+Since $P(X_{n+1} = x | \theta) = \theta$ by definition, this integral calculates the \textbf{expected value} (mean) of the posterior Beta distribution. The mean of a $Beta(\alpha, \beta)$ distribution is $\frac{\alpha}{\alpha+\beta}$. Substituting our posterior parameters $\alpha = n_x+1$ and $\beta = n_y+1$:
+\begin{equation}
+    \hat{p}(x) = \mathbb{E}[\theta | D] = \frac{n_x + 1}{(n_x + 1) + (n_y + 1)} = \frac{n_x + 1}{n + 2}.
+\end{equation}
+
+This result is the famous \textbf{Laplace's Rule of Succession}. It provides a rigorous justification for "add-one smoothing": we are not arbitrarily adding 1, but rather including the "pseudocounts" from our uniform prior.
+
+\subsubsection{Generalization to Text (Dirichlet Distribution)}
+For an alphabet of size $K$ (e.g., $K=256$ for ASCII), the Beta distribution generalizes to the \textbf{Dirichlet distribution}. The uniform prior corresponds to a Dirichlet distribution with parameter vector $\boldsymbol{\alpha} = (1, 1, \dots, 1)$. The predictive probability for any symbol $x$ becomes:
+\begin{equation}
+    \hat{p}(x) = \frac{n_x + 1}{\sum_{i=1}^K (n_i + 1)} = \frac{n_x + 1}{n + K}.
+\end{equation}
+This is the estimator we implemented in the laboratory. It ensures that every symbol always has a non-zero probability of at least $1/(n+K)$, preventing the infinite code length problem while converging to the true frequency $n_x/n$ as $n \to \infty$.
 \subsection{Experimental Performance}
 
 We implemented an adaptive arithmetic coder using this estimator.
