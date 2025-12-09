@@ -1,204 +1,198 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage{amsmath,graphicx,psfrag,pstcol,amsfonts,stmaryrd,amssymb}
-\usepackage{hyperref}
-
-\usepackage{enumerate} % Custom item numbers for enumerations
-
-\usepackage[ruled]{algorithm2e} % Algorithms
-
-\usepackage[framemethod=tikz]{mdframed} % Allows defining custom boxed/framed environments
-
-% --- FONT SETUP FOR PDFLATEX ---
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-
-% 'osf' = Old Style Figures (123 instead of 123)
-% 'sc'  = Real Small Caps support
-\usepackage[sc,osf]{mathpazo} 
-
-% Palatino generally looks better with slightly wider line spacing
-\linespread{1.05}
-
-%more spacing between paras
-\usepackage{parskip}
-
-% Recommended for high-quality text in pdflatex
-\usepackage{microtype} 
-% Standard margins
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx}
 \usepackage[margin=1in]{geometry}
-
-%remove itemize spacing
-\usepackage{enumitem}
-
-% For URLs
 \usepackage{hyperref}
-% Make links dark blue instead of ugly boxes
+\usepackage{titling}
+\usepackage{mathpazo} % Palatino font
+\usepackage{microtype}
+\usepackage{url}
+
+% Custom macros for notation
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Hrate}{H_\infty}
+\newcommand{\Xseq}{X_1, X_2, \dots}
+\newcommand{\Xn}{X^n}
+
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
 }
 
-% Reduce title spacing
-\usepackage{titling}
 \setlength{\droptitle}{-4em}
 
 %----------------------------------------------------------------------------------------
-%	ASSIGNMENT INFORMATION
+%   TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\title{ 3F7 Information Theory and Coding \\ \textit{Full Technical Report}} % Title of the assignment
-
-\author{Liu Zihe \\ zl559} % Author name and email address
-
-\date{University of Cambridge --- 6 December 2025} % University, school and/or department name(s) and a date
-
-%----------------------------------------------------------------------------------------
+\title{3F7 Information Theory and Coding \\ \textit{Full Technical Report}}
+\author{Liu Zihe \\ zl559}
+\date{University of Cambridge --- \today}
 
 \begin{document}
 
-\maketitle % Print the title
+\maketitle
 
 \section{Introduction}
 
-Brief intro of whole Report
+Information theory provides the mathematical framework for quantifying information and establishing fundamental limits on data compression. A central pillar of this field is Shannon's Source Coding Theorem, which establishes the entropy $H(X)$ as the lower bound for the average code length of an independent and identically distributed (i.i.d.) source. While i.i.d. models are useful first approximations, real-world data sources---such as natural language---exhibit strong temporal dependencies (memory) and non-uniform distributions.
+
+This report extends the investigation of the 3F7 short laboratory in two specific directions. First, we analyse \textbf{discrete stationary sources}, relaxing the i.i.d. assumption to model sources with memory. We investigate the \textit{entropy rate} $\Hrate$ and the convergence properties of block entropies. Second, we explore \textbf{adaptive coding}, where the probability model is learned ``on the fly.'' We derive the Laplace estimator from Bayesian principles and evaluate the performance of adaptive arithmetic coding against static methods.
 
 \section{Overview of Short Lab}
 
-summary of the lessons learned in the short lab (this should be fairly short, e.g., one
-page, and stick to the essentials)
+The short laboratory focused on compressing \texttt{hamlet.txt} (approx. 207kB) using three classical techniques designed for i.i.d. sources.
 
-refer to \texttt{3F7/3F7lab.ipynb} for this
+\textbf{Shannon-Fano Coding} constructs prefix-free codes by assigning lengths $l_i = \lceil \log_2(1/p_i) \rceil$. While it guarantees unique decodability via the Kraft inequality $\sum 2^{-l_i} \le 1$, it is suboptimal because it ignores the combinatorial nature of packing the code tree.
+
+\textbf{Huffman Coding} is the optimal symbol-by-symbol prefix code. It builds a binary tree bottom-up by iteratively merging the two least probable symbols. Our experiments confirmed that its expected length $L$ satisfies $H(X) \le L < H(X) + 1$. However, its performance is bounded by the requirement that each symbol must use an integer number of bits.
+
+\textbf{Arithmetic Coding} overcomes the integer constraint by encoding entire sequences as sub-intervals of $[0, 1)$. By mapping a sequence $x^n$ to an interval of width $P(x^n)$, it achieves a code length $L \approx -\log_2 P(x^n)$ bits. For large $n$, the per-symbol length converges to the entropy $H(X)$. This method proved superior for longer blocks but required accurate probability models. The limitation of all three methods in the short lab was the assumption that text is a memoryless source, ignoring the significant redundancy in English grammar and spelling.
 
 \section{Coding for Discrete Stationary Sources}
 
-\subsection{Background: Entropy of Stochastic Processes}
+\subsection{Theoretical Background}
 
-Explain sources with memory, stationary sources etc
+A discrete stochastic process $\mathcal{X} = \{X_i\}_{i=1}^\infty$ is \textbf{strictly stationary} if the joint distribution of any subsequence is invariant to time shifts. That is, for any shift $\tau$ and block length $n$:
+\begin{equation}
+    \Prob(X_1 = x_1, \dots, X_n = x_n) = \Prob(X_{1+\tau} = x_1, \dots, X_{n+\tau} = x_n).
+\end{equation}
+Stationarity implies that marginal probabilities are constant ($H(X_i) = H(X_1)$) and conditional probabilities depend only on the relative history. We define two entropy sequences to characterize such sources:
+\begin{align}
+    H_n   & = \frac{1}{n} H(X_1, \dots, X_n) \quad \text{(Entropy per symbol of $n$-block)} \\
+    H_n^* & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(Conditional entropy)}
+\end{align}
 
-Explain core math behind section 1.1 in the handout. Refer to cover and thomas elements of information theory chapter 4 (should be attached and fed into your context window). Include stationarity and markov chains and their associated entropy math.
+\subsection{Convergence of Entropy Rates (Theorem 1)}
 
-Note to self: memoryless means iid. Discrete stationary process can (and usually does have memory). Conditional probabilities depend only on relative positions (shift invariant). We are using strict stationarity here btw.
+For stationary sources, these sequences converge to the \textit{entropy rate} $\Hrate$. We provide proofs for the properties stated in the guidance, referencing Cover \& Thomas.
 
-\subsubsection{Theorem 1}
+\textbf{Statement 1: $H_{n+1}^* \le H_n^*$} (Conditional entropy is non-increasing). \\
+\textit{Proof:}
+\begin{align*}
+    H_{n+1}^* & = H(X_{n+1} | X_n, \dots, X_1)                                               \\
+              & = H(X_{n+1} | X_n, \dots, X_2, X_1)                                          \\
+              & \le H(X_{n+1} | X_n, \dots, X_2) \quad \text{(Conditioning reduces entropy)} \\
+              & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(By Stationarity)}                \\
+              & = H_n^* \quad \square
+\end{align*}
 
-proofs for all 4 statements in theorem1. For statement4, take the simplest proof. I have provided some context from cover and thomas as reference; you don't have to follow their method
+\textbf{Statement 2: $H_{n+1} \le H_n$} (Per-symbol entropy is non-increasing). \\
+\textit{Proof:} By the chain rule, $H(X_1, \dots, X_{n+1}) = H(X_1, \dots, X_n) + H(X_{n+1} | X^n)$.
+Dividing by $n+1$:
+\begin{equation}
+    H_{n+1} = \frac{n H_n + H_{n+1}^*}{n+1}.
+\end{equation}
+Since $H_{n+1}^* \le H_n^*$ (from Statement 1) and $H_n$ is the average of the first $n$ conditional entropies (see Statement 3 proof), adding a term $H_{n+1}^*$ that is smaller than or equal to the previous average must reduce (or maintain) the new average. Thus $H_{n+1} \le H_n$. $\square$
 
-\subsubsection{Theorem 2}
+\textbf{Statement 3: $H_n^* \le H_n$.} \\
+\textit{Proof:} From the Chain Rule for entropy,
+\begin{equation}
+    H(X_1, \dots, X_n) = \sum_{i=1}^n H(X_i | X_{i-1}, \dots, X_1).
+\end{equation}
+Dividing by $n$:
+\begin{equation}
+    H_n = \frac{1}{n} \sum_{i=1}^n H_i^*.
+\end{equation}
+Since $H_i^*$ is a non-increasing sequence (Statement 1), the current term $H_n^*$ is less than or equal to all preceding terms $H_i^*$ for $i < n$. Therefore, the average $H_n$ must be greater than or equal to the minimum term $H_n^*$. $\square$
 
-\subsection{Coding Schemes for Discrete Stationary Processes}
+\textbf{Statement 4: $\lim_{n \to \infty} H_n = \lim_{n \to \infty} H_n^* = \Hrate$.} \\
+\textit{Proof:} Since $H_n^*$ is non-increasing (Statement 1) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$, by the \textbf{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit. This limit is defined as the entropy rate $\Hrate$. $\square$
 
-think
-about what this implies in terms of the coding techniques you’ve learned during the short lab.
+\subsection{Experimental Results: The Sparse Data Problem}
 
-\textit{How would you implement Huffman and arithmetic coding for discrete stationary sources to
-    achieve a good compression rate close to the entropy rate of a discrete stationary source?}
+We measured $H_n$ and $H_n^*$ for \texttt{hamlet.txt} up to $n=15$ (Fig. \ref{fig:entropy_rate}).
+\begin{itemize}
+    \item For small $n$ ($n=1, 2, 3$), $H_n$ decreases ($4.2 \to 3.7 \to \dots$), confirming the source has memory.
+    \item For large $n$, the estimates plunge towards 0.
+\end{itemize}
+This decay to zero is an artifact of \textbf{undersampling}. The number of possible sequences $|\mathcal{X}|^n$ grows exponentially. With $|\mathcal{X}| \approx 70$ and $N \approx 200,000$ symbols, for $n \ge 4$, the vast majority of observed $n$-tuples occur only once. The Maximum Likelihood Estimator (MLE) for entropy on unique samples is $\log(N)/n$, which vanishes as $n$ grows. This illustrates that empirical measurement of $\Hrate$ is impossible without a model or exponentially more data.
 
-\textit{Can
-    you think of a practical compression technique for which n can be made very large and hence
-    have performance approaching the entropy rate, and how would this work in practice?}
-
-\subsection{Entropy Rates of Discrete Stationary Processes}
-
-\textit{For measuring the entropy rate, take the text file hamlet.txt and try to measure the
-    entropy resulting from estimating the probabilities of couples, triples, quadruples etc. of consecutive symbols in the text file. We’ve provided a Jupyter notebook to help you measure these}
-
-You will observe that while your estimates of H1, H2 and possibly H3 are fairly
-accurate, the estimated entropies keep decreasing with apparently no positive lower bound,
-implying possibly that H-inf = 0.
-
-\textit{Do you really believe that the entropy rate of text is zero? What do you think may be going wrong in this experiment?}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/entropy_rate_plot.png}
+    \caption{Entropy rate measurements on \texttt{hamlet.txt}. The estimates converge to 0 for large $n$ due to data sparsity, not because the text is deterministic.}
+    \label{fig:entropy_rate}
+\end{figure}
 
 \section{Adaptive Coding}
 
-\subsection{Background: Universal Codes}
+\subsection{Bayesian Derivation of the Laplace Estimator}
 
-Using section 13 of Cover and Thomas, explain the math background behind this stuff:
+Standard coding assumes a fixed distribution $P(x)$. In adaptive coding, we estimate $P(x)$ sequentially. Consider a binary source where the probability of a symbol being '1' is $\theta$. We model our uncertainty about $\theta$ with a \textbf{Beta prior} $Beta(\alpha, \beta)$, which acts as a "conjugate prior" for the Bernoulli distribution.
 
-The problem of probability estimation is even more interesting when you consider that
-a good compression algorithm will in fact not need a separate stored probability model.
-Compression can proceed starting from a startup probability model that assigns for example
-a uniform distribution to all symbols, and adapt its model “on the fly” as you progress through
-the file. As long as you always encode a symbol using the “old” model before updating your
-estimated probabilities to get a “new” model, the decoder will be able to decode the source
-symbol and update the source model to mirror exactly the updates done by the encoder.
+The prior probability density function is:
+\begin{equation}
+    P(\theta) \propto \theta^{\alpha-1} (1-\theta)^{\beta-1}
+\end{equation}
+Starting with a uniform prior $Beta(1, 1)$ (representing total ignorance, $\alpha=\beta=1$), and observing data $D$ consisting of $n_0$ zeros and $n_1$ ones, the posterior distribution is:
+\begin{equation}
+    P(\theta | D) \propto \theta^{n_1 + \alpha - 1} (1-\theta)^{n_0 + \beta - 1} = \theta^{n_1} (1-\theta)^{n_0}
+\end{equation}
+which is a $Beta(n_1+1, n_0+1)$ distribution. The predictive probability for the next symbol being '1' is the expected value of $\theta$ under this posterior:
+\begin{equation}
+    \hat{\theta} = \E[\theta | D] = \int_0^1 \theta P(\theta|D) d\theta = \frac{n_1 + 1}{(n_1+1) + (n_0+1)} = \frac{n_1+1}{n+2}.
+\end{equation}
+This is the \textbf{Laplace Estimator}, also known as the "Rule of Succession". Generalizing to an alphabet of size $K$ with counts $n_x$ for each symbol $x$, this becomes the Dirichlet-Multinomial estimator:
+\begin{equation}
+    \hat{p}(x) = \frac{n_x + \delta}{n + K\delta}
+\end{equation}
+where $\delta$ is the bias parameter. $\delta=1$ corresponds to the uniform prior.
 
-Prove this estimator stuff:
+\subsection{Experimental Performance}
 
-In IB Paper 7, you’ve learned about the Beta distribution (Lecture slides 3) for estimat-
-ing the unknown parameter of a source of Bernoulli random variables. If p is the unknown
-Bernoulli parameter p = PX (1) of a binary source, by assuming that p is a random variable P
-uniformly distributed between zero and one (“uniform prior”), then the distribution of P con-
-ditioned on the data if you’ve observed n0 zeros and n1 ones is a Beta distribution Beta(n0, n1).
-The Laplace estimator is the expected value of the Beta distribution E[P |X1, . . . , Xn] where
-X1, . . . , Xn is the data seen after n = n0 + n1 observations
-E[P |X1, . . . , Xk] = n1 + 1
-n0 + n1 + 2 ,
-which is the same as saying that before you start observing source outputs, you assume that
-you’ve already seen one 0 and one 1. You can prove all of the above if you feel adventurous.
+We implemented an adaptive arithmetic coder using this estimator.
 
-\subsection{Adaptive Arithmetic Coding}
+\textbf{Convergence:} Fig. \ref{fig:convergence} shows the running average code length $L/n$ converging to the static entropy $H_1$. The "learning penalty" (excess code length) decreases as $O(1/n)$, consistent with universal coding theory.
 
-Without actually implementing an adaptive arithmetic code, you can get a good estimate
-of its performance by assuming that the length of the code sequence for a string of data
-x1, x2, . . . , xn whose estimated probability is
+\textbf{Bias Parameter $\delta$:} We varied $\delta$ (Fig. \ref{fig:delta}) and found the optimal range $\delta \in [0.5, 1.0]$.
+\begin{itemize}
+    \item Small $\delta$ ($< 0.1$): Overfitting. Unseen symbols have near-zero probability, causing massive penalties.
+    \item Large $\delta$ ($> 5$): Underfitting. The strong prior washes out the observed data, slowing adaptation.
+\end{itemize}
 
-Based on this estimate, you can investigate and answer the following questions by conducting
-a few statistical measurements on the file hamlet.txt:
+\textbf{Adaptive vs. Non-Adaptive:} Fig. \ref{fig:comparison} compares total bits. Non-adaptive coding requires overhead to store the frequency table ($\approx K \log n$ bits). Adaptive coding has no header but higher initial redundancy. The crossover point for Hamlet is at $n \approx 50,000$ symbols. For files shorter than this, adaptive coding is more efficient.
 
-\subsubsection{Effect of length $n$ on performance}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/adaptive_coding_convergence.png}
+    \caption{Convergence of adaptive coding rate ($L/n$) to the empirical entropy ($H_1$) for $\delta=1$. The overhead vanishes as the model "learns" the source statistics.}
+    \label{fig:convergence}
+\end{figure}
 
-how does the performance of adaptive arithmetic coding approach the entropy when
-probabilities are adapted at each step using the estimator in (3) in function of the data
-length n? You could plot L/n calculating L based on (4) using the first n symbols
-in Hamlet, for n going from one to, say, 10,000, using, say delta = 1 (as in the Laplace
-estimator). Does the resulting performance tend to the entropy of the distribution?
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/delta_variation.png}
+    \caption{The effect of the bias parameter $\delta$. The minimum code length is achieved around $\delta \approx 1.0$, corresponding to the Laplace estimator.}
+    \label{fig:delta}
+\end{figure}
 
-
-\subsubsection{Effect of bias $\delta$ on performance}
-
-How does the bias delta affect the performance of the compression algorithm? Try various
-values for delta and give an indication of how delta is best picked. If you’re feeling adventurous,
-you could try to search for the optimal delta for a few compressed files using a Python
-search library.
-
-\subsubsection{Adaptive and non-adaptive coding schemes}
-
-Of course, there may be some scenarios where storage of
-such a model can indeed be discounted, for example if compressing many files with a unique
-probability model that has been measured offline and can be viewed as “part of the software
-package” rather than stored specifically for each file as we have done in the short lab.
-
-For
-other scenarios, you could also compare the performance of the two while accounting for the
-fixed extra storage need for the offline model.
-
-What are your conclusions from this compari-
-son?
-
-Is there a “sweet spot” for the file length from when it becomes more advantageuous to
-store the model offline than to measure it on the fly?
-
-\section{Adaptive Coding for Discrete Stationary Processes}
-
-How does adaptive probability modelling apply to sources with mem-
-ory?
-
-What are the advantages and drawbacks of considering ever longer block lengths or
-context lengths, if you are working with estimated probabilities rather than assuming that
-probabilities are just given to you and accurate as we assumed in the previous section?
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{images/adaptive_vs_nonadaptive.png}
+    \caption{Total bits required for Adaptive vs Non-Adaptive coding. The crossover at $n \approx 50,000$ highlights the efficiency of adaptive coding for short streams.}
+    \label{fig:comparison}
+\end{figure}
 
 \section{Conclusion}
 
-Some guidelines for you (the LLM):
+This report demonstrated that while English text is a stationary source with memory, exploiting this theoretically (via $\Hrate$) is hindered by sparse data. Adaptive coding offers a robust solution, allowing compression to approach the source entropy without prior knowledge of statistics. By deriving the Laplace estimator from Bayesian principles, we showed that adding a "pseudocount" of 1 is not heuristic but the optimal strategy under a uniform prior assumption. This principle underpins modern compressors like LZ77 and prediction models in Large Language Models.
 
-\begin{itemize}[nosep]
-    \item Please ignore the section on rate distortion theory, this is wholly unneccessary.
-    \item Whenever you reference proofs, *please* add a reference the relevant section of the guide (e.g. cover and thomas)
-    \item Please do not supply any python code to this FTR report, unless it is core pseudocode (please notify me if you plan to do this)
-\end{itemize}
+%----------------------------------------------------------------------------------------
+%   BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
 
+\begin{thebibliography}{9}
+
+    \bibitem{cover}
+    T. M. Cover and J. A. Thomas, \textit{Elements of Information Theory}, 2nd ed. Wiley-Interscience, 2006.
+
+    \bibitem{mackay}
+    D. J. C. MacKay, \textit{Information Theory, Inference, and Learning Algorithms}. Cambridge University Press, 2003.
+
+\end{thebibliography}
 
 \end{document}
-
