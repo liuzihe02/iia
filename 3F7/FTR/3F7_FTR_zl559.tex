@@ -130,39 +130,17 @@ Since $H_i^*$ is a non-increasing sequence (Statement 1), the current term $H_n^
     \label{fig:entropy_rate}
 \end{figure}
 
-We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X^n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 \dot 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator operating in a high-dimensional regime with insufficient data (the "curse of dimensionality").
-
-Let $N$ be the total length of the text ($\approx 200000$) and $|\mathcal{X}|$ be the alphabet size ($\approx 70$). The number of possible sequences $|\mathcal{X}|^n$ grows exponentially. When $|\mathcal{X}|^n \gg N$, the vast majority of observed $n$-tuples appear only once.
-In this "sparse" regime, the empirical distribution $\hat{p}(x^n)$ becomes uniform over the $N$ observed unique sequences, with probability $1/N$ for each. The estimated block entropy becomes:
-$$
-    \hat{H}(X^n) = - \sum_{i=1}^N \frac{1}{N} \log_2 \left(\frac{1}{N}\right) = \log_2 N
-$$
-Consequently, the estimated entropy rate per symbol behaves as:
-$$
-    \hat{h}_n = \frac{\hat{H}(X^n)}{n} \approx \frac{\log_2 N}{n}
-$$
-As $n \to \infty$, this term vanishes ($\lim_{n \to \infty} \frac{\text{const}}{n} = 0$). This proves that the observed decay is a bias of the estimator, not a property of the source. Measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
+We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 \dot 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator (of the entropy rate) operating in a high-dimensional regime with insufficient data (the "curse of dimensionality"). Accurate measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
 
 \subsection{Implications for Static Coding}
 
-The failure of the entropy estimator highlights a critical limitation in static source coding (e.g., Static Huffman or Static Arithmetic). To approach the entropy rate of a stationary source, we must exploit context. In a static framework, this implies constructing a code for blocks of length $n$ (or using a conditional probability model of order $n$).
+The convergence failure observed in highlights a critical limitation for static source coding. To approach the entropy rate of a stationary source, the encoder must exploit a context of length $n$. In a static framework, this requires transmitting the probability model (e.g., a frequency table) to the decoder as side information. The size of this model is proportional to $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$.
 
-However, for a static code, the encoder must transmit the model (the codebook or frequency table) to the decoder as side information. The size of this model is proportional to the number of possible contexts $|\mathcal{X}|^n$.
-\begin{itemize}
-    \item \textbf{Exploding Overhead:} As we increase $n$ to capture more dependencies, the model overhead grows exponentially ($70^n$), quickly exceeding the size of the data itself.
-    \item \textbf{The Trade-off:} There is an optimal finite $n$ that balances the reduction in coding rate (better compression) against the increase in model overhead. We cannot simply let $n \to \infty$.
-\end{itemize}
+\subsection{Context-Adaptive Arithmetic Coding}
 
-\subsection{Practical Techniques for Large $n$: Lempel-Ziv}
+To overcome the static overhead limit, we employ \textit{Context-Adaptive Arithmetic Coding}, often formalized as \textit{Prediction by Partial Matching (PPM)}. Instead of transmitting a massive static table, the model consists of a set of conditional probability distributions $P(X_t | C)$ that are built adaptively during encoding, where $C$ is the context $(X_{t-n}, \dots, X_{t-1})$.
 
-The handout asks if there is a technique where $n$ can be made large to approach the entropy rate. The answer is **universal source coding**, specifically **Lempel-Ziv (LZ)** algorithms (e.g., LZ77, LZ78).
-
-Unlike Huffman or Arithmetic coding, LZ does not rely on explicit probability estimates or frequency tables. Instead, it operates by replacing variable-length phrases in the source with pointers to previous occurrences of those phrases.
-\begin{itemize}
-    \item \textbf{Mechanism:} As the algorithm processes more text, it builds a dictionary of longer and longer substrings. A pointer $(d, l)$ representing a match of length $l$ at distance $d$ effectively exploits a context of length $l$.
-    \item \textbf{Asymptotic Optimality:} As the file length $N \to \infty$, the average match length $l$ grows. This allows LZ to implicitly exploit dependencies of arbitrary length ($n$) without the overhead of transmitting an exponential probability table. It is asymptotically optimal for stationary ergodic sources, meaning it approaches $H_\infty$ as $N \to \infty$.
-\end{itemize}
-
+This approach directly addresses the data sparsity problem. When a symbol appears in a context $C$ that has zero frequency (has never been seen before), encoder and decoder then "back off" to a shorter context of length $n-1$, recursing down to order-0 if necessary. By using this escape mechanism, the algorithm can exploit very large $n$ for frequent patterns (where statistics are rich) while falling back to shorter contexts for rare sequences. This allows the compression rate to approach $\Hrate$ without the prohibitive $|\mathcal{X}|^n$ overhead required by static methods.
 
 \section{Adaptive Coding}
 
