@@ -96,7 +96,7 @@ This rate represents the irreducible uncertainty of the process after all past h
     H_n^* & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(Conditional entropy)}
 \end{align}
 
-\subsection{Convergence of Entropy Rates (Theorem 1)}
+\subsection{Convergence of Entropy Rates}
 
 For stationary sources, these two sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the below properties, referencing Cover \& Thomas \cite[Chap 4]{cover}.
 
@@ -145,6 +145,12 @@ Since $H_i^*$ is a non-increasing sequence (Statement \ref{stm:cond_non_increasi
 \end{statement}
 
 \textit{Proof:} Since $H_n^*$ is non-increasing (Statement \ref{stm:cond_non_increasing}) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* $ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
+
+\textbf{Source Coding Theorem for Stationary Sources:} For a discrete stationary source, the expected codeword length per symbol $L_n$ approaches the entropy rate:
+\begin{equation}
+    \lim_{n \to \infty} \frac{1}{n} \E[L_n] = \Hrate.
+\end{equation}
+Practically, for sufficiently large block length $n$, the rate is bounded by $\Hrate \le \frac{\E[L_n]}{n} < \Hrate + \frac{1}{n}$
 
 
 \subsection{Experimental Results: Entropy Rate Convergence}
@@ -338,7 +344,7 @@ This illustrates a Bias-Variance Trade-off: short contexts have high bias (ignor
 
 \section{Conclusion}
 
-The entropy rate $\Hrate$ defines the theoretical compression limit for stationary sources, yet approaching it is practically constrained by the "curse of dimensionality." We demonstrated that adaptive coding addresses the overhead of transmitting static probability models. Ultimately, exploiting source memory faces a fundamental trade-off: increasing context depth reduces theoretical uncertainty but exponentially dilutes statistical evidence. Optimal compression, therefore, cannot simply maximize context length but must balance model complexity against the data sparsity inherent in finite streams.
+The entropy rate $\Hrate$ defines the theoretical compression limit for stationary sources, yet approaching it is practically constrained by finite data. We demonstrated that adaptive coding addresses the overhead of transmitting static probability models. Ultimately, using memory faces a trade-off: increasing context depth reduces theoretical uncertainty but exponentially dilutes statistical evidence. Optimal compression, therefore, cannot simply maximize context length but must balance model complexity against the data sparsity inherent in finite data.
 
 %----------------------------------------------------------------------------------------
 %   BIBLIOGRAPHY
