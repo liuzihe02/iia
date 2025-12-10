@@ -144,7 +144,7 @@ Since $H_i^*$ is a non-increasing sequence (Statement \ref{stm:cond_non_increasi
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/entropy_rate_plot.png}
+    \includegraphics[width=0.6\textwidth]{images/entropy_rate_plot.png}
     \caption{Entropy rate measurements on \texttt{hamlet.txt}. The estimates converge to 0 for large $n$ due to data sparsity, not because the text is deterministic.}
     \label{fig:entropy_rate}
 \end{figure}
@@ -159,10 +159,10 @@ The convergence failure observed in highlights a critical limitation for static 
 
 \subsection{Bayesian Derivation of the Laplace Estimator}
 
-In adaptive coding, we face the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty \cite[p. 97]{godsill}.
+Previously, we faced the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty \cite[p. 97]{godsill}.
 
 \subsubsection{The Beta Posterior}
-Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with \textbf{Bayes' Theorem}:
+Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with Bayes' Theorem:
 \begin{equation}
     P(\theta | D) = \frac{P(D | \theta) P(\theta)}{P(D)}
 \end{equation}
@@ -170,7 +170,7 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
 
 \begin{itemize}[nosep]
     \item \textbf{Prior:}
-          Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
+          Since we assume no prior knowledge, we choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}:
           \begin{equation}
               P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1
           \end{equation}
@@ -187,10 +187,10 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
           \end{equation}
 \end{itemize}
 
-This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. (The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$) As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
+This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. \footnote{The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$}As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
 
 \subsubsection{Laplace's Rule of Succession (Binary Case)}
-To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - a process known as \textit{marginalization}. This predictive probability is equivalent to the expected value of the posterior distribution:
+To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - hence marginalization. This predictive probability is equivalent to the expected value of the posterior distribution:
 \begin{align}
     P(X_{n+1} = x | D) & = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta                                                          \\
                        & = \int_0^1 \theta \cdot P(\theta | D) \, d\theta \quad \text{since $P(X_{n+1} = x | \theta) = \theta$ by definition} \\
@@ -202,11 +202,9 @@ This expectation corresponds to the Minimum Mean-Squared Error (MMSE) estimator 
 \end{equation}
 This result is Laplace's Rule of Succession. It effectively adds 1 "pseudocount" to both outcomes, preventing zero probabilities \cite[p. 52]{mackay}.
 
-\subsubsection{Generalization to Text (The Dirichlet Distribution)}
+\subsubsection{Generalization to Text (Multinomial Case)}
 
-We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$.
-
-The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. Just as the Beta distribution represents our uncertainty about a single probability parameter, the Dirichlet distribution represents our uncertainty about a \textit{vector} of probabilities that must sum to 1. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
+We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$. The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. Just as the Beta distribution represents our uncertainty about a single probability parameter, the Dirichlet distribution represents our uncertainty about a \textit{vector} of probabilities that must sum to 1. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
 \begin{equation}
     P(\boldsymbol{\theta} | \boldsymbol{\alpha}) = \frac{1}{B(\boldsymbol{\alpha})} \prod_{i=1}^K \theta_i^{\alpha_i - 1}
 \end{equation}
@@ -215,7 +213,7 @@ where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \a
 Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations.
 
 \begin{itemize}[nosep]
-    \item \textbf{Prior:} We start with a uniform prior representing complete ignorance, which corresponds to $\boldsymbol{\alpha} = (1, \dots, 1)$:
+    \item \textbf{Prior:} We start with a uniform prior representing complete ignorance $\boldsymbol{\alpha} = (1, \dots, 1)$:
           \begin{equation}
               P(\boldsymbol{\theta}) = \text{Dir}(1, \dots, 1) = \text{Uniform}
           \end{equation}
@@ -227,7 +225,7 @@ Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)
 
     \item \textbf{Posterior:} By Bayes' theorem, the posterior is also Dirichlet with updated parameters:
           \begin{equation}
-              P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}(\alpha_1 + n_1, \dots, \alpha_K + n_K) = \text{Dir}(1 + n_1, \dots, 1 + n_K)
+              P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}( n_1 + \alpha_1, \dots, n_K + \alpha_K) = \text{Dir}(n_1 + 1, \dots, n_K + 1)
           \end{equation}
 \end{itemize}
 
@@ -236,7 +234,7 @@ To predict the next symbol, we must marginalize over all possible parameter valu
     \mathbb{E}[\theta_i] = \frac{\alpha_i'}{\sum_{j=1}^K \alpha_j'}
 \end{equation}
 
-Substituting our posterior parameters $\alpha_i' = 1+ n_i$:
+Substituting our posterior parameters $\alpha_i' = n_i + 1$:
 \begin{equation}
     \hat{p}(i) = \mathbb{E}[\theta_i | \mathbf{n}] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
 \end{equation}
@@ -245,7 +243,7 @@ This is the \textit{Laplace estimator}. It ensures every symbol has non-zero pro
 
 \subsection{Experimental Performance and Analysis}
 
-We simulated adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step:
+We simulate adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step:
 \begin{equation}
     L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}
 \end{equation}
@@ -263,7 +261,7 @@ Figure \ref{fig:convergence} shows the running average rate $L/n$, which is the 
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/adaptive_coding_convergence.png}
+    \includegraphics[width=0.6\textwidth]{images/adaptive_coding_convergence.png}
     \caption{Convergence of 0-order Adaptive Coding ($L/n$) to the static entropy $H_1$ with $\delta=1.0$ (Laplace Estimator) over $N=10,000$ symbols.}
     \label{fig:convergence}
 \end{figure}
@@ -271,7 +269,7 @@ Figure \ref{fig:convergence} shows the running average rate $L/n$, which is the 
 
 \subsubsection{Sensitivity to Bias Parameter $\delta$}
 
-We investigated the impact of the pseudocount parameter $\delta$ by generalizing the estimator to:
+We investigated the impact of the pseudocount parameter $\delta$ \footnote{Note $\delta=\alpha$ assuming a uniform prior for the Dirichlet distribution} by generalizing the estimator to:
 \begin{equation}
     \hat{p}(x) = \frac{n_x + \delta}{N + K\delta}
 \end{equation}
@@ -279,14 +277,14 @@ We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{ham
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{images/delta_convergence_grid.png}
+    \includegraphics[width=0.6\textwidth]{images/delta_convergence_grid.png}
     \caption{Adaptive coding convergence profiles for various prior strengths $\delta$ ($N=10,000$ symbols). Small $\delta$ leads to rapid learning but high volatility; large $\delta$ creates a stable but slow-converging model.}
     \label{fig:delta_grid}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/delta_variation.png}
+    \includegraphics[width=0.6\textwidth]{images/delta_variation.png}
     \caption{Effect of bias $\delta$ on the final compression rate, measured on the \textit{entire} Hamlet text ($N \approx 207k$)}
     \label{fig:delta_final}
 \end{figure}
@@ -304,7 +302,7 @@ We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{ham
 
 \subsection{Comparison of Adaptive vs. Static Coding}
 
-To rigorously compare the performance of Adaptive and Static coding, we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself: \cite[Chap 14]{cover}
+To rigorously compare the performance of Adaptive and Static coding, we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion \textit{(MDL in nats instead of bits)}, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself: \cite[Chap 14]{cover}
 \begin{equation}
     L(x^n) = L(\text{Data} \mid \text{Model}) + L(\text{Model})
 \end{equation}
@@ -319,59 +317,49 @@ Since static coding requires a pre-computed frequency table, it is impossible to
 The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
 
 \textbf{Adaptive Coding (Actual Cost):}
-This curve represents the number of bits generated by the simulated arithmetic coder up to symbol $n$. Unlike the static case, there is no explicit model header ($L(\text{Model}) = 0$). Instead, the cost is the sum of the negative log-probabilities assigned by the sequential estimator:
+This curve represents the number of bits generated by the simulated arithmetic coder up to symbol $n$. Unlike the static case, there is no explicit model cost ($L(\text{Model}) = 0$). Instead, the cost is the sum of the negative log-probabilities assigned by the sequential estimator:
 \begin{equation}
     L_{\text{adaptive}}(n) = \sum_{i=1}^n -\log_2 \hat{P}(x_i \mid x^{i-1})
 \end{equation}
-The "redundancy" in this case is the difference between this sum and the ideal entropy $n H_n$. This difference represents the "learning penalty" incurred while the estimator $\hat{P}$ converges from the uniform prior to the true statistics.
 
 \subsubsection{Experimental Results}
 Figure \ref{fig:adaptive_vs_static} presents the comparison of these two quantities on the \texttt{hamlet.txt} sequence.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/adaptive_vs_nonadaptive.png}
+    \includegraphics[width=0.6\textwidth]{images/adaptive_vs_nonadaptive.png}
     \caption{Comparison of Adaptive Coding (actual cumulative bits) versus Static Coding (theoretical data + MDL model cost). The curves run parallel for large $n$, confirming that the adaptive learning penalty scales identically to the static model overhead.}
     \label{fig:adaptive_vs_static}
 \end{figure}
 
 \begin{itemize}
     \item \textbf{Short Sequences ($n < 10^4$):} Adaptive coding is superior. The static method suffers from the "overhead problem," where the fixed cost of the frequency table ($\approx \frac{K}{2} \log n$) outweighs the data payload. Adaptive coding avoids this upfront cost, making it ideal for short messages.
-    \item \textbf{Convergence ($n \to \infty$):} As $n$ increases, the two curves converge. The static overhead is amortized over more symbols, while the adaptive estimator converges to the true frequencies. The crossover point marks the length where the static header cost becomes negligible compared to the accumulated learning redundancy.
+    \item \textbf{Convergence ($n \to \infty$):} As $n$ increases, the two curves converge. The static overhead is amortized over more symbols, while the adaptive estimator converges to the true frequencies.
 \end{itemize}
 
 Ultimately, this demonstrates that adaptive coding achieves the same asymptotic efficiency as static coding without requiring a two-pass process.
 
 \section{Adaptive Coding with Memory} \label{sec:ada_cod_mem}
 
-The experiments in this report utilized a 0-order adaptive model, implicitly assuming the source is memoryless (i.i.d.). To approach the true entropy rate $\Hrate$ of English, we must exploit memory by estimating conditional probabilities $P(X_t \mid X_{t-1}, \dots, X_{t-k})$ for a context length $k > 0$. However, extending the adaptive estimator to high-order contexts introduces the problem of \textbf{Context Dilution}.
-
-\subsection{The Curse of Dimensionality}
-As the context length $k$ increases, the number of possible contexts grows exponentially ($|\mathcal{X}|^k$). For a fixed text length $N$, the data becomes increasingly sparse.
-\begin{itemize}
-    \item \textbf{Low Order ($k=1$):} Contexts are frequent. The counts $n_{x|c}$ are large, so the estimator $\hat{P}$ reflects the true statistics of the language.
-    \item \textbf{High Order ($k=5$):} The number of possible contexts ($67^5 \approx 1.3 \text{ billion}$) vastly exceeds the file size ($2 \times 10^5$). Consequently, almost every context encountered is unique (seen for the first time).
+The previous experiments assumed a memoryless source. To approach the true entropy of English, we must estimate conditional probabilities $P(X_t \mid X_{t-1}, \dots, X_{t-k})$. However, extending the adaptive estimator to high-order contexts $k$ causes the "curse of dimensionality". As $k$ increases, the number of possible contexts grows exponentially $|\mathcal{X}|^k$. For a fixed text length $N$, the data becomes sparse.
+\begin{itemize}[nosep]
+    \item \textbf{Low Order ($k=1$):} Contexts are frequent. The counts are high, so $\hat{P}$ reflects the true language statistics.
+    \item \textbf{High Order ($k=5$):} The number of contexts ($67^5$) exceeds the file size. Most contexts are seen for the first time.
 \end{itemize}
 
-\subsection{Dominance of the Prior}
-When a context is encountered for the first time ($n_{x|c} = 0$), the Laplace estimator depends entirely on the pseudocount $\delta$:
+When a context is encountered for the first time, the Laplace estimator relies entirely on the prior $\delta$:
 \begin{equation}
-    \hat{P}(x \mid \text{new context}) = \frac{0 + \delta}{0 + M\delta} = \frac{1}{M}
+    \hat{P}(x \mid \text{new context}) = \frac{1}{|\mathcal{X}|}
 \end{equation}
-In this regime, the model effectively ignores the data and reverts to a Uniform Distribution (maximum entropy). Instead of compressing better by using memory, the model performs worse because it is constantly "starting over" with a flat prior for every new context.
-
-This represents a classic \textbf{Bias-Variance Trade-off}:
-\begin{itemize}
-    \item \textbf{Short Contexts:} High Bias (ignores structure), but Low Variance (stable statistics).
-    \item \textbf{Long Contexts:} Low Bias (can capture phrases), but High Variance (insufficient data).
-\end{itemize}
-
-\subsection{Solution: Prediction by Partial Matching (PPM)}
-To solve this, practical algorithms like PPM use an adaptive back-off strategy. They attempt to encode using the longest context ($k_{max}$); if that context has no statistics (count is zero), the encoder transmits an \textit{Escape} symbol and reverts to a shorter context ($k-1$). This allows the model to exploit specific patterns where they recur, while falling back to stable, low-order statistics for rare sequences.
+In this regime, the model effectively reverts to a Uniform Distribution. This illustrates a Bias-Variance Trade-off: short contexts have high bias (ignore contextual structure of text) but low variance (stable statistics), while long contexts capture structure but suffer from high variance due to insufficient data. Practical solutions (e.g., Prediction by Partial Matching) address this by dynamically backing off to shorter contexts when data is sparse.
 
 \section{Conclusion}
 
-This report demonstrated that while English text is a stationary source with memory, exploiting this theoretically (via $\Hrate$) is hindered by sparse data. Adaptive coding offers a robust solution, allowing compression to approach the source entropy without prior knowledge of statistics. By deriving the Laplace estimator from Bayesian principles, we showed that adding a "pseudocount" of 1 is not heuristic but the optimal strategy under a uniform prior assumption. This principle underpins modern compressors like LZ77 and prediction models in Large Language Models.
+This report explored the fundamental limits of compressing English text by relaxing the assumption that the source is memoryless. Through the analysis of block entropies, we confirmed that English is a stationary source with significant memory; however, we demonstrated that empirical measurements of the entropy rate $\Hrate$ fail to converge to the true value for large contexts due to the sparsity of data relative to the size of the state space.
+
+To overcome the overhead inherent in static coding models, we implemented an adaptive arithmetic coder using the Laplace estimator. By deriving this estimator from a Bayesian framework with a Dirichlet prior, we showed that adding pseudocounts is mathematically consistent with an assumption of initial ignorance. Our experiments revealed that a bias parameter of $\delta = 0.5$ (approximating the Jeffreys prior) yields slightly better compression than the standard Laplace rule ($\delta = 1$) for this dataset.
+
+Finally, the comparison of adaptive coding against the theoretical Minimum Description Length (MDL) of static coding confirmed that adaptive methods incur a learning penalty that scales logarithmically, identical to the cost of transmitting a static model. This proves that adaptive coding is not only practical for streaming applications but is asymptotically as efficient as two-pass static methods, providing a robust foundation for modern compression algorithms like PPM and Lempel-Ziv.
 
 %----------------------------------------------------------------------------------------
 %   BIBLIOGRAPHY
