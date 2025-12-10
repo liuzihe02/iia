@@ -9,6 +9,9 @@
 \usepackage{url}
 \usepackage{parskip} %removes indentation and spacing between paras
 \usepackage{enumitem}
+% Define theorem-like environments
+\theoremstyle{definition} % 'definition' style keeps text upright (not italic) which is easier to read for reports
+\newtheorem{statement}{Statement}
 
 % Custom macros for notation
 \newcommand{\E}{\mathbb{E}}
@@ -91,7 +94,11 @@ This rate represents the \textit{irreducible randomness} of the process after al
 
 For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the properties stated in the FTR handout, referencing Cover \& Thomas \cite[Chap 4]{cover}.
 
-\textbf{Statement 1: $H_{n+1}^* \le H_n^*$} (Conditional entropy is non-increasing). \\
+% STATEMENT 1
+\begin{statement} \label{stm:cond_non_increasing}
+    $H_{n+1}^* \le H_n^*$ (Conditional entropy is non-increasing).
+\end{statement}
+
 \textit{Proof:}
 \begin{align*}
     H_{n+1}^* & = H(X_{n+1} | X_n, \dots, X_2, X_1)                                          \\
@@ -100,14 +107,22 @@ For stationary sources, these sequences converge to the entropy rate $\Hrate$ as
               & = H_n^* \quad \square
 \end{align*}
 
-\textbf{Statement 2: $H_{n+1} \le H_n$} (Per-symbol entropy is non-increasing). \\
+% STATEMENT 2
+\begin{statement} \label{stm:persymbol_non_increasing}
+    $H_{n+1} \le H_n$ (Per-symbol entropy is non-increasing).
+\end{statement}
+
 \textit{Proof:} By the chain rule, $H(X_1, \dots, X_{n+1}) = H(X_1, \dots, X_n) + H(X_{n+1} | X_1, \dots, X_n)$. Then
 \begin{equation}
     H_{n+1} = \frac{H(X_1, \dots, X_{n+1})}{n+1} = \frac{n H_n + H_{n+1}^*}{n+1}
 \end{equation}
-Since $H_{n+1}^* \le H_n^*$ (from Statement 1), $H_n^* \le H_n$ (from statement 3), then $H_{n+1}^* \le H_n^* \le H_n$ where $H_n$ is the average of joint entropy across the $n$ terms. Adding a term $H_{n+1}^*$ that is smaller than or equal to the previous average must reduce (or maintain) the new average. Thus $H_{n+1} \le H_n$. $\square$
+Since $H_{n+1}^* \le H_n^*$ (from Statement \ref{stm:cond_non_increasing}) and $H_n^* \le H_n$ (from Statement \ref{stm:bound_relation} below), then $H_{n+1}^* \le H_n^* \le H_n$. Here $H_n$ is the average of joint entropy terms; adding a term $H_{n+1}^*$ that is smaller than or equal to the previous average must reduce (or maintain) the new average. Thus $H_{n+1} \le H_n$. $\square$
 
-\textbf{Statement 3: $H_n^* \le H_n$.} \\
+% STATEMENT 3
+\begin{statement} \label{stm:bound_relation}
+    $H_n^* \le H_n$.
+\end{statement}
+
 \textit{Proof:} From the Chain Rule for entropy,
 \begin{equation}
     H(X_1, \dots, X_n) = \sum_{i=1}^n H(X_i | X_{i-1}, \dots, X_1).
@@ -116,10 +131,14 @@ Dividing by $n$:
 \begin{equation}
     H_n = \frac{1}{n} \sum_{i=1}^n H_i^*.
 \end{equation}
-Since $H_i^*$ is a non-increasing sequence (Statement 1), the current term $H_n^*$ is less than or equal to all preceding terms $H_i^*$ for $i < n$. Therefore, the average $H_n$ must be greater than or equal to the minimum term $H_n^*$. $\square$
+Since $H_i^*$ is a non-increasing sequence (Statement \ref{stm:cond_non_increasing}), the current term $H_n^*$ is less than or equal to all preceding terms $H_i^*$ for $i < n$. Therefore, the average $H_n$ must be greater than or equal to the minimum term $H_n^*$. $\square$
 
-\textbf{Statement 4: $\lim_{n \to \infty} H_n = \lim_{n \to \infty} H_n^* = \Hrate$.} \\
-\textit{Proof:} Since $H_n^*$ is non-increasing (Statement 1) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
+% STATEMENT 4
+\begin{statement} \label{stm:convergence}
+    $\lim_{n \to \infty} H_n = \lim_{n \to \infty} H_n^* = \Hrate$.
+\end{statement}
+
+\textit{Proof:} Since $H_n^*$ is non-increasing (Statement \ref{stm:cond_non_increasing}) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
 
 
 \subsection{Experimental Results: Entropy Rate Convergence}
