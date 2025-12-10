@@ -8,6 +8,7 @@
 \usepackage{microtype}
 \usepackage{url}
 \usepackage{parskip} %removes indentation and spacing between paras
+\usepackage{enumitem}
 
 % Custom macros for notation
 \newcommand{\E}{\mathbb{E}}
@@ -155,7 +156,7 @@ Consider a binary version of the problem where we simply estimate the probabilit
 \end{equation}
 where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit{prior} belief, and $P(D|\theta)$ is the \textit{likelihood} of the data.
 
-\begin{itemize}
+\begin{itemize}[nosep]
     \item \textbf{Prior:}
           Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
           \begin{equation}
@@ -176,7 +177,7 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
 
 This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. (The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$) As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
 
-\subsubsection{Laplace's Rule of Succession}
+\subsubsection{Laplace's Rule of Succession (Binary Case)}
 To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - a process known as \textit{marginalization}. This predictive probability is equivalent to the expected value of the posterior distribution:
 \begin{align}
     P(X_{n+1} = x | D) & = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta                                                          \\
@@ -201,7 +202,7 @@ where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \a
 
 Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations.
 
-\begin{enumerate}
+\begin{itemize}[nosep]
     \item \textbf{Prior:} We start with a uniform prior representing complete ignorance, which corresponds to $\boldsymbol{\alpha} = (1, \dots, 1)$:
           \begin{equation}
               P(\boldsymbol{\theta}) = \text{Dir}(1, \dots, 1) = \text{Uniform}
@@ -216,7 +217,7 @@ Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)
           \begin{equation}
               P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}(\alpha_1 + n_1, \dots, \alpha_K + n_K) = \text{Dir}(1 + n_1, \dots, 1 + n_K)
           \end{equation}
-\end{enumerate}
+\end{itemize}
 
 To predict the next symbol, we must marginalize over all possible parameter values weighted by the posterior. This predictive probability equals the \textit{mean} of the posterior Dirichlet distribution. For a Dirichlet distribution with parameters $(\alpha_1', \dots, \alpha_K')$, the mean is \cite[Eq. 23.32]{mackay}:
 \begin{equation}
@@ -232,7 +233,7 @@ This is the \textit{Laplace estimator}. It ensures every symbol has non-zero pro
 
 \subsection{Experimental Performance}
 
-We implemented an adaptive arithmetic coder using this estimator.
+We estimate the performance of the adaptive arithmetic code.
 
 \textbf{Convergence:} Fig. \ref{fig:convergence} shows the running average code length $L/n$ converging to the static entropy $H_1$. The "learning penalty" (excess code length) decreases as $O(1/n)$, consistent with universal coding theory \cite[Sec 13.2]{cover}.
 
