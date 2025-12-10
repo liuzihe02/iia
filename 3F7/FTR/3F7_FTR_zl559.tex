@@ -52,7 +52,7 @@ This report extends the investigation of the 3F7 short laboratory in two directi
 
 The short laboratory focused on compressing \texttt{hamlet.txt} (approx. 207kB using fixed-length ASCII encoding) using three classical techniques designed for i.i.d. sources.
 
-\textbf{Shannon-Fano Coding} constructs prefix-free codes by assigning lengths $l_i = \lceil \log_2(1/p_i) \rceil$. While it guarantees unique decodability (via the Kraft inequality $\sum 2^{-l_i} \le 1$), it is suboptimal because it ignores the combinatorial nature of packing the prefix-free code tree (codewords can still be placed at shorter leaf nodes, hence optimizing our encoding)
+\textbf{Shannon-Fano Coding} constructs prefix-free codes by assigning lengths $l_i = \lceil \log_2(1/p_i) \rceil$. While it guarantees unique decodability (via the Kraft inequality $\sum 2^{-l_i} \le 1$), it is suboptimal because it ignores the combinatorial nature of packing the prefix-free code tree (codewords can still be placed at shorter leaf nodes, hence creating a more optimal encoding)
 
 \textbf{Huffman Coding} is the optimal symbol-by-symbol prefix code. It builds a binary tree bottom-up by iteratively merging the two least probable symbols. Our experiments confirmed that its expected length $L$ satisfies $H(X) \le L < H(X) + 1$. However, its performance is constrained by the requirement that each symbol must use an integer number of bits.
 
@@ -64,7 +64,7 @@ The limitation of all three methods in the short lab was the assumption that tex
 
 \subsection{Theoretical Background}
 
-We model natural language text as a sequence of random variables, specifically a \textit{discrete stochastic process}, $\mathcal{X} = \{X_i\}_{i=1}^\infty$. We distinguish between two primary classes of sources:
+We model natural language text as a sequence of random variables, specifically a \textit{discrete stochastic process}, $\{X_i\}_{i=1}^\infty$. We distinguish between two primary classes of sources:
 
 \textbf{Memoryless Sources (i.i.d.):}
 The simplest model assumes that successive symbols are i.i.d. A source is \textit{memoryless} if the joint probability of a sequence factorizes completely into the product of its components:
@@ -85,7 +85,7 @@ For a source with memory, the marginal entropy $H(X_1)$ overestimates the true i
 \begin{equation}
     \Hrate = \lim_{n \to \infty} \frac{1}{n} H(X_1, \dots, X_n).
 \end{equation}
-This rate represents the \textit{irreducible randomness} of the process after all past history is accounted for. To estimate $\Hrate$, we define two sequences of block entropies:
+This rate represents the irreducible uncertainty of the process after all past history is accounted for. To estimate $\Hrate$, we define two sequences of block entropies:
 \begin{align}
     H_n   & = \frac{1}{n} H(X_1, \dots, X_n) \quad \text{(Entropy per symbol of $n$-block)} \\
     H_n^* & = H(X_n | X_{n-1}, \dots, X_1) \quad \text{(Conditional entropy)}
@@ -93,7 +93,7 @@ This rate represents the \textit{irreducible randomness} of the process after al
 
 \subsection{Convergence of Entropy Rates (Theorem 1)}
 
-For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the properties stated in the FTR handout, referencing Cover \& Thomas \cite[Chap 4]{cover}.
+For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the below properties, referencing Cover \& Thomas \cite[Chap 4]{cover}.
 
 % STATEMENT 1
 \begin{statement} \label{stm:cond_non_increasing}
@@ -139,7 +139,7 @@ Since $H_i^*$ is a non-increasing sequence (Statement \ref{stm:cond_non_increasi
     $\lim_{n \to \infty} H_n = \lim_{n \to \infty} H_n^* = \Hrate$.
 \end{statement}
 
-\textit{Proof:} Since $H_n^*$ is non-increasing (Statement \ref{stm:cond_non_increasing}) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* = H'$ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
+\textit{Proof:} Since $H_n^*$ is non-increasing (Statement \ref{stm:cond_non_increasing}) and bounded below by 0 (entropy is non-negative), the limit $\lim_{n \to \infty} H_n^* $ exists. Since $H_n$ is the arithmetic mean (Cesàro mean) of the sequence $H_n^*$ as $n \to \infty$, by the \textit{Cesàro Mean Theorem} (if $a_n \to a$, then $\frac{1}{n}\sum a_i \to a$), the sequence of averages converges to the same limit \cite[Thm 4.2.1]{cover}. This limit is defined as the \textit{entropy rate} $\Hrate$. $\square$
 
 
 \subsection{Experimental Results: Entropy Rate Convergence}
@@ -151,11 +151,11 @@ Since $H_i^*$ is a non-increasing sequence (Statement \ref{stm:cond_non_increasi
     \label{fig:entropy_rate}
 \end{figure}
 
-We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 - 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator (of the entropy rate) operating in a high-dimensional regime with insufficient data (the "curse of dimensionality"). Accurate measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
+We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 - 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator (of the entropy rate) operating in a high-dimensional regime with insufficient data (the "curse of dimensionality"). Accurate measurement of $H_\infty$ is impossible without a sample size $N$ (length of our sample \texttt{hamlet.txt}) that scales as $|\mathcal{X}|^n$ (number of possible sequences in our probability model).
 
 \subsection{Implications for Static Coding}
 
-The convergence failure observed above highlights a critical limitation for static source coding. Theoretically, to approach the entropy rate $\Hrate$ using a static method like Huffman coding, one must group $n$ consecutive symbols into a single "meta-symbol" (a technique known as blocking). The encoder would then construct a Huffman tree for the extended alphabet $\mathcal{X}^n$, assigning codes based on the joint probabilities $P(X_1, \dots, X_n)$.
+The convergence failure observed above highlights a critical limitation for static source coding. Theoretically, to approach the entropy rate $\Hrate$ using a static method like Huffman coding, one must group $n$ consecutive symbols into a single "meta-symbol" (blocking). The encoder would then construct a Huffman tree for the extended alphabet $\mathcal{X}^n$, assigning codes based on the joint probabilities $P(X_1, \dots, X_n)$.
 
 However, in a static framework, this requires transmitting the probability model (the frequency table) to the decoder as side information. The size of this model is proportional to the alphabet size $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$. To overcome this "static overhead limit" and exploit long-range memory, we must abandon the two-part code structure entirely and adopt an \textit{adaptive} approach (discussed below in section \ref{sec:ada_cod_mem})
 
@@ -163,7 +163,7 @@ However, in a static framework, this requires transmitting the probability model
 
 \subsection{Bayesian Derivation of the Laplace Estimator}
 
-Previously, we faced the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty \cite[p. 97]{godsill}.
+In Bayesian inference, we treat the unknown probabilities for our symbols not as fixed values, but as random variables containing uncertainty \cite[p. 97]{godsill}. We derive the Laplace Estimator to estimate the unknown probabilities for generating symbols given data.
 
 \subsubsection{The Beta Posterior}
 Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with Bayes' Theorem:
@@ -179,7 +179,7 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
               P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1
           \end{equation}
     \item \textbf{Likelihood:}
-          Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence given $\theta$, the probability of seeing this specific sequence is:
+          Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence of symbols given $\theta$, the probability of seeing this specific sequence is:
           \begin{equation}
               P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
           \end{equation}
@@ -212,7 +212,7 @@ We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$
 \begin{equation}
     P(\boldsymbol{\theta} | \boldsymbol{\alpha}) = \frac{1}{B(\boldsymbol{\alpha})} \prod_{i=1}^K \theta_i^{\alpha_i - 1}
 \end{equation}
-where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \alpha_i)}$ is the multivariate Beta function (normalizing constant) and each $\alpha_i > 0$ \cite{tsun2025}. Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations. Bayesian analysis (with the uniform prior  $\boldsymbol{\alpha} = (1, \dots, 1)$) gives us the posterior:
+where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \alpha_i)}$ is the multivariate Beta function (normalizing constant) and each $\alpha_i > 0$ \cite{tsun2025}. Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations. Bayesian analysis with the uniform prior  $\boldsymbol{\alpha} = (1, \dots, 1)$ gives us the posterior:
 
 \begin{equation}
     P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}( n_1 + \alpha_1, \dots, n_K + \alpha_K) = \text{Dir}(n_1 + 1, \dots, n_K + 1)
@@ -223,16 +223,11 @@ To predict the next symbol, we marginalize over all possible parameter values we
     \hat{p}(i) = \mathbb{E}[\theta_i | \mathbf{n}] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
 \end{equation}
 
-This is the \textit{Laplace estimator}. It ensures every symbol has non-zero probability of at least $1/(N+K)$, solving the zero-frequency problem. The uniform prior $\boldsymbol{\alpha} = (1, \dots, 1)$ effectively adds 1 "pseudocount" to each symbol, which can be interpreted as pretending we observed each symbol once before seeing any real data \cite{tsun2025,mackay}.
+This is the \textit{Laplace estimator}. It ensures every symbol has non-zero probability of at least $1/(N+K)$, which effectively adds 1 "pseudocount" to each symbol.
 
 \subsection{Experimental Performance and Analysis}
 
-We simulate adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step:
-\begin{equation}
-    L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}
-\end{equation}
-
-Note that the probability model here built is a still a 0-order adaptive model (we are still learning the distribution assuming each character is i.i.d.) The model is adaptive in the sense of updating its probabilities as more characters are observed.
+We simulate adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step $L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}$ . Note that the probability model here built is a still a 0-order adaptive model (we are still learning the distribution assuming each character is i.i.d.) The model is adaptive in the sense of updating its probabilities as more characters are observed.
 
 \subsubsection{Convergence to Static Entropy}
 Figure \ref{fig:convergence} shows the running average rate $L/n$, which is the estimate of the entropy of the i.i.d distribution.
@@ -257,12 +252,13 @@ We investigated the impact of the pseudocount parameter $\delta$ \footnote{Note 
 \begin{equation}
     \hat{p}(x) = \frac{n_x + \delta}{N + K\delta}
 \end{equation}
+
 We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{hamlet.txt} to visualize convergence behavior (Fig. \ref{fig:delta_grid}), and then measured the final compression rate on the \textit{entire text} ($N=207,039$) to determine the optimal parameter (Fig. \ref{fig:delta_final}).
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{images/delta_convergence_grid.png}
-    \caption{Adaptive coding convergence profiles for various prior strengths $\delta$ ($N=10,000$ symbols). Small $\delta$ leads to rapid learning but high volatility; large $\delta$ creates a stable but slow-converging model.}
+    \caption{Adaptive coding convergence profiles for various prior strengths $\delta$ ($N=10,000$ symbols). Small $\delta$ leads to rapid convergence but high volatility; large $\delta$ creates a stable but slow-converging model.}
     \label{fig:delta_grid}
 \end{figure}
 
@@ -274,19 +270,25 @@ We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{ham
 \end{figure}
 
 \begin{itemize}
-    \item \textbf{Small $\delta$ ($\delta < 0.5$):}
-          When $\delta$ is very small (e.g., 0.01), the model assigns negligible probability mass to unseen characters. This makes the "zero-frequency" penalty extremely harsh. During the first appearance of a symbol ($n_x=0$), the estimated probability is $P \approx \delta/N$, leading to a code length of $-\log_2(\delta/N)$. As $\delta \to 0$, this initial cost spikes dramatically, as seen in the sharp initial peaks in Fig. \ref{fig:delta_grid}. However, once a symbol is seen, the model adapts very quickly.
+    \item \textbf{Small $\delta$ ($\delta \ll 1$):} The denominator is dominated by $N$, so the estimator approximates:
+          \begin{equation}
+              \hat{p}(x) \approx \frac{n_x + \delta}{N} = \frac{n_x}{N} + \frac{\delta}{N}.
+          \end{equation}
+          The estimator closely tracks the empirical frequency $n_x/N$, enabling rapid learning. However, for unseen symbols ($n_x=0$), the probability is only $\delta/N$, yielding a harsh code length penalty of $-\log_2(\delta/N) \approx \log_2(N/\delta)$ bits. As $\delta \to 0$, this initial cost spikes dramatically, as seen in the sharp initial peaks in Fig. \ref{fig:delta_grid}. However, once a symbol is seen, the model adapts very quickly as the estimator closely tracks the empirical frequency.
 
-    \item \textbf{Large $\delta$ ($\delta > 1.0$):}
-          A large $\delta$ (e.g., 50.0) corresponds to a strong prior belief that the distribution is uniform. It dominates the denominator $N + K\delta$, diluting the influence of the observed data counts $n_x$. This acts as a "dampener," resulting in a very stable curve that converges slowly to the true entropy (Fig. \ref{fig:delta_grid}, bottom right).
+    \item \textbf{Large $\delta$ ($\delta \gg 1$):} The denominator is dominated by $K\delta$, so the estimator approximates:
+          \begin{equation}
+              \hat{p}(x) \approx \frac{n_x + \delta}{K\delta} = \frac{n_x}{K\delta} + \frac{1}{K}.
+          \end{equation}
+          Initially the uniform prior $1/K$ dominates, and observed counts $n_x$ have diluted influence. As the data requires large $n_x$ values to overcome the strong prior belief, this results in a very stable curve that converges slowly to the true entropy (Fig. \ref{fig:delta_grid}, bottom right).
 
-    \item \textbf{Optimal $\delta = 0.5$:}
+    \item \textbf{Optimal $\delta \approx 0.5$:}
           Our experiments on the full text (Fig. \ref{fig:delta_final}) show that $\delta=0.5$ yields the minimum code rate, slightly outperforming the Laplace estimator ($\delta=1$)
 \end{itemize}
 
 \subsection{Comparison of Adaptive vs. Static Coding}
 
-To rigorously compare the performance of Adaptive and Static coding, we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion \textit{(MDL in nats instead of bits)}, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself: \cite[Chap 14]{cover}
+To rigorously compare the performance of Adaptive and Static coding (instead of considering fixed offline storage), we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion \textit{(MDL in nats instead of bits)}, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself: \cite[Chap 14]{cover}
 \begin{equation}
     L(x^n) = L(\text{Data} \mid \text{Model}) + L(\text{Model})
 \end{equation}
@@ -294,12 +296,12 @@ To rigorously compare the performance of Adaptive and Static coding, we invoke t
 In our experiment, we compare the cumulative code lengths of the two approaches as a function of the sequence length $n$:
 
 \textbf{Static Coding (Theoretical Bound):}
-Since static coding requires a pre-computed frequency table, it is impossible to run "online" in the same manner as adaptive coding. Instead, we plot the theoretical lower bound at each length $n$. This bound assumes that for any prefix of length $n$, we transmit the optimal frequency table followed by the data. The cost is calculated using the standard MDL penalty \cite[Ch. 28]{mackay}:
+Since static coding requires a pre-computed frequency table, it is impossible to run "online" in the same manner as adaptive coding. Instead, we plot the theoretical lower bound at each length $n$, calculated using the standard MDL penalty \cite[Ch. 28]{mackay}:
 \begin{equation}
     L_{\text{static}}(n) \approx \underbrace{n H_n}_{\text{Data Cost}} + \underbrace{\frac{K-1}{2} \log_2 n}_{\text{Model Cost}}
 \end{equation}
 
-While we can simply view the model cost as fixed offline storage, we adopt the more rigorous Minimum Description Length (MDL) principle. The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity. \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
+The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity. \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
 
 \textbf{Adaptive Coding (Actual Cost):}
 This curve represents the number of bits generated by the simulated arithmetic coder up to symbol $n$. Unlike the static case, there is no explicit model cost ($L(\text{Model}) = 0$). Instead, the cost is the sum of the negative log-probabilities assigned by the sequential estimator:
@@ -318,7 +320,7 @@ Figure \ref{fig:adaptive_vs_static} presents the comparison of these two quantit
 \end{figure}
 
 \begin{itemize}
-    \item \textbf{Short Sequences ($n < 10^4$):} Adaptive coding is superior. The static method suffers from the "overhead problem," where the fixed cost of the frequency table ($\approx \frac{K}{2} \log n$) outweighs the data payload. Adaptive coding avoids this upfront cost, making it ideal for short messages.
+    \item \textbf{Short Sequences ($n < 10^4$):} Adaptive coding is superior. The static method suffers from the "overhead problem," where the fixed cost of the frequency table ($\approx \frac{K}{2} \log n$) outweighs the data payload.
     \item \textbf{Convergence ($n \to \infty$):} As $n$ increases, the two curves converge. The static overhead is amortized over more symbols, while the adaptive estimator converges to the true frequencies.
 \end{itemize}
 
@@ -326,17 +328,13 @@ Ultimately, this demonstrates that adaptive coding achieves the same asymptotic 
 
 \section{Adaptive Coding with Memory} \label{sec:ada_cod_mem}
 
-The previous experiments assumed a memoryless source. To approach the true entropy of English, we must estimate conditional probabilities $P(X_t \mid X_{t-1}, \dots, X_{t-k})$. However, extending the adaptive estimator to high-order contexts $k$ causes the "curse of dimensionality". As $k$ increases, the number of possible contexts grows exponentially $|\mathcal{X}|^k$. For a fixed text length $N$, the data becomes sparse.
+The previous experiments assumed a memoryless source. To approach the true entropy of English, we must estimate conditional probabilities $P(X_t \mid X_{t-1}, \dots, X_{t-k})$. However, extending the adaptive estimator to high-order contexts $k$ causes the "curse of dimensionality". As $k$ increases, the number of possible contexts grows exponentially $|\mathcal{X}|^k$ despite a fixed text length $N$. The data becomes relatively sparse.
 \begin{itemize}[nosep]
-    \item \textbf{Low Order ($k=1$):} Contexts are frequent. The counts are high, so $\hat{P}$ reflects the true language statistics.
-    \item \textbf{High Order ($k=5$):} The number of contexts ($67^5$) exceeds the file size. Most contexts are seen for the first time.
+    \item \textbf{Low Order ($k=1$):} Contexts are frequent. The counts are high, so $\hat{P}$ reflects the true language statistics and converge stably
+    \item \textbf{High Order ($k=5$):} The number of contexts ($67^5$) exceeds the file size. Most contexts are seen for the first time, where $\hat{P}$ is initially volatile
 \end{itemize}
 
-When a context is encountered for the first time, the Laplace estimator relies entirely on the prior $\delta$:
-\begin{equation}
-    \hat{P}(x \mid \text{new context}) = \frac{1}{|\mathcal{X}|}
-\end{equation}
-In this regime, the model effectively reverts to a Uniform Distribution. This illustrates a Bias-Variance Trade-off: short contexts have high bias (ignore contextual structure of text) but low variance (stable statistics), while long contexts capture structure but suffer from high variance due to insufficient data. Practical solutions (e.g., Prediction by Partial Matching) address this by dynamically backing off to shorter contexts when data is sparse.
+This illustrates a Bias-Variance Trade-off: short contexts have high bias (ignore contextual structure of text) but low variance (stable statistics), while long contexts capture structure but suffer from high variance due to insufficient data. Practical solutions (e.g., Prediction by Partial Matching) address this by dynamically backing off to shorter contexts when data is sparse.
 
 \section{Conclusion}
 
@@ -345,6 +343,8 @@ The entropy rate $\Hrate$ defines the theoretical compression limit for stationa
 %----------------------------------------------------------------------------------------
 %   BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
+
+\newpage
 
 \begin{thebibliography}{9}
 
