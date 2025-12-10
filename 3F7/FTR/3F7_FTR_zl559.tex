@@ -9,6 +9,8 @@
 \usepackage{url}
 \usepackage{parskip} %removes indentation and spacing between paras
 \usepackage{enumitem}
+% Remove vertical space between list items globally
+\setlist{nosep}
 % Define theorem-like environments
 \theoremstyle{definition} % 'definition' style keeps text upright (not italic) which is easier to read for reports
 \newtheorem{statement}{Statement}
@@ -76,7 +78,7 @@ Natural languages like English are not memoryless; the letter 'h' is much more l
 \begin{equation}
     P(X_1 = x_1, \dots, X_n = x_n) = P(X_{1+\tau} = x_1, \dots, X_{n+\tau} = x_n).
 \end{equation}
-Stationarity implies that marginal probabilities are constant $H(X_i) = H(X_1)$ and conditional probabilities depend only on the relative history, not the absolute time.
+This invariance in probability distribution directly implies the invariance of entropy. If the distribution $P$ is shift-invariant, the expectation $H(X^n) = \E[-\log P(X^n)]$ must also be shift-invariant. Thus, $H(X_1, \dots, X_n) = H(X_{1+\tau}, \dots, X_{n+\tau})$ and conditional entropies rely solely on relative history, not absolute time.
 
 \textbf{Entropy Rate:}
 For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$, defined as the asymptotic per-symbol entropy \cite[Def 4.1]{cover}:
@@ -153,7 +155,9 @@ We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$
 
 \subsection{Implications for Static Coding}
 
-The convergence failure observed in highlights a critical limitation for static source coding. To approach the entropy rate of a stationary source, the encoder must exploit a context of length $n$. In a static framework, this requires transmitting the probability model (e.g., a frequency table) to the decoder as side information. The size of this model is proportional to $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$. To overcome this "static overhead limit" and exploit long-range memory, we must abandon the two-part code structure entirely and adopt an \textit{adaptive} approach (discussed below in section \ref{sec:ada_cod_mem})
+The convergence failure observed above highlights a critical limitation for static source coding. Theoretically, to approach the entropy rate $\Hrate$ using a static method like Huffman coding, one must group $n$ consecutive symbols into a single "meta-symbol" (a technique known as blocking). The encoder would then construct a Huffman tree for the extended alphabet $\mathcal{X}^n$, assigning codes based on the joint probabilities $P(X_1, \dots, X_n)$
+
+However, in a static framework, this requires transmitting the probability model (the frequency table) to the decoder as side information. The size of this model is proportional to the alphabet size $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$.To overcome this "static overhead limit" and exploit long-range memory, we must abandon the two-part code structure entirely and adopt an \textit{adaptive} approach (discussed below in section \ref{sec:ada_cod_mem})
 
 \section{Adaptive Coding}
 
@@ -191,7 +195,7 @@ This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+
 
 \subsubsection{Laplace's Rule of Succession (Binary Case)}
 To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - hence marginalization. This predictive probability is equivalent to the expected value of the posterior distribution:
-\begin{align}
+\begin{align} \label{eq:expect}
     P(X_{n+1} = x | D) & = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta                                                          \\
                        & = \int_0^1 \theta \cdot P(\theta | D) \, d\theta \quad \text{since $P(X_{n+1} = x | \theta) = \theta$ by definition} \\
                        & = \mathbb{E}[\theta | D]
@@ -204,37 +208,17 @@ This result is Laplace's Rule of Succession. It effectively adds 1 "pseudocount"
 
 \subsubsection{Generalization to Text (Multinomial Case)}
 
-We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$. The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. Just as the Beta distribution represents our uncertainty about a single probability parameter, the Dirichlet distribution represents our uncertainty about a \textit{vector} of probabilities that must sum to 1. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
+We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$. The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
 \begin{equation}
     P(\boldsymbol{\theta} | \boldsymbol{\alpha}) = \frac{1}{B(\boldsymbol{\alpha})} \prod_{i=1}^K \theta_i^{\alpha_i - 1}
 \end{equation}
-where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \alpha_i)}$ is the multivariate Beta function (normalizing constant) and each $\alpha_i > 0$ \cite{tsun2025}.
+where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \alpha_i)}$ is the multivariate Beta function (normalizing constant) and each $\alpha_i > 0$ \cite{tsun2025}. Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations. Bayesian analysis (with the uniform prior  $\boldsymbol{\alpha} = (1, \dots, 1)$) gives us the posterior:
 
-Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations.
-
-\begin{itemize}[nosep]
-    \item \textbf{Prior:} We start with a uniform prior representing complete ignorance $\boldsymbol{\alpha} = (1, \dots, 1)$:
-          \begin{equation}
-              P(\boldsymbol{\theta}) = \text{Dir}(1, \dots, 1) = \text{Uniform}
-          \end{equation}
-
-    \item \textbf{Likelihood:} The probability of observing these counts follows the multinomial distribution:
-          \begin{equation}
-              P(\mathbf{n} | \boldsymbol{\theta}) \propto \prod_{i=1}^K \theta_i^{n_i}
-          \end{equation}
-
-    \item \textbf{Posterior:} By Bayes' theorem, the posterior is also Dirichlet with updated parameters:
-          \begin{equation}
-              P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}( n_1 + \alpha_1, \dots, n_K + \alpha_K) = \text{Dir}(n_1 + 1, \dots, n_K + 1)
-          \end{equation}
-\end{itemize}
-
-To predict the next symbol, we must marginalize over all possible parameter values weighted by the posterior. This predictive probability equals the \textit{mean} of the posterior Dirichlet distribution. For a Dirichlet distribution with parameters $(\alpha_1', \dots, \alpha_K')$, the mean is \cite[Eq. 23.32]{mackay}:
 \begin{equation}
-    \mathbb{E}[\theta_i] = \frac{\alpha_i'}{\sum_{j=1}^K \alpha_j'}
+    P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}( n_1 + \alpha_1, \dots, n_K + \alpha_K) = \text{Dir}(n_1 + 1, \dots, n_K + 1)
 \end{equation}
 
-Substituting our posterior parameters $\alpha_i' = n_i + 1$:
+To predict the next symbol, we marginalize over all possible parameter values weighted by the posterior, giving us the mean of the posterior Dirichlet distribution (similar to the binary case Eq \ref{eq:expect}). For a Dirichlet distribution with parameters $(\alpha_1', \dots, \alpha_K')$, the mean is \cite[Eq. 23.32]{mackay} $\mathbb{E}[\theta_i] = \frac{\alpha_i'}{\sum_{j=1}^K \alpha_j'}$. Substituting our posterior parameters $\alpha_i' = n_i + 1$:
 \begin{equation}
     \hat{p}(i) = \mathbb{E}[\theta_i | \mathbf{n}] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
 \end{equation}
@@ -314,7 +298,8 @@ Since static coding requires a pre-computed frequency table, it is impossible to
 \begin{equation}
     L_{\text{static}}(n) \approx \underbrace{n H_n}_{\text{Data Cost}} + \underbrace{\frac{K-1}{2} \log_2 n}_{\text{Model Cost}}
 \end{equation}
-The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
+
+While we can simply view the model cost as fixed offline storage, we adopt the more rigorous Minimum Description Length (MDL) principle. The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity. \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
 
 \textbf{Adaptive Coding (Actual Cost):}
 This curve represents the number of bits generated by the simulated arithmetic coder up to symbol $n$. Unlike the static case, there is no explicit model cost ($L(\text{Model}) = 0$). Instead, the cost is the sum of the negative log-probabilities assigned by the sequential estimator:
@@ -355,11 +340,7 @@ In this regime, the model effectively reverts to a Uniform Distribution. This il
 
 \section{Conclusion}
 
-This report explored the fundamental limits of compressing English text by relaxing the assumption that the source is memoryless. Through the analysis of block entropies, we confirmed that English is a stationary source with significant memory; however, we demonstrated that empirical measurements of the entropy rate $\Hrate$ fail to converge to the true value for large contexts due to the sparsity of data relative to the size of the state space.
-
-To overcome the overhead inherent in static coding models, we implemented an adaptive arithmetic coder using the Laplace estimator. By deriving this estimator from a Bayesian framework with a Dirichlet prior, we showed that adding pseudocounts is mathematically consistent with an assumption of initial ignorance. Our experiments revealed that a bias parameter of $\delta = 0.5$ (approximating the Jeffreys prior) yields slightly better compression than the standard Laplace rule ($\delta = 1$) for this dataset.
-
-Finally, the comparison of adaptive coding against the theoretical Minimum Description Length (MDL) of static coding confirmed that adaptive methods incur a learning penalty that scales logarithmically, identical to the cost of transmitting a static model. This proves that adaptive coding is not only practical for streaming applications but is asymptotically as efficient as two-pass static methods, providing a robust foundation for modern compression algorithms like PPM and Lempel-Ziv.
+The entropy rate $\Hrate$ defines the theoretical compression limit for stationary sources, yet approaching it is practically constrained by the "curse of dimensionality." We demonstrated that adaptive coding addresses the overhead of transmitting static probability models. Ultimately, exploiting source memory faces a fundamental trade-off: increasing context depth reduces theoretical uncertainty but exponentially dilutes statistical evidence. Optimal compression, therefore, cannot simply maximize context length but must balance model complexity against the data sparsity inherent in finite streams.
 
 %----------------------------------------------------------------------------------------
 %   BIBLIOGRAPHY
