@@ -135,13 +135,7 @@ We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$
 
 \subsection{Implications for Static Coding}
 
-The convergence failure observed in highlights a critical limitation for static source coding. To approach the entropy rate of a stationary source, the encoder must exploit a context of length $n$. In a static framework, this requires transmitting the probability model (e.g., a frequency table) to the decoder as side information. The size of this model is proportional to $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$.
-
-\subsection{Context-Adaptive Arithmetic Coding}
-
-To overcome the static overhead limit, we employ \textit{Context-Adaptive Arithmetic Coding}, often formalized as \textit{Prediction by Partial Matching (PPM)}. Instead of transmitting a massive static table, the model consists of a set of conditional probability distributions $P(X_t | C)$ that are built adaptively during encoding, where $C$ is the context $(X_{t-n}, \dots, X_{t-1})$.
-
-This approach directly addresses the data sparsity problem. When a symbol appears in a context $C$ that has zero frequency (has never been seen before), encoder and decoder then "back off" to a shorter context of length $n-1$, recursing down to order-0 if necessary. By using this escape mechanism, the algorithm can exploit very large $n$ for frequent patterns (where statistics are rich) while falling back to shorter contexts for rare sequences. This allows the compression rate to approach $\Hrate$ without the prohibitive $|\mathcal{X}|^n$ overhead required by static methods.
+The convergence failure observed in highlights a critical limitation for static source coding. To approach the entropy rate of a stationary source, the encoder must exploit a context of length $n$. In a static framework, this requires transmitting the probability model (e.g., a frequency table) to the decoder as side information. The size of this model is proportional to $|\mathcal{X}|^n$. As we increase $n$ to capture longer dependencies, this overhead grows exponentially, quickly exceeding the size of the compressed data itself. Consequently, static methods cannot simply let $n \to \infty$; they are fundamentally limited to a small, finite $n$. To overcome this "static overhead limit" and exploit long-range memory, we must abandon the two-part code structure entirely and adopt an \textit{adaptive} approach (discussed below in section \ref{sec:ada_cod_mem})
 
 \section{Adaptive Coding}
 
@@ -292,7 +286,7 @@ We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{ham
 
 \subsection{Comparison of Adaptive vs. Static Coding}
 
-To rigorously compare the performance of Adaptive and Static coding, we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself:
+To rigorously compare the performance of Adaptive and Static coding, we invoke the \textit{Minimum Description Length (MDL)} principle. \footnote{Interestingly enough, I actually wrote a paper using the Bayesian Information Criterion, so I'm delighted to see its use here. See \url{https://arxiv.org/abs/2409.04913}} This principle states that the total description length $L(x_1 \dots x_n)=L(x^n)$ is composed of the cost to encode the data given a model, plus the cost of specifying the probability model itself: \cite[Chap 14]{cover}
 \begin{equation}
     L(x^n) = L(\text{Data} \mid \text{Model}) + L(\text{Model})
 \end{equation}
@@ -330,10 +324,32 @@ Figure \ref{fig:adaptive_vs_static} presents the comparison of these two quantit
 
 Ultimately, this demonstrates that adaptive coding achieves the same asymptotic efficiency as static coding without requiring a two-pass process.
 
-\subsection{Adaptive Coding with Memory}
-The experiment above used a 0-order model (assuming i.i.d.). To capture memory (where $\Hrate < H_1$), we would need to estimate conditional probabilities $P(X_t | X_{t-1})$.
-However, extending Eq. \ref{eq:estimator} to high-order contexts introduces \textbf{Context Dilution}. As context length increases, the total count $n$ is split among $|\mathcal{X}|^k$ distinct contexts. Most contexts appear only a few times, so $n_{context} \approx 0$.
-In this regime, the bias $\delta$ dominates the counts ($n_x \ll \delta$), resulting in a near-uniform distribution and poor compression. Practical schemes like PPM solve this by "escaping" to shorter contexts when statistics are sparse.
+\subsection{Adaptive Coding with Memory} \label{sec:ada_cod_mem}
+
+The experiments in this report utilized a 0-order adaptive model, implicitly assuming the source is memoryless (i.i.d.). To approach the true entropy rate $\Hrate$ of English, we must exploit memory by estimating conditional probabilities $P(X_t \mid X_{t-1}, \dots, X_{t-k})$ for a context length $k > 0$. However, extending the adaptive estimator to high-order contexts introduces the problem of \textbf{Context Dilution}.
+
+\subsubsection{The Curse of Dimensionality}
+As the context length $k$ increases, the number of possible contexts grows exponentially ($|\mathcal{X}|^k$). For a fixed text length $N$, the data becomes increasingly sparse.
+\begin{itemize}
+    \item \textbf{Low Order ($k=1$):} Contexts are frequent. The counts $n_{x|c}$ are large, so the estimator $\hat{P}$ reflects the true statistics of the language.
+    \item \textbf{High Order ($k=5$):} The number of possible contexts ($67^5 \approx 1.3 \text{ billion}$) vastly exceeds the file size ($2 \times 10^5$). Consequently, almost every context encountered is unique (seen for the first time).
+\end{itemize}
+
+\subsubsection{Dominance of the Prior}
+When a context is encountered for the first time ($n_{x|c} = 0$), the Laplace estimator depends entirely on the pseudocount $\delta$:
+\begin{equation}
+    \hat{P}(x \mid \text{new context}) = \frac{0 + \delta}{0 + M\delta} = \frac{1}{M}
+\end{equation}
+In this regime, the model effectively ignores the data and reverts to a Uniform Distribution (maximum entropy). Instead of compressing better by using memory, the model performs worse because it is constantly "starting over" with a flat prior for every new context.
+
+This represents a classic \textbf{Bias-Variance Trade-off}:
+\begin{itemize}
+    \item \textbf{Short Contexts:} High Bias (ignores structure), but Low Variance (stable statistics).
+    \item \textbf{Long Contexts:} Low Bias (can capture phrases), but High Variance (insufficient data).
+\end{itemize}
+
+\subsubsection{Solution: Prediction by Partial Matching (PPM)}
+To solve this, practical algorithms like PPM use an adaptive back-off strategy. They attempt to encode using the longest context ($k_{max}$); if that context has no statistics (count is zero), the encoder transmits an \textit{Escape} symbol and reverts to a shorter context ($k-1$). This allows the model to exploit specific patterns where they recur, while falling back to stable, low-order statistics for rare sequences.
 
 \section{Conclusion}
 
