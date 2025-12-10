@@ -27,8 +27,11 @@
     citecolor=blue,
     urlcolor=blue
 }
+% bring title up
+%\setlength{\droptitle}{-4em}
 
-\setlength{\droptitle}{-4em}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{0.5em}{4pt}
 
 %----------------------------------------------------------------------------------------
 %   TITLE SECTION
@@ -44,9 +47,9 @@
 
 \section{Introduction}
 
-Information theory provides the mathematical framework for quantifying information and establishing fundamental limits on data compression. Shannon's Source Coding Theorem establishes the entropy $H(X)$ as the lower bound for the average code length of an independent and identically distributed (i.i.d.) source. While i.i.d. models are useful first approximations, real-world data sources---such as natural language---exhibit strong temporal dependencies (memory) and non-uniform distributions.
+Information theory provides the mathematical framework for quantifying information and establishing fundamental limits on data compression. Shannon's Source Coding Theorem establishes the entropy $H(X)$ as the lower bound for the average code length of an independent and identically distributed (i.i.d.) source. While i.i.d. models are useful first approximations, real-world data sources---such as natural language---exhibit strong temporal dependencies (memory).
 
-This report extends the investigation of the 3F7 short laboratory in two directions. First, we analyse \textbf{discrete stationary sources}, relaxing the i.i.d. assumption to model sources with memory. We investigate the \textit{entropy rate} $\Hrate$ of a stochastic process and the convergence properties of block entropies. Second, we explore \textbf{adaptive coding}, where the probability model is learned online instead of 2 separate phases (building the probability model from the complete text and encoding). We derive the Laplace estimator from Bayesian principles and evaluate the performance of adaptive arithmetic coding against static methods.
+This report extends the investigation of the 3F7 short laboratory in two directions. First, we analyse \textbf{discrete stationary sources}, relaxing the i.i.d. assumption to model sources with memory. We investigate the \textit{entropy rate} $\Hrate$ of a stochastic process and the convergence properties of block entropies. Second, we explore \textbf{adaptive coding}, where the probability model is learned online instead of 2 separate phases (building the probability model from the complete text and encoding).
 
 \section{Overview of Short Lab}
 
@@ -59,6 +62,8 @@ The short laboratory focused on compressing \texttt{hamlet.txt} (approx. 207kB u
 \textbf{Arithmetic Coding} overcomes the integer constraint by encoding entire sequences as sub-intervals of $[0, 1)$. By mapping a sequence $x^n$ to an interval of width $P(x^n)$, it achieves a code length $L \approx -\log_2 P(x^n)$ bits. For large $n$, the per-symbol length converges to the entropy $H(X)$. This method proved superior for longer blocks but required accurate probability models.
 
 The limitation of all three methods in the short lab was the assumption that text is a memoryless source, ignoring the significant redundancy in English grammar and spelling.
+
+\newpage
 
 \section{Coding for Discrete Stationary Sources}
 
@@ -74,14 +79,14 @@ The simplest model assumes that successive symbols are i.i.d. A source is \texti
 For such a source, the information content is additive, and the entropy of a block is simply $H(X^n) = n H(X)$. The optimal code length per symbol is thus fixed at the marginal entropy $H(X)$. The fixed-length ASCII and standard Huffman coding (without blocking) implicitly assume this model.
 
 \textbf{Stationary Sources (Sources with Memory):}
-Natural languages like English are not memoryless; the letter 'h' is much more likely to follow 't' than 'q'. To capture this, we relax the independence assumption while retaining time-invariance. A process is \textit{strictly stationary} if the joint distribution of any subsequence is invariant to time shifts. That is, for any shift $\tau$ and block length $n$:
+Natural languages like English are not memoryless; the letter 'h' is much more likely to follow 't' than 'q'. To capture this context, we relax the independence assumption while retaining time-invariance. A process is \textit{strictly stationary} if the joint distribution of any subsequence is invariant to time shifts. That is, for any shift $\tau$ and block length $n$:
 \begin{equation}
     P(X_1 = x_1, \dots, X_n = x_n) = P(X_{1+\tau} = x_1, \dots, X_{n+\tau} = x_n).
 \end{equation}
-This invariance in probability distribution directly implies the invariance of entropy. If the distribution $P$ is shift-invariant, the expectation $H(X^n) = \E[-\log P(X^n)]$ must also be shift-invariant. Thus, $H(X_1, \dots, X_n) = H(X_{1+\tau}, \dots, X_{n+\tau})$ and conditional entropies rely solely on relative history, not absolute time.
+This invariance in probability distribution directly implies the invariance of entropy. If the distribution $P$ is shift-invariant, $H(X^n) = \E[-\log P(X^n)]$ must also be shift-invariant. Thus, $H(X_1, \dots, X_n) = H(X_{1+\tau}, \dots, X_{n+\tau})$ and conditional entropies rely solely on relative history.
 
 \textbf{Entropy Rate:}
-For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$, defined as the asymptotic per-symbol entropy \cite[Def 4.1]{cover}:
+For a source with memory, the marginal entropy $H(X_1)$ overestimates the true information content because it ignores the predictability provided by the context. The fundamental limit is instead given by the \textit{entropy rate} $\Hrate$: \cite[Def 4.1]{cover}:
 \begin{equation}
     \Hrate = \lim_{n \to \infty} \frac{1}{n} H(X_1, \dots, X_n).
 \end{equation}
@@ -93,7 +98,7 @@ This rate represents the irreducible uncertainty of the process after all past h
 
 \subsection{Convergence of Entropy Rates (Theorem 1)}
 
-For stationary sources, these sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the below properties, referencing Cover \& Thomas \cite[Chap 4]{cover}.
+For stationary sources, these two sequences converge to the entropy rate $\Hrate$ as $n \to \infty$. We provide proofs for the below properties, referencing Cover \& Thomas \cite[Chap 4]{cover}.
 
 % STATEMENT 1
 \begin{statement} \label{stm:cond_non_increasing}
@@ -183,7 +188,6 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
           \begin{equation}
               P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
           \end{equation}
-
     \item \textbf{Posterior:}
           Multiplying the prior and likelihood gives us the posterior distribution (proportionality ignores the normalizing constant $P(D)$):
           \begin{equation}
@@ -191,16 +195,16 @@ where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit
           \end{equation}
 \end{itemize}
 
-This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. \footnote{The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$}As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
+This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. \footnote{The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$}As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$.
 
 \subsubsection{Laplace's Rule of Succession (Binary Case)}
-To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - hence marginalization. This predictive probability is equivalent to the expected value of the posterior distribution:
+To encode the next symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we marginalize over \textit{all possible} values of $\theta$. This predictive probability is equivalent to the expected value of the posterior distribution:
 \begin{align} \label{eq:expect}
     P(X_{n+1} = x | D) & = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta                                                          \\
                        & = \int_0^1 \theta \cdot P(\theta | D) \, d\theta \quad \text{since $P(X_{n+1} = x | \theta) = \theta$ by definition} \\
                        & = \mathbb{E}[\theta | D]
 \end{align}
-This expectation corresponds to the Minimum Mean-Squared Error (MMSE) estimator in Bayesian theory. Since our posterior is a Beta distribution $Beta(\alpha, \beta)$ with $\alpha = n_x+1$ and $\beta = n_y+1$, we use the known formula for the mean of a Beta distribution, $\mu = \frac{\alpha}{\alpha+\beta}$ \cite{mackay,weisberg}:
+Since our posterior is a Beta distribution $Beta(\alpha, \beta)$ with $\alpha = n_x+1$ and $\beta = n_y+1$, we use the known formula for the mean of a Beta distribution, $\mu = \frac{\alpha}{\alpha+\beta}$ \cite{mackay,weisberg}:
 \begin{equation}
     \hat{p}(x) = \mathbb{E}[\theta | D] = \frac{\alpha}{\alpha + \beta} = \frac{n_x + 1}{(n_x + 1) + (n_y + 1)} = \frac{n_x + 1}{n + 2}.
 \end{equation}
@@ -208,7 +212,7 @@ This result is Laplace's Rule of Succession. It effectively adds 1 "pseudocount"
 
 \subsubsection{Generalization to Text (Multinomial Case)}
 
-We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$. The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
+We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$. The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay} with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ and probability density \cite[Eq. 23.30]{mackay}:
 \begin{equation}
     P(\boldsymbol{\theta} | \boldsymbol{\alpha}) = \frac{1}{B(\boldsymbol{\alpha})} \prod_{i=1}^K \theta_i^{\alpha_i - 1}
 \end{equation}
@@ -227,7 +231,7 @@ This is the \textit{Laplace estimator}. It ensures every symbol has non-zero pro
 
 \subsection{Experimental Performance and Analysis}
 
-We simulate adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step $L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}$ . Note that the probability model here built is a still a 0-order adaptive model (we are still learning the distribution assuming each character is i.i.d.) The model is adaptive in the sense of updating its probabilities as more characters are observed.
+We simulate adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step $L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}$ . \footnote{Note that the probability model here built is a still a 0-order adaptive model (we are still learning the distribution assuming each character is i.i.d.) The model is adaptive in the sense of updating its probabilities as more characters are observed}
 
 \subsubsection{Convergence to Static Entropy}
 Figure \ref{fig:convergence} shows the running average rate $L/n$, which is the estimate of the entropy of the i.i.d distribution.
@@ -274,7 +278,7 @@ We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{ham
           \begin{equation}
               \hat{p}(x) \approx \frac{n_x + \delta}{N} = \frac{n_x}{N} + \frac{\delta}{N}.
           \end{equation}
-          The estimator closely tracks the empirical frequency $n_x/N$, enabling rapid learning. However, for unseen symbols ($n_x=0$), the probability is only $\delta/N$, yielding a harsh code length penalty of $-\log_2(\delta/N) \approx \log_2(N/\delta)$ bits. As $\delta \to 0$, this initial cost spikes dramatically, as seen in the sharp initial peaks in Fig. \ref{fig:delta_grid}. However, once a symbol is seen, the model adapts very quickly as the estimator closely tracks the empirical frequency.
+          For unseen symbols ($n_x=0$), the probability is only $\delta/N$, yielding a harsh code length penalty of $-\log_2(\delta/N) \approx \log_2(N/\delta)$ bits. As $\delta \to 0$, this initial cost spikes dramatically, as seen in the sharp initial peaks in Fig. \ref{fig:delta_grid}. However, once a symbol is seen, the model adapts very quickly as the estimator closely tracks the empirical frequency $n_x/N$
 
     \item \textbf{Large $\delta$ ($\delta \gg 1$):} The denominator is dominated by $K\delta$, so the estimator approximates:
           \begin{equation}
@@ -296,12 +300,10 @@ To rigorously compare the performance of Adaptive and Static coding (instead of 
 In our experiment, we compare the cumulative code lengths of the two approaches as a function of the sequence length $n$:
 
 \textbf{Static Coding (Theoretical Bound):}
-Since static coding requires a pre-computed frequency table, it is impossible to run "online" in the same manner as adaptive coding. Instead, we plot the theoretical lower bound at each length $n$, calculated using the standard MDL penalty \cite[Ch. 28]{mackay}:
+Since static coding requires a pre-computed frequency table, it is impossible to run "online" in the same manner as adaptive coding. Instead, we plot the theoretical lower bound at each length $n$, calculated using the MDL penalty \cite[Ch. 28]{mackay}: \footnote{The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity, the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
 \begin{equation}
     L_{\text{static}}(n) \approx \underbrace{n H_n}_{\text{Data Cost}} + \underbrace{\frac{K-1}{2} \log_2 n}_{\text{Model Cost}}
 \end{equation}
-
-The term $\frac{K-1}{2} \log_2 n$ represents the parametric complexity. \footnote{The "Occam Factor", the cost of specifying $K-1$ independent probability parameters to a precision of $1/\sqrt{n}$}
 
 \textbf{Adaptive Coding (Actual Cost):}
 This curve represents the number of bits generated by the simulated arithmetic coder up to symbol $n$. Unlike the static case, there is no explicit model cost ($L(\text{Model}) = 0$). Instead, the cost is the sum of the negative log-probabilities assigned by the sequential estimator:
@@ -323,8 +325,6 @@ Figure \ref{fig:adaptive_vs_static} presents the comparison of these two quantit
     \item \textbf{Short Sequences ($n < 10^4$):} Adaptive coding is superior. The static method suffers from the "overhead problem," where the fixed cost of the frequency table ($\approx \frac{K}{2} \log n$) outweighs the data payload.
     \item \textbf{Convergence ($n \to \infty$):} As $n$ increases, the two curves converge. The static overhead is amortized over more symbols, while the adaptive estimator converges to the true frequencies.
 \end{itemize}
-
-Ultimately, this demonstrates that adaptive coding achieves the same asymptotic efficiency as static coding without requiring a two-pass process.
 
 \section{Adaptive Coding with Memory} \label{sec:ada_cod_mem}
 
