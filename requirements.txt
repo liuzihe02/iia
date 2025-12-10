@@ -4,3 +4,4 @@ scipy
 jupyter
 notebook
 pandas
+plotly
