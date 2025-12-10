@@ -231,40 +231,84 @@ Substituting our posterior parameters $\alpha_i' = 1+ n_i$:
 
 This is the \textit{Laplace estimator}. It ensures every symbol has non-zero probability of at least $1/(N+K)$, solving the zero-frequency problem. The uniform prior $\boldsymbol{\alpha} = (1, \dots, 1)$ effectively adds 1 "pseudocount" to each symbol, which can be interpreted as pretending we observed each symbol once before seeing any real data \cite{tsun2025,mackay}.
 
-\subsection{Experimental Performance}
+\subsection{Experimental Performance and Analysis}
 
-We estimate the performance of the adaptive arithmetic code.
+We simulated adaptive arithmetic coding on \texttt{hamlet.txt}. The code length $L$ for a sequence $x_1, \dots, x_n$ is estimated as the sum of the log-probabilities assigned by the model at each step:
+\begin{equation}
+    L = - \sum_{i=1}^n \log_2 \hat{p}_{x_i}
+\end{equation}
 
-\textbf{Convergence:} Fig. \ref{fig:convergence} shows the running average code length $L/n$ converging to the static entropy $H_1$. The "learning penalty" (excess code length) decreases as $O(1/n)$, consistent with universal coding theory \cite[Sec 13.2]{cover}.
+Note that the probability model here built is a still a 0-order adaptive model (we are still learning the distribution assuming each character is i.i.d.) The model is adaptive in the sense of updating its probabilities as more characters are observed.
 
-\textbf{Bias Parameter $\delta$:} We varied $\delta$ (Fig. \ref{fig:delta}) and found the optimal range $\delta \in [0.5, 1.0]$.
+\subsubsection{Convergence to Static Entropy}
+Figure \ref{fig:convergence} shows the running average rate $L/n$, which is the estimate of the entropy of the i.i.d distribution.
+
 \begin{itemize}
-    \item Small $\delta$ ($< 0.1$): Overfitting. Unseen symbols have near-zero probability, causing massive penalties.
-    \item Large $\delta$ ($> 5$): Underfitting. The strong prior washes out the observed data, slowing adaptation.
+    \item \textbf{Initial Behaviour:} For small $n$, the rate is high ($>6$ bits) because counts are low and the uniform prior dominates the distribution.
+    \item \textbf{Asymptotic Behavior:} As $n \to \infty$, the estimator $\hat{p}_x$ converges to the true relative frequencies of the file. Consequently, the adaptive rate converges to the static i.i.d. entropy $H_1$ ($\approx 4.45$ bits). Note that the curve stays slightly above $H_1$. This redundancy represents the "learning cost" of building the model online (we haven't observed the complete data yet)
 \end{itemize}
 
-\textbf{Adaptive vs. Non-Adaptive:} Fig. \ref{fig:comparison} compares total bits. Non-adaptive coding requires overhead to store the frequency table ($\approx K \log n$ bits). Adaptive coding has no header but higher initial redundancy. The crossover point for Hamlet is at $n \approx 50,000$ symbols. For files shorter than this, adaptive coding is more efficient.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/adaptive_coding_convergence.png}
-    \caption{Convergence of adaptive coding rate ($L/n$) to the empirical entropy ($H_1$) for $\delta=1$. The overhead vanishes as the model "learns" the source statistics.}
+    \includegraphics[width=0.8\textwidth]{images/adaptive_coding_convergence.png}
+    \caption{Convergence of 0-order Adaptive Coding ($L/n$) to the static entropy $H_1$ with $\delta=1.0$ (Laplace Estimator) over $N=10,000$ symbols.}
     \label{fig:convergence}
 \end{figure}
 
+
+\subsubsection{Sensitivity to Bias Parameter $\delta$}
+
+We investigated the impact of the pseudocount parameter $\delta$ by generalizing the estimator to:
+\begin{equation}
+    \hat{p}(x) = \frac{n_x + \delta}{N + K\delta}
+\end{equation}
+We tested $\delta \in [0.01, 50]$ on the first $N=10,000$ symbols of \texttt{hamlet.txt} to visualize convergence behavior (Fig. \ref{fig:delta_grid}), and then measured the final compression rate on the \textit{entire text} ($N=207,039$) to determine the optimal parameter (Fig. \ref{fig:delta_final}).
+
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/delta_variation.png}
-    \caption{The effect of the bias parameter $\delta$. The minimum code length is achieved around $\delta \approx 1.0$, corresponding to the Laplace estimator.}
-    \label{fig:delta}
+    \includegraphics[width=0.9\textwidth]{images/delta_convergence_grid.png}
+    \caption{Adaptive coding convergence profiles for various prior strengths $\delta$ ($N=10,000$ symbols). Small $\delta$ leads to rapid learning but high volatility; large $\delta$ creates a stable but slow-converging model.}
+    \label{fig:delta_grid}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.75\textwidth]{images/adaptive_vs_nonadaptive.png}
-    \caption{Total bits required for Adaptive vs Non-Adaptive coding. The crossover at $n \approx 50,000$ highlights the efficiency of adaptive coding for short streams.}
+    \includegraphics[width=0.8\textwidth]{images/delta_variation.png}
+    \caption{Effect of bias $\delta$ on the final compression rate, measured on the \textit{entire} Hamlet text ($N \approx 207k$). The minimum occurs at $\delta \approx 0.5$ (Krichevsky-Trofimov estimator).}
+    \label{fig:delta_final}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Small $\delta$ ($\delta < 0.5$):}
+          When $\delta$ is very small (e.g., 0.01), the model assigns negligible probability mass to unseen characters. This makes the "zero-frequency" penalty extremely harsh. During the first appearance of a symbol ($n_x=0$), the estimated probability is $P \approx \delta/N$, leading to a code length of $-\log_2(\delta/N)$. As $\delta \to 0$, this initial cost spikes dramatically, as seen in the sharp initial peaks in Fig. \ref{fig:delta_grid}. However, once a symbol is seen, the model adapts very quickly.
+
+    \item \textbf{Large $\delta$ ($\delta > 1.0$):}
+          A large $\delta$ (e.g., 50.0) corresponds to a strong prior belief that the distribution is uniform. It dominates the denominator $N + K\delta$, diluting the influence of the observed data counts $n_x$. This acts as a "dampener," resulting in a very stable curve that converges slowly to the true entropy (Fig. \ref{fig:delta_grid}, bottom right).
+
+    \item \textbf{Optimal $\delta = 0.5$:}
+          Our experiments on the full text (Fig. \ref{fig:delta_final}) show that $\delta=0.5$ yields the minimum code rate, slightly outperforming the Laplace estimator ($\delta=1$)
+\end{itemize}
+
+\subsubsection{Adaptive vs. Static: The Trade-off}
+Static coding requires transmitting a probability table (overhead) plus the data. Adaptive coding has less overhead but pays a learning penalty.
+We modeled the static overhead as $k \log_2 n$ bits. Figure \ref{fig:comparison} compares the total file size.
+\begin{itemize}
+    \item For file lengths $n < 50,000$ symbols, \textbf{Adaptive coding} (blue) is superior. The cost of the static header dominates the compression gains for short files.
+    \item For $n > 50,000$, the \textbf{Static method} (red) becomes marginally more efficient. Once the file is long enough to amortize the header cost, the static model (which is "optimal" from the start) beats the adaptive model (which is still refining its estimates).
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/adaptive_vs_nonadaptive.png}
+    \caption{Adaptive vs Static Coding. The crossover at $n \approx 50,000$ indicates where the overhead of a static header outweighs the learning cost of adaptive coding.}
     \label{fig:comparison}
 \end{figure}
+
+\subsection{Adaptive Coding with Memory}
+The experiment above used a 0-order model (assuming i.i.d.). To capture memory (where $\Hrate < H_1$), we would need to estimate conditional probabilities $P(X_t | X_{t-1})$.
+However, extending Eq. \ref{eq:estimator} to high-order contexts introduces \textbf{Context Dilution}. As context length increases, the total count $n$ is split among $|\mathcal{X}|^k$ distinct contexts. Most contexts appear only a few times, so $n_{context} \approx 0$.
+In this regime, the bias $\delta$ dominates the counts ($n_x \ll \delta$), resulting in a near-uniform distribution and poor compression. Practical schemes like PPM solve this by "escaping" to shorter contexts when statistics are sparse.
 
 \section{Conclusion}
 
