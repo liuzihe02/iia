@@ -148,52 +148,79 @@ This approach directly addresses the data sparsity problem. When a symbol appear
 
 In adaptive coding, we face the "zero-frequency problem": if a symbol $x$ has not yet appeared in the stream, its Maximum Likelihood Estimate (MLE) is $P(x) = 0$. This is catastrophic for arithmetic coding. To solve this, we must assign probability mass to unseen events. We derive the solution using Bayesian inference, which treats the unknown probabilities not as fixed values, but as random variables describing our uncertainty \cite[p. 97]{godsill}.
 
-\subsubsection{The Beta Prior and Posterior}
+\subsubsection{The Beta Posterior}
 Consider a binary version of the problem where we simply estimate the probability $\theta$ that the next symbol is a specific character 'x'. We start with \textbf{Bayes' Theorem}:
 \begin{equation}
     P(\theta | D) = \frac{P(D | \theta) P(\theta)}{P(D)}
 \end{equation}
 where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit{prior} belief, and $P(D|\theta)$ is the \textit{likelihood} of the data.
 
-\textbf{1. The Prior (Before Data):}
-Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the \textbf{Uniform Distribution}, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
+\textbf{Prior:}
+Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
 \begin{equation}
     P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1.
 \end{equation}
 
-This implies that before we start reading, we consider every possible value for the probability of 'x' to be equally likely.
-
-\textbf{2. The Likelihood (The Data):}
+\textbf{Likelihood:}
 Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence given $\theta$, the probability of seeing this specific sequence is:
 \begin{equation}
     P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
 \end{equation}
 
-\textbf{3. The Posterior (Updated Belief):}
+\textbf{Posterior:}
 Multiplying the prior and likelihood gives us the posterior distribution (proportionality ignores the normalizing constant $P(D)$):
 \begin{equation}
     P(\theta | D) \propto \theta^{n_x} (1-\theta)^{n_y} \cdot 1.
 \end{equation}
-This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
 
-\subsubsection{The Rule of Succession (Prediction)}
-To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability. This process is called \textbf{marginalization}:
-\begin{equation}
-    P(X_{n+1} = x | D) = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta.
-\end{equation}
-Since $P(X_{n+1} = x | \theta) = \theta$ by definition, this integral calculates the \textbf{expected value} (mean) of the posterior Beta distribution. This corresponds to the Minimum Mean-Squared Error (MMSE) estimator in Bayesian theory, which is defined as the expectation of the posterior \cite[p. 129]{godsill}. The mean of a $Beta(\alpha, \beta)$ distribution is $\frac{\alpha}{\alpha+\beta}$ \cite{mackay}. Substituting our posterior parameters $\alpha = n_x+1$ and $\beta = n_y+1$:
-\begin{equation}
-    \hat{p}(x) = \mathbb{E}[\theta | D] = \frac{n_x + 1}{(n_x + 1) + (n_y + 1)} = \frac{n_x + 1}{n + 2}.
-\end{equation}
+This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. (The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$) As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
 
-This result is the famous \textbf{Laplace's Rule of Succession}. It provides a rigorous justification for "add-one smoothing": we are not arbitrarily adding 1, but rather including the "pseudocounts" from our uniform prior.
-
-\subsubsection{Generalization to Text (Dirichlet Distribution)}
-For an alphabet of size $K$ (e.g., $K=256$ for ASCII), the Beta distribution generalizes to the \textbf{Dirichlet distribution} \cite[Ch 3]{mackay}. The uniform prior corresponds to a Dirichlet distribution with parameter vector $\boldsymbol{\alpha} = (1, 1, \dots, 1)$. The predictive probability for any symbol $x$ becomes:
+\subsubsection{Laplace's Rule of Succession}
+To encode the \textit{next} symbol $X_{n+1}$, we do not simply use the most probable value of $\theta$ (the peak). Instead, we must average over \textit{all possible} values of $\theta$, weighted by their posterior probability - a process known as \textit{marginalization}. This predictive probability is equivalent to the expected value of the posterior distribution:
+\begin{align}
+    P(X_{n+1} = x | D) & = \int_0^1 P(X_{n+1} = x | \theta) P(\theta | D) \, d\theta                                                          \\
+                       & = \int_0^1 \theta \cdot P(\theta | D) \, d\theta \quad \text{since $P(X_{n+1} = x | \theta) = \theta$ by definition} \\
+                       & = \mathbb{E}[\theta | D]
+\end{align}
+This expectation corresponds to the Minimum Mean-Squared Error (MMSE) estimator in Bayesian theory. Since our posterior is a Beta distribution $Beta(\alpha, \beta)$ with $\alpha = n_x+1$ and $\beta = n_y+1$, we use the known formula for the mean of a Beta distribution, $\mu = \frac{\alpha}{\alpha+\beta}$ \cite{mackay,weisberg}:
 \begin{equation}
-    \hat{p}(x) = \frac{n_x + 1}{\sum_{i=1}^K (n_i + 1)} = \frac{n_x + 1}{n + K}.
+    \hat{p}(x) = \mathbb{E}[\theta | D] = \frac{\alpha}{\alpha + \beta} = \frac{n_x + 1}{(n_x + 1) + (n_y + 1)} = \frac{n_x + 1}{n + 2}.
 \end{equation}
-This is the estimator we implemented in the laboratory. It ensures that every symbol always has a non-zero probability of at least $1/(n+K)$, preventing the infinite code length problem while converging to the true frequency $n_x/n$ as $n \to \infty$.
+This result is Laplace's Rule of Succession. It effectively adds 1 "pseudocount" to both outcomes, preventing zero probabilities \cite[p. 52]{mackay}.
+
+\subsubsection{Generalization to Text (The Dirichlet Distribution)}
+We now generalize from binary to an alphabet of size $K$ (e.g., $K=256$). The unknown parameter is now a probability vector $\mathbf{p} = (p_1, \dots, p_K)$ such that $\sum p_i = 1$.
+
+The generalization of the Beta distribution to $K$ dimensions is the **Dirichlet distribution** \cite[Eq. 23.46]{mackay}. Its probability density function is given by:
+\begin{equation}
+    P(\mathbf{p} | \boldsymbol{\alpha}) = \frac{1}{Z(\boldsymbol{\alpha})} \prod_{i=1}^K p_i^{\alpha_i - 1}
+\end{equation}
+where $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ are the parameters and $Z(\boldsymbol{\alpha})$ is a normalizing constant.
+
+If we assume a uniform prior (Dirichlet with $\alpha_i = 1$ for all $i$) and observe counts $\mathbf{n} = (n_1, \dots, n_K)$, the posterior becomes Dirichlet with parameters $\alpha_i' = n_i + 1$. The predictive probability for the next symbol being $i$ is the mean of this posterior \cite[p. 316]{mackay}:
+\begin{equation}
+    \hat{p}_i = \frac{\alpha_i'}{\sum_j \alpha_j'} = \frac{n_i + 1}{\sum_j (n_j + 1)} = \frac{n_i + 1}{N + K}
+\end{equation}
+This is the **Laplace Estimator** used in our lab. It is the natural multivariate extension of the Rule of Succession, adding 1 pseudocount to every possible symbol in the alphabet.
+
+\subsubsection{Generalization to Text (The Dirichlet Distribution)}
+We now generalize from 2 outcomes to an alphabet of size $K$ (e.g., $K=256$). The unknown parameter is a vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ \cite{teh2010}.
+
+\begin{enumerate}
+    \item \textbf{Likelihood:} The probability of observing counts $\mathbf{n} = (n_1, \dots, n_K)$ is given by the multinomial distribution: $P(D|\boldsymbol{\theta}) \propto \prod_{i=1}^K \theta_i^{n_i}$ \cite{notes74}.
+    \item \textbf{Prior:} The natural generalization of the Beta distribution to $K$ dimensions is the **Dirichlet distribution**. A uniform prior corresponds to Dirichlet parameters $\boldsymbol{\alpha} = (1, \dots, 1)$. Its density is $P(\boldsymbol{\theta}) = 1$ \cite{teh2010}.
+    \item \textbf{Posterior:} Multiplying the multinomial likelihood by the Dirichlet prior yields the posterior:
+          \begin{equation}
+              P(\boldsymbol{\theta} | D) \propto \prod_{i=1}^K \theta_i^{n_i} \cdot 1 = \prod_{i=1}^K \theta_i^{(n_i + 1) - 1}
+          \end{equation}
+          The posterior is simply a Dirichlet distribution with updated parameters $\alpha_i' = n_i + 1$ \cite[Sec. 3]{notes74}
+\end{enumerate}
+
+Just as in the binary case, the predictive probability for the next symbol being $i$ is the expected value of $\theta_i$ under this posterior distribution. The mean of a Dirichlet distribution with parameters $\boldsymbol{\alpha}'$ is $\alpha_i' / \sum_j \alpha_j'$ \cite[Eq. 7.18]{notes74}:
+\begin{equation}
+    \hat{p}(i) = \mathbb{E}[\theta_i | D] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
+\end{equation}
+This is the Laplace Estimator. It ensures every symbol has a non-zero probability of at least $1/(N+K)$, allowing adaptive coding to start from a blank slate without infinite code lengths.
 
 \subsection{Experimental Performance}
 
@@ -248,6 +275,18 @@ This report demonstrated that while English text is a stationary source with mem
 
     \bibitem{godsill}
     S. Godsill, \textit{Estimation Theory and Inference Methods}, Lecture Notes (3F3), University of Cambridge, 2023
+
+    \bibitem{weisberg}
+    J. Weisberg, "Laplace's Rule of Succession," \textit{Formal Epistemology}, 2019. Available: \url{https://jonathanweisberg.org/post/inductive-logic-2/}
+
+    \bibitem{teh2010}
+    Y. W. Teh, "Dirichlet Process," in \textit{Encyclopedia of Machine Learning}, 2010.
+
+    \bibitem{notes74}
+    Course Notes, "Chapter 7.4: The Dirichlet-Multinomial Model".
+
+    \bibitem{lecture19}
+    Scribe Notes, "Lecture 19: Conjugate Priors".
 
 \end{thebibliography}
 
