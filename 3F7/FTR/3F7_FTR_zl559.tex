@@ -130,7 +130,7 @@ Since $H_i^*$ is a non-increasing sequence (Statement 1), the current term $H_n^
     \label{fig:entropy_rate}
 \end{figure}
 
-We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 \dot 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator (of the entropy rate) operating in a high-dimensional regime with insufficient data (the "curse of dimensionality"). Accurate measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
+We measured the block entropy per symbol, $H_n = \frac{1}{n} H(X_1, \dots, X_n)$, for $n=1$ to $100$. As shown in Fig. \ref{fig:entropy_rate}, estimates for small $n$ ($n=1 - 20$) decrease quickly, correctly reflecting that English text is a source with memory; knowledge of previous characters reduces the uncertainty of the current one. However, for $n \ge 4$, the estimate continues to decay toward zero. The true entropy rate of English ($H_\infty$) is surely not zero. Rather, this decay is a statistical artifact of an maximum likelihood estimator (of the entropy rate) operating in a high-dimensional regime with insufficient data (the "curse of dimensionality"). Accurate measurement of $H_\infty$ is impossible without a sample size $N$ that scales as $|\mathcal{X}|^n$.
 
 \subsection{Implications for Static Coding}
 
@@ -155,23 +155,24 @@ Consider a binary version of the problem where we simply estimate the probabilit
 \end{equation}
 where $D$ is the observed data (sequence of symbols), $P(\theta)$ is the \textit{prior} belief, and $P(D|\theta)$ is the \textit{likelihood} of the data.
 
-\textbf{Prior:}
-Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
-\begin{equation}
-    P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1.
-\end{equation}
+\begin{itemize}
+    \item \textbf{Prior:}
+          Since we assume no prior knowledge about the text, we must choose a prior that represents total ignorance. For a probability parameter $\theta \in [0,1]$, the natural choice is the Uniform Distribution, also known as the $Beta(1,1)$ distribution \cite[Ch 3]{mackay}. In the Bayesian framework, this corresponds to a prior which expresses no initial preference for one parameter set over another:
+          \begin{equation}
+              P(\theta) = 1 \quad \text{for } 0 \le \theta \le 1
+          \end{equation}
+    \item \textbf{Likelihood:}
+          Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence given $\theta$, the probability of seeing this specific sequence is:
+          \begin{equation}
+              P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
+          \end{equation}
 
-\textbf{Likelihood:}
-Suppose we observe a stream of length $n$ containing $n_x$ occurrences of 'x' and $n_y$ occurrences of other symbols ($n_y = n - n_x$). Assuming independence given $\theta$, the probability of seeing this specific sequence is:
-\begin{equation}
-    P(D | \theta) = \theta^{n_x} (1-\theta)^{n_y}.
-\end{equation}
-
-\textbf{Posterior:}
-Multiplying the prior and likelihood gives us the posterior distribution (proportionality ignores the normalizing constant $P(D)$):
-\begin{equation}
-    P(\theta | D) \propto \theta^{n_x} (1-\theta)^{n_y} \cdot 1.
-\end{equation}
+    \item \textbf{Posterior:}
+          Multiplying the prior and likelihood gives us the posterior distribution (proportionality ignores the normalizing constant $P(D)$):
+          \begin{equation}
+              P(\theta | D) \propto \theta^{n_x} (1-\theta)^{n_y} \cdot 1.
+          \end{equation}
+\end{itemize}
 
 This resulting distribution is a Beta distribution with parameters $(n_x+1, n_y+1)$. (The general form of the Beta probability density function is: $f(\theta; \alpha, \beta) \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}$) As $n$ grows, this curve becomes a sharp peak around the empirical frequency $n_x/n$, representing our growing confidence.
 
@@ -189,38 +190,45 @@ This expectation corresponds to the Minimum Mean-Squared Error (MMSE) estimator 
 This result is Laplace's Rule of Succession. It effectively adds 1 "pseudocount" to both outcomes, preventing zero probabilities \cite[p. 52]{mackay}.
 
 \subsubsection{Generalization to Text (The Dirichlet Distribution)}
-We now generalize from binary to an alphabet of size $K$ (e.g., $K=256$). The unknown parameter is now a probability vector $\mathbf{p} = (p_1, \dots, p_K)$ such that $\sum p_i = 1$.
 
-The generalization of the Beta distribution to $K$ dimensions is the **Dirichlet distribution** \cite[Eq. 23.46]{mackay}. Its probability density function is given by:
+We now generalize from binary outcomes to an alphabet of size $K$ (e.g., $K=256$ for extended ASCII). The unknown parameter is now a probability vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ where $\sum_{i=1}^K \theta_i = 1$.
+
+The natural generalization of the Beta distribution to $K$ dimensions is the \textit{Dirichlet distribution} \cite[pg 317]{mackay}. Just as the Beta distribution represents our uncertainty about a single probability parameter, the Dirichlet distribution represents our uncertainty about a \textit{vector} of probabilities that must sum to 1. The Dirichlet distribution with parameters $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ has probability density \cite[Eq. 23.30]{mackay}:
 \begin{equation}
-    P(\mathbf{p} | \boldsymbol{\alpha}) = \frac{1}{Z(\boldsymbol{\alpha})} \prod_{i=1}^K p_i^{\alpha_i - 1}
+    P(\boldsymbol{\theta} | \boldsymbol{\alpha}) = \frac{1}{B(\boldsymbol{\alpha})} \prod_{i=1}^K \theta_i^{\alpha_i - 1}
 \end{equation}
-where $\boldsymbol{\alpha} = (\alpha_1, \dots, \alpha_K)$ are the parameters and $Z(\boldsymbol{\alpha})$ is a normalizing constant.
+where $B(\boldsymbol{\alpha}) = \frac{\prod_i \Gamma(\alpha_i)}{\Gamma(\sum_i \alpha_i)}$ is the multivariate Beta function (normalizing constant) and each $\alpha_i > 0$ \cite{tsun2025}.
 
-If we assume a uniform prior (Dirichlet with $\alpha_i = 1$ for all $i$) and observe counts $\mathbf{n} = (n_1, \dots, n_K)$, the posterior becomes Dirichlet with parameters $\alpha_i' = n_i + 1$. The predictive probability for the next symbol being $i$ is the mean of this posterior \cite[p. 316]{mackay}:
-\begin{equation}
-    \hat{p}_i = \frac{\alpha_i'}{\sum_j \alpha_j'} = \frac{n_i + 1}{\sum_j (n_j + 1)} = \frac{n_i + 1}{N + K}
-\end{equation}
-This is the **Laplace Estimator** used in our lab. It is the natural multivariate extension of the Rule of Succession, adding 1 pseudocount to every possible symbol in the alphabet.
-
-\subsubsection{Generalization to Text (The Dirichlet Distribution)}
-We now generalize from 2 outcomes to an alphabet of size $K$ (e.g., $K=256$). The unknown parameter is a vector $\boldsymbol{\theta} = (\theta_1, \dots, \theta_K)$ \cite{teh2010}.
+Suppose we observe a sequence with symbol counts $\mathbf{n} = (n_1, \dots, n_K)$ where $N = \sum_i n_i$ is the total number of observations.
 
 \begin{enumerate}
-    \item \textbf{Likelihood:} The probability of observing counts $\mathbf{n} = (n_1, \dots, n_K)$ is given by the multinomial distribution: $P(D|\boldsymbol{\theta}) \propto \prod_{i=1}^K \theta_i^{n_i}$ \cite{notes74}.
-    \item \textbf{Prior:} The natural generalization of the Beta distribution to $K$ dimensions is the **Dirichlet distribution**. A uniform prior corresponds to Dirichlet parameters $\boldsymbol{\alpha} = (1, \dots, 1)$. Its density is $P(\boldsymbol{\theta}) = 1$ \cite{teh2010}.
-    \item \textbf{Posterior:} Multiplying the multinomial likelihood by the Dirichlet prior yields the posterior:
+    \item \textbf{Prior:} We start with a uniform prior representing complete ignorance, which corresponds to $\boldsymbol{\alpha} = (1, \dots, 1)$:
           \begin{equation}
-              P(\boldsymbol{\theta} | D) \propto \prod_{i=1}^K \theta_i^{n_i} \cdot 1 = \prod_{i=1}^K \theta_i^{(n_i + 1) - 1}
+              P(\boldsymbol{\theta}) = \text{Dir}(1, \dots, 1) = \text{Uniform}
           \end{equation}
-          The posterior is simply a Dirichlet distribution with updated parameters $\alpha_i' = n_i + 1$ \cite[Sec. 3]{notes74}
+
+    \item \textbf{Likelihood:} The probability of observing these counts follows the multinomial distribution:
+          \begin{equation}
+              P(\mathbf{n} | \boldsymbol{\theta}) \propto \prod_{i=1}^K \theta_i^{n_i}
+          \end{equation}
+
+    \item \textbf{Posterior:} By Bayes' theorem, the posterior is also Dirichlet with updated parameters:
+          \begin{equation}
+              P(\boldsymbol{\theta} | \mathbf{n}) = \text{Dir}(\alpha_1 + n_1, \dots, \alpha_K + n_K) = \text{Dir}(1 + n_1, \dots, 1 + n_K)
+          \end{equation}
 \end{enumerate}
 
-Just as in the binary case, the predictive probability for the next symbol being $i$ is the expected value of $\theta_i$ under this posterior distribution. The mean of a Dirichlet distribution with parameters $\boldsymbol{\alpha}'$ is $\alpha_i' / \sum_j \alpha_j'$ \cite[Eq. 7.18]{notes74}:
+To predict the next symbol, we must marginalize over all possible parameter values weighted by the posterior. This predictive probability equals the \textit{mean} of the posterior Dirichlet distribution. For a Dirichlet distribution with parameters $(\alpha_1', \dots, \alpha_K')$, the mean is \cite[Eq. 23.32]{mackay}:
 \begin{equation}
-    \hat{p}(i) = \mathbb{E}[\theta_i | D] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
+    \mathbb{E}[\theta_i] = \frac{\alpha_i'}{\sum_{j=1}^K \alpha_j'}
 \end{equation}
-This is the Laplace Estimator. It ensures every symbol has a non-zero probability of at least $1/(N+K)$, allowing adaptive coding to start from a blank slate without infinite code lengths.
+
+Substituting our posterior parameters $\alpha_i' = 1+ n_i$:
+\begin{equation}
+    \hat{p}(i) = \mathbb{E}[\theta_i | \mathbf{n}] = \frac{n_i + 1}{\sum_{j=1}^K (n_j + 1)} = \frac{n_i + 1}{N + K}
+\end{equation}
+
+This is the \textit{Laplace estimator}. It ensures every symbol has non-zero probability of at least $1/(N+K)$, solving the zero-frequency problem. The uniform prior $\boldsymbol{\alpha} = (1, \dots, 1)$ effectively adds 1 "pseudocount" to each symbol, which can be interpreted as pretending we observed each symbol once before seeing any real data \cite{tsun2025,mackay}.
 
 \subsection{Experimental Performance}
 
@@ -279,14 +287,13 @@ This report demonstrated that while English text is a stationary source with mem
     \bibitem{weisberg}
     J. Weisberg, "Laplace's Rule of Succession," \textit{Formal Epistemology}, 2019. Available: \url{https://jonathanweisberg.org/post/inductive-logic-2/}
 
-    \bibitem{teh2010}
-    Y. W. Teh, "Dirichlet Process," in \textit{Encyclopedia of Machine Learning}, 2010.
+    \bibitem{tsun2025}
+    A. Tsun, ``The Beta and Dirichlet Distributions,'' Chapter 7.4 in \textit{Probability \& Statistics with Applications to Computing}, CS109 Course Reader, Stanford University, 2025. Available: \url{https://web.stanford.edu/class/archive/cs/cs109/cs109.1218/files/student_drive/7.4.pdf}
 
-    \bibitem{notes74}
-    Course Notes, "Chapter 7.4: The Dirichlet-Multinomial Model".
 
-    \bibitem{lecture19}
-    Scribe Notes, "Lecture 19: Conjugate Priors".
+    \bibitem{xing2014}
+    E. P. Xing, ``Bayesian Nonparametrics: Dirichlet Processes,'' Lecture 19 in \textit{10-708: Probabilistic Graphical Models}, Lecture notes by C. Malings and J. Gao, Carnegie Mellon University, Spring 2014. Available: \url{https://www.cs.cmu.edu/~epxing/Class/10708-14/scribe_notes/scribe_note_lecture19.pdf}
+
 
 \end{thebibliography}
 
