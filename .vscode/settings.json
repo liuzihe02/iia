@@ -1,3 +1,5 @@
+//this is a git-tracked file!
+//denotes how we want to auto-compile the files in this repo
 {
   "markdown.validate.enabled": true,
   // LaTeX Workshop - Auto compile on file save
