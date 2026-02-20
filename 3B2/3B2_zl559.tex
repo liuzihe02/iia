@@ -82,12 +82,14 @@
 \section{Traffic Light Controller Design}
 
 We design a controller for a pedestrian light-controlled crossing, satisfying the following requirements:
-\begin{enumerate}
-    \item The initial state is vehicle GREEN and pedestrian RED.
-    \item State changes occur only on demand: a pedestrian request or a reset.
-    \item After a request, the sequence is: vehicle YELLOW for 5\,s, then vehicle RED with pedestrian GREEN for 10\,s, then back to the initial state.
-    \item An asynchronous reset returns to the initial state from any state.
-\end{enumerate}
+\textit{
+    \begin{enumerate}
+        \item The initial state is vehicle GREEN and pedestrian RED.
+        \item State changes occur only on demand: a pedestrian request or a reset.
+        \item After a request, the sequence is: vehicle YELLOW for 5\,s, then vehicle RED with pedestrian GREEN for 10\,s, then back to the initial state.
+        \item An asynchronous reset returns to the initial state from any state.
+    \end{enumerate}
+}
 
 These requirements are captured by a three-state FSM shown in Figure~\ref{fig:state-diagram}. State \texttt{G} is the idle state with vehicle GREEN and pedestrian RED. A pedestrian \texttt{request} triggers a transition to state \texttt{Y} (vehicle YELLOW), which serves as a warning to vehicles. After a 5\,s timeout the FSM enters state \texttt{R} (vehicle RED, pedestrian GREEN), allowing pedestrians to cross. A 10\,s timeout then returns the FSM to state \texttt{G}. An asynchronous active-low \texttt{reset} forces the FSM back to state \texttt{G} from any state.
 
@@ -158,8 +160,9 @@ The 32 registers break down as follows: the 2-bit \texttt{state} register, the 2
 %========================================================================================
 \section{Pin Assignment}
 
-%TODO: Comment on configurability of pin assignments in Quartus
-%TODO: Note: all on-board LEDs are RED; comment on this limitation
+During initial compilation, Quartus is free to assign design signals to any FPGA pin. However, the DE1-SoC board has hardwired connections between specific FPGA pins and on-board components (LEDs, push-buttons, clock oscillator), so pin assignments must be set manually via the Assignment Editor to match. The assignments used are shown in Table~\ref{tab:pins}. The design was recompiled after assigning pins so I/O is fitted correctly.
+
+One limitation of the DE1-SoC is that all ten on-board user LEDs (LEDR0--LEDR9) are physically red. The traffic light colours (green, yellow, red) are therefore represented by LED position rather than colour: for example, LEDR8 represents vehicle GREEN even though the physical LED is red. Every output was placed at a different even integer position.
 
 \begin{table}[htbp]
     \centering
