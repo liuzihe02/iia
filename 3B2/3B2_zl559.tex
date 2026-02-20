@@ -12,6 +12,7 @@
 
 %for state diagrams
 \usepackage{tikz}
+\usepackage{booktabs} % nicer table rules with built-in spacing
 \usetikzlibrary{automata, positioning, arrows.meta}
 
 % Remove vertical space between list items globally
@@ -38,11 +39,8 @@
     breaklines=true
 }
 
-% Custom macros for notation
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\Hrate}{H_\infty}
-\newcommand{\Xseq}{X_1, X_2, \dots}
-\newcommand{\Xn}{X^n}
+% colours for listings (tikz loads xcolor, but be explicit)
+\usepackage{xcolor}
 
 \hypersetup{
     colorlinks=true,
@@ -78,37 +76,182 @@
     \noindent This report documents the design, implementation and testing of a traffic light controller on an Altera Cyclone V FPGA. A three-state finite state machine controlling a pedestrian crossing is described in Verilog, compiled, and configured onto a DE1-SoC board via JTAG, and is improved with a vehicle lockout.
 \end{abstract}
 
+%========================================================================================
+% SECTION: TLC Design
+%========================================================================================
+\section{Traffic Light Controller Design}
+
+We design a controller for a pedestrian light-controlled crossing, satisfying the following requirements:
+\begin{enumerate}
+    \item The initial state is vehicle GREEN and pedestrian RED.
+    \item State changes occur only on demand: a pedestrian request or a reset.
+    \item After a request, the sequence is: vehicle YELLOW for 5\,s, then vehicle RED with pedestrian GREEN for 10\,s, then back to the initial state.
+    \item An asynchronous reset returns to the initial state from any state.
+\end{enumerate}
+
+These requirements are captured by a three-state FSM shown in Figure~\ref{fig:state-diagram}. State \texttt{G} is the idle state with vehicle GREEN and pedestrian RED. A pedestrian \texttt{request} triggers a transition to state \texttt{Y} (vehicle YELLOW), which serves as a warning to vehicles. After a 5\,s timeout the FSM enters state \texttt{R} (vehicle RED, pedestrian GREEN), allowing pedestrians to cross. A 10\,s timeout then returns the FSM to state \texttt{G}. An asynchronous active-low \texttt{reset} forces the FSM back to state \texttt{G} from any state.
+
+% State diagram (tikz figure from external file)
 \input{3B2_state_base.tex}
 
-\lstinputlisting[style=verilog, caption={Traffic Light Controller}, label={lst:tlc}]{tlc.v}
+The outputs of each state and the transitions to the next states are summarised in Table~\ref{tab:state-table}. Each state activates exactly one vehicle light and one pedestrian light.
 
-%----------------------------------------------------------------------------------------
-%   BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
+\begin{table}[htbp]
+    \centering
+    \caption{State table for the traffic light controller.}
+    \label{tab:state-table}
+    \begin{tabular}{c cccc ccccc}
+        \toprule
+                   & \multicolumn{4}{c}{Next State} & \multicolumn{5}{c}{Outputs}                                                                                                                     \\
+        \cmidrule(lr){2-5} \cmidrule(lr){6-10}
+        State      & \texttt{reset}                 & \texttt{request}            & 5\,s       & 10\,s      & \texttt{veh\_G} & \texttt{veh\_Y} & \texttt{veh\_R} & \texttt{ped\_G} & \texttt{ped\_R} \\
+        \midrule
+        \texttt{G} & \texttt{G}                     & \texttt{Y}                  & --         & --         & 1               & 0               & 0               & 0               & 1               \\
+        \texttt{Y} & \texttt{G}                     & --                          & \texttt{R} & --         & 0               & 1               & 0               & 0               & 1               \\
+        \texttt{R} & \texttt{G}                     & --                          & --         & \texttt{G} & 0               & 0               & 1               & 1               & 0               \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-\newpage
+%========================================================================================
+% SECTION: Verilog Implementation
+%========================================================================================
+\section{Verilog Implementation}
 
-\begin{thebibliography}{9}
+\lstinputlisting[style=verilog, caption={Basic traffic light controller.}, label={lst:tlc}]{tlc.v}
 
-    \bibitem{cover}
-    T. M. Cover and J. A. Thomas, \textit{Elements of Information Theory}, 2nd ed. Wiley-Interscience, 2006.
+%TODO: Explain key design choices:
+%TODO:   - 50 MHz clock divided via 29-bit counter (250M cycles = 5s, 500M cycles = 10s)
+%TODO:   - 2-bit state encoding: G=0, Y=1, R=2
+%TODO:   - Active-low reset (negedge) -- matches DE1-SoC push-buttons
+%TODO:   - 5-bit output vector mapping: {veh_G, veh_Y, veh_R, ped_G, ped_R}
 
-    \bibitem{mackay}
-    D. J. C. MacKay, \textit{Information Theory, Inference, and Learning Algorithms}. Cambridge University Press, 2003.
+%========================================================================================
+% SECTION: Compilation Results
+%========================================================================================
+\section{Compilation Results}
 
-    \bibitem{godsill}
-    S. Godsill, \textit{Estimation Theory and Inference Methods}, Lecture Notes (3F3), University of Cambridge, 2023
+%TODO: Report Compiler Flow Summary figures from Quartus
+%TODO: Fill in actual values below
 
-    \bibitem{weisberg}
-    J. Weisberg, "Laplace's Rule of Succession," \textit{Formal Epistemology}, 2019. Available: \url{https://jonathanweisberg.org/post/inductive-logic-2/}
+\begin{table}[htbp]
+    \centering
+    \caption{Compiler Flow Summary.}
+    \label{tab:compilation}
+    \begin{tabular}{lc}
+        \toprule
+        Resource       & Count         \\
+        \midrule
+        Logic Elements & \textbf{TODO} \\
+        Registers      & \textbf{TODO} \\
+        Pins           & \textbf{TODO} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-    \bibitem{tsun2025}
-    A. Tsun, ``The Beta and Dirichlet Distributions,'' Chapter 7.4 in \textit{Probability \& Statistics with Applications to Computing}, CS109 Course Reader, Stanford University, 2025. Available: \url{https://web.stanford.edu/class/archive/cs/cs109/cs109.1218/files/student_drive/7.4.pdf}
+%TODO: Comment on whether these numbers are reasonable for the circuit complexity
+%TODO: (handout reference: 31 LEs, 35 registers, 8 pins for the example code)
 
-    \bibitem{xing2014}
-    E. P. Xing, ``Bayesian Nonparametrics: Dirichlet Processes,'' Lecture 19 in \textit{10-708: Probabilistic Graphical Models}, Lecture notes by C. Malings and J. Gao, Carnegie Mellon University, Spring 2014. Available: \url{https://www.cs.cmu.edu/~epxing/Class/10708-14/scribe_notes/scribe_note_lecture19.pdf}
+%========================================================================================
+% SECTION: Pin Assignment
+%========================================================================================
+\section{Pin Assignment}
 
+%TODO: Comment on configurability of pin assignments in Quartus
+%TODO: Note: all on-board LEDs are RED; comment on this limitation
 
-\end{thebibliography}
+\begin{table}[htbp]
+    \centering
+    \caption{Pin assignments for the DE1-SoC board.}
+    \label{tab:pins}
+    \begin{tabular}{lll}
+        \toprule
+        Signal             & Pin                & Component          \\
+        \midrule
+        \texttt{clk}       & \texttt{PIN\_AF14} & 50\,MHz Clock      \\
+        \texttt{request}   & \texttt{PIN\_AA15} & KEY1 (Push-button) \\
+        \texttt{reset}     & \texttt{PIN\_AA14} & KEY0 (Push-button) \\
+        \texttt{output[0]} & \texttt{PIN\_V16}  & LEDR0 (ped RED)    \\
+        \texttt{output[1]} & \texttt{PIN\_V17}  & LEDR2 (ped GREEN)  \\
+        \texttt{output[2]} & \texttt{PIN\_W17}  & LEDR4 (veh RED)    \\
+        \texttt{output[3]} & \texttt{PIN\_Y19}  & LEDR6 (veh YELLOW) \\
+        \texttt{output[4]} & \texttt{PIN\_W21}  & LEDR8 (veh GREEN)  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+%========================================================================================
+% SECTION: Testing
+%========================================================================================
+\section{Testing}
+
+%TODO: Describe testing procedure
+%TODO: Verify behaviour against Table 1 for all input combinations
+
+\begin{table}[htbp]
+    \centering
+    \caption{Board testing results.}
+    \label{tab:testing}
+    \begin{tabular}{llll}
+        \toprule
+        Initial State & Input Applied    & Expected Next State      & Pass/Fail     \\
+        \midrule
+        \texttt{G}    & \texttt{request} & \texttt{Y} (5\,s timer)  & \textbf{TODO} \\
+        \texttt{Y}    & 5\,s timeout     & \texttt{R} (10\,s timer) & \textbf{TODO} \\
+        \texttt{R}    & 10\,s timeout    & \texttt{G}               & \textbf{TODO} \\
+        Any           & \texttt{reset}   & \texttt{G}               & \textbf{TODO} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+%TODO: Comment on any discrepancies or observations during testing
+
+%========================================================================================
+% SECTION: Improved Circuit
+%========================================================================================
+\section{Improved Circuit}
+
+%TODO: Describe the problem: continuous request can permanently block the vehicle lane
+%TODO: Explain your solution: 10-second vehicle GREEN lockout after completing a request
+
+\subsection{Updated State Machine}
+%TODO: Updated state diagram / description of new state(s) or transitions
+
+\subsection{Verilog Implementation}
+%TODO: \lstinputlisting[style=verilog, caption={Improved TLC.}, label={lst:tlc-improved}]{tlc_improved.v}
+%TODO: Explain key changes from the original design
+
+\subsection{Testing}
+%TODO: Describe how you tested the lockout behaviour
+%TODO: Verify that a second request during the 10s lockout window is correctly deferred
+
+%========================================================================================
+% SECTION: Conclusions
+%========================================================================================
+\section{Conclusions}
+
+%TODO: Brief conclusions for each main result:
+%TODO:   - Did the basic TLC circuit behave correctly against Table 1?
+%TODO:   - Were the resource usage figures as expected for the circuit complexity?
+%TODO:   - Did the improved circuit successfully prevent lane blocking?
+%TODO:   - Any observations about FPGA design methodology, Verilog vs schematic entry, or JTAG?
+
+%========================================================================================
+% APPENDIX
+%========================================================================================
+\appendix
+\section{Appendix}
+
+%TODO: Compilation Report Screenshot
+% \includegraphics[width=\textwidth]{compilation_report.png}
+
+%TODO: Pin Assignment Table Screenshot
+% \includegraphics[width=\textwidth]{pin_assignment.png}
+
+%TODO: Board Photos (FPGA board in each state G, Y, R showing LED outputs)
+% \includegraphics[width=\textwidth]{board_state_G.png}
+
+\subsection{Testbench}
+\lstinputlisting[style=verilog, caption={Testbench for the basic TLC.}, label={lst:tb}]{tlc_tb.v}
 
 \end{document}

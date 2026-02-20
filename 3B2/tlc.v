@@ -13,7 +13,6 @@
 //   - On pedestrian request: State G -> State Y (5s) -> State R (10s) -> State G
 //   - Reset returns to State G at any time
 //
-// Target: DE1-SoC board (Cyclone V FPGA) with 50 MHz clock
 // Output mapping: {veh_GREEN, veh_YELLOW, veh_RED, ped_GREEN, ped_RED}
 // ============================================================================
 

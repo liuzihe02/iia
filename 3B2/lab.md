@@ -1,5 +1,7 @@
 # Experiment 3B2: FPGA Programming and Testing
 
+> OUTDATED SCAFFOLDING PLEASE WORK OFF THE LATEX FILE DIRECTLY
+
 This markdown file contains basic scaffolding for how to write our short lab report in latex. The entire report should not exceed 5 pages long.\
 
 > This report is in SHORT_COURSEWORK
@@ -135,3 +137,12 @@ output[4]   | PIN_W21   | LED8 (LEDR8)
 <!-- Photos of FPGA board in each state (G, Y, R) showing LED outputs -->
 
 ### Testbench Code
+
+#### Test Coverage (basic tlc.v)
+
+| Test | Description | Checks |
+|------|-------------|--------|
+| T1 | Reset enters state G | state=G, output=10001 |
+| T2 | Full cycle G->Y->R->G with correct outputs and timing | request triggers G->Y (01001), 5s timeout Y->R (00110), 10s timeout R->G (10001) |
+| T3 | Async reset from Y and R | reset mid-sequence returns to G |
+| T4 | Idle stability | no transition without request |
