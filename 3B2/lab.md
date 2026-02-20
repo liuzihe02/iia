@@ -1,6 +1,13 @@
 # Experiment 3B2: FPGA Programming and Testing
 
-This markdown file contains basic scaffolding for how to write our short lab report in latex
+This markdown file contains basic scaffolding for how to write our short lab report in latex. The entire report should not exceed 5 pages long.\
+
+> This report is in SHORT_COURSEWORK
+
+Although the emphasis is on a succinct report, a good write-up should clearly explain:
+what each part of the experiment sought to explore;
+what you found out, and what precautions you needed; and
+brief conclusions about each main result.
 
 ## Traffic Light Controller (TLC) Design
 
@@ -50,7 +57,7 @@ Draw an actual state diagram
 
 ## Pin Assignment
 
-<!-- Describe how inputs/outputs were assigned to physical FPGA pins -->
+<!-- Comment on the configurability of pin assignments in Quartus -->
 
 Pin Assignments
 
@@ -66,7 +73,6 @@ output[3]   | PIN_Y19   | LED6 (LEDR6)
 output[4]   | PIN_W21   | LED8 (LEDR8)
 
 <!-- Note: all on-board LEDs are RED; comment on this limitation and how GREEN/YELLOW are represented -->
-<!-- Comment on the configurability of pin assignments in Quartus -->
 
 ---
 

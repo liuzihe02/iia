@@ -9,14 +9,34 @@
 \usepackage{url}
 \usepackage{parskip} %removes indentation and spacing between paras
 \usepackage{enumitem}
+
+%for state diagrams
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning, arrows.meta}
+
 % Remove vertical space between list items globally
 \setlist{nosep}
+
 % Define theorem-like environments
 \theoremstyle{definition} % 'definition' style keeps text upright (not italic) which is easier to read for reports
 \newtheorem{statement}{Statement}
 
-%text rendering for pipe
+%text rendering for pipe symbol
 \usepackage[T1]{fontenc}
+
+% include code
+\usepackage{listings}
+% Optional: style for Verilog syntax highlighting
+\lstdefinestyle{verilog}{
+    language=Verilog,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\bfseries\color{blue},
+    commentstyle=\color{gray},
+    numbers=left,
+    numberstyle=\tiny,
+    frame=single,
+    breaklines=true
+}
 
 % Custom macros for notation
 \newcommand{\E}{\mathbb{E}}
@@ -55,8 +75,12 @@
 \maketitle
 
 \begin{abstract}
-    \noindent This report investigates random number generation and statistical density estimation. We develop theoretical foundations for histogram uncertainty using multinomial distribution theory, implement the inverse CDF transformation method for generating non-uniform random variables, and characterize heavy-tailed $\alpha$-stable distributions. Empirical validation demonstrates convergence rates for Monte Carlo estimation and the advantage of kernel density estimation over histograms.
+    \noindent This report documents the design, implementation and testing of a traffic light controller on an Altera Cyclone V FPGA. A three-state finite state machine controlling a pedestrian crossing is described in Verilog, compiled, and configured onto a DE1-SoC board via JTAG, and is improved with a vehicle lockout.
 \end{abstract}
+
+\input{3B2_state_base.tex}
+
+\lstinputlisting[style=verilog, caption={Traffic Light Controller}, label={lst:tlc}]{tlc.v}
 
 %----------------------------------------------------------------------------------------
 %   BIBLIOGRAPHY
