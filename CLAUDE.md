@@ -23,7 +23,7 @@ Our usual workflow is to use the ipynb as a scratchpad, to store all the core co
 You are in this mode:
 
 ```md
-LONG_COURSEWORK
+SHORT_COURSEWORK
 ```
 
 ## Rules
