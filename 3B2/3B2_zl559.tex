@@ -134,26 +134,24 @@ The Verilog code in Listing~\ref{lst:tlc} implements the FSM from Section~1. Key
 %========================================================================================
 \section{Compilation Results}
 
-%TODO: Report Compiler Flow Summary figures from Quartus
-%TODO: Fill in actual values below
+The design was compiled in Quartus Prime 25.1 Lite Edition targeting the Cyclone V 5CSEMA5F31C6 device. The full Compiler Flow Summary screenshot is in Appendix~\ref{sec:appendix}; key figures are in Table~\ref{tab:compilation}.
 
 \begin{table}[htbp]
     \centering
     \caption{Compiler Flow Summary.}
     \label{tab:compilation}
-    \begin{tabular}{lc}
+    \begin{tabular}{lr}
         \toprule
-        Resource       & Count         \\
+        Resource                 & Count \\
         \midrule
-        Logic Elements & \textbf{TODO} \\
-        Registers      & \textbf{TODO} \\
-        Pins           & \textbf{TODO} \\
+        Logic utilisation (ALMs) & 27    \\
+        Total registers          & 32    \\
+        Total pins               & 8     \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-%TODO: Comment on whether these numbers are reasonable for the circuit complexity
-%TODO: (handout reference: 31 LEs, 35 registers, 8 pins for the example code)
+The 32 registers break down as follows: the 2-bit \texttt{state} register, the 29-bit \texttt{count} register, and 1 synchroniser flip-flop for the \texttt{request} input. The 27 Adaptive Logic Modules (ALMs) house the counter increment, ad state transition logic. The 8 pins match the 3 inputs (\texttt{clk}, \texttt{request}, \texttt{reset}) and 5 outputs (\texttt{output[4:0]}).
 
 %========================================================================================
 % SECTION: Pin Assignment
@@ -243,10 +241,15 @@ The Verilog code in Listing~\ref{lst:tlc} implements the FSM from Section~1. Key
 % APPENDIX
 %========================================================================================
 \appendix
-\section{Appendix}
+\section{Appendix}\label{sec:appendix}
 
-%TODO: Compilation Report Screenshot
-% \includegraphics[width=\textwidth]{compilation_report.png}
+\subsection{Compilation Report}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/compilation_report.png}
+    \caption{Quartus Prime Compiler Flow Summary for the basic TLC design.}
+    \label{fig:compilation-report}
+\end{figure}
 
 %TODO: Pin Assignment Table Screenshot
 % \includegraphics[width=\textwidth]{pin_assignment.png}
