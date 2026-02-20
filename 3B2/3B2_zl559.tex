@@ -216,19 +216,28 @@ A functional simulation testbench (Listing~\ref{lst:tb} in Appendix~\ref{sec:app
 %========================================================================================
 \section{Improved Circuit}
 
-%TODO: Describe the problem: continuous request can permanently block the vehicle lane
-%TODO: Explain your solution: 10-second vehicle GREEN lockout after completing a request
+In the basic TLC, a pedestrian who holds the \texttt{request} button continuously causes the FSM to cycle \texttt{G}$\to$\texttt{Y}$\to$\texttt{R}$\to$\texttt{G}$\to$\texttt{Y}$\to\cdots$ with no gap, permanently blocking the vehicle lane on RED. To prevent this, a fourth state \texttt{L} (lockout) is added: after completing state \texttt{R}, the FSM enters \texttt{L} which holds vehicle GREEN for 10\,s while ignoring any \texttt{request}. Only after the lockout expires does the FSM return to \texttt{G}, where requests are accepted again. The updated state diagram is shown in Figure~\ref{fig:state-diagram-lock}.
 
 \subsection{Updated State Machine}
-%TODO: Updated state diagram / description of new state(s) or transitions
+
+\input{3B2_state_lock.tex}
+
+The key change is that state \texttt{R} now transitions to \texttt{L} (not \texttt{G}), and \texttt{L} transitions to \texttt{G} after a 10\,s timeout. State \texttt{L} has the same output as \texttt{G} (\texttt{10001}: vehicle GREEN, pedestrian RED) but does not respond to \texttt{request}. All four states fit in the existing 2-bit encoding (\texttt{L}=3), so no additional register bits are needed.
 
 \subsection{Verilog Implementation}
-%TODO: \lstinputlisting[style=verilog, caption={Improved TLC.}, label={lst:tlc-improved}]{tlc_improved.v}
-%TODO: Explain key changes from the original design
+
+\lstinputlisting[style=verilog, caption={Improved TLC with lockout.}, label={lst:tlc-lock}]{tlc_lock.v}
+
+Compared to the basic design, the changes in Listing~\ref{lst:tlc-lock} are minimal: state \texttt{R} transitions to \texttt{L} instead of \texttt{G}, and a new \texttt{L} case reuses the same 10\,s counter threshold. Since all four 2-bit encodings are now used, the \texttt{default} case is no longer needed.
 
 \subsection{Testing}
-%TODO: Describe how you tested the lockout behaviour
-%TODO: Verify that a second request during the 10s lockout window is correctly deferred
+
+The lockout behaviour was verified in simulation (Icarus Verilog, 16/16 assertions passing) with the following key tests:
+\begin{itemize}
+    \item Full cycle \texttt{G}$\to$\texttt{Y}$\to$\texttt{R}$\to$\texttt{L}$\to$\texttt{G} with correct outputs at each transition.
+    \item \texttt{request} held low during state \texttt{L}: the FSM remains in \texttt{L} until the 10\,s lockout expires, confirming the request is ignored.
+    \item Asynchronous reset from state \texttt{L} returns to \texttt{G} immediately.
+\end{itemize}
 
 %========================================================================================
 % SECTION: Conclusions
