@@ -189,8 +189,7 @@ One limitation of the DE1-SoC is that all ten on-board user LEDs (LEDR0--LEDR9) 
 %========================================================================================
 \section{Testing}
 
-%TODO: Describe testing procedure
-%TODO: Verify behaviour against Table 1 for all input combinations
+After programming the FPGA via JTAG, the circuit was tested on-board by exercising each transition in Table~\ref{tab:state-table} and verifying the LED outputs. The results are summarised in Table~\ref{tab:testing}.
 
 \begin{table}[htbp]
     \centering
@@ -198,17 +197,19 @@ One limitation of the DE1-SoC is that all ten on-board user LEDs (LEDR0--LEDR9) 
     \label{tab:testing}
     \begin{tabular}{llll}
         \toprule
-        Initial State & Input Applied    & Expected Next State      & Pass/Fail     \\
+        Initial State & Input Applied    & Expected Next State      & Pass/Fail \\
         \midrule
-        \texttt{G}    & \texttt{request} & \texttt{Y} (5\,s timer)  & \textbf{TODO} \\
-        \texttt{Y}    & 5\,s timeout     & \texttt{R} (10\,s timer) & \textbf{TODO} \\
-        \texttt{R}    & 10\,s timeout    & \texttt{G}               & \textbf{TODO} \\
-        Any           & \texttt{reset}   & \texttt{G}               & \textbf{TODO} \\
+        \texttt{G}    & \texttt{request} & \texttt{Y} (5\,s timer)  & Pass      \\
+        \texttt{Y}    & 5\,s timeout     & \texttt{R} (10\,s timer) & Pass      \\
+        \texttt{R}    & 10\,s timeout    & \texttt{G}               & Pass      \\
+        Any           & \texttt{reset}   & \texttt{G}               & Pass      \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-%TODO: Comment on any discrepancies or observations during testing
+All transitions matched the expected behaviour. Pressing KEY1 (\texttt{request}) in state \texttt{G} immediately turned on LEDR6 (vehicle YELLOW); after approximately 5\,s, LEDR4 (vehicle RED) and LEDR2 (pedestrian GREEN) turned on; after a further 10\,s the system returned to LEDR8 (vehicle GREEN) and LEDR0 (pedestrian RED). Pressing KEY0 (\texttt{reset}) at any point during the sequence returned the circuit to state \texttt{G} immediately, confirming the asynchronous reset. A photo of the board in state \texttt{G} is shown in Figure~\ref{fig:board-stateG}.
+
+A functional simulation testbench (Listing~\ref{lst:tb} in Appendix~\ref{sec:appendix}) was also used to verify the design in Icarus Verilog prior to board programming, with all 13 assertions passing.
 
 %========================================================================================
 % SECTION: Improved Circuit
@@ -254,11 +255,13 @@ One limitation of the DE1-SoC is that all ten on-board user LEDs (LEDR0--LEDR9) 
     \label{fig:compilation-report}
 \end{figure}
 
-%TODO: Pin Assignment Table Screenshot
-% \includegraphics[width=\textwidth]{pin_assignment.png}
-
-%TODO: Board Photos (FPGA board in each state G, Y, R showing LED outputs)
-% \includegraphics[width=\textwidth]{board_state_G.png}
+\subsection{Board Photo}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/fpga_board.jpg}
+    \caption{DE1-SoC board in state \texttt{G}: LEDR8 (vehicle GREEN) and LEDR0 (pedestrian RED) are lit.}
+    \label{fig:board-stateG}
+\end{figure}
 
 \subsection{Testbench}
 \lstinputlisting[style=verilog, caption={Testbench for the basic TLC.}, label={lst:tb}]{tlc_tb.v}
