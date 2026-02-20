@@ -1,18 +1,16 @@
 % ============================================================
 % Improved TLC State Diagram (with lockout state L)
-% Requires: \usepackage{tikz}
-%           \usetikzlibrary{automata, positioning, arrows.meta}
 % ============================================================
 \begin{figure}[htbp]
     \centering
-    \begin{tikzpicture}[->, >=Stealth, shorten >=1pt, auto, node distance=3.5cm,
-            semithick, every state/.style={minimum size=1.6cm, font=\large}]
+    \begin{tikzpicture}[->, >=Stealth, shorten >=1pt, auto, node distance=3.2cm,
+            semithick, every state/.style={minimum size=1.3cm}]
 
         % --- States ---
-        \node[state, fill=green!15]   (G) {$\mathbf{G}$};
-        \node[state, fill=yellow!25]  (Y) [right of=G] {$\mathbf{Y}$};
-        \node[state, fill=red!15]     (R) [below of=Y] {$\mathbf{R}$};
-        \node[state, fill=green!8, dashed]  (L) [below of=G] {$\mathbf{L}$};
+        \node[state, fill=green!15]          (G) {$\mathbf{G}$};
+        \node[state, fill=yellow!25]         (Y) [right of=G] {$\mathbf{Y}$};
+        \node[state, fill=red!15]            (R) [below of=Y] {$\mathbf{R}$};
+        \node[state, fill=green!8, dashed]   (L) [below of=G] {$\mathbf{L}$};
 
         % --- Transitions ---
         \path (G) edge node {\texttt{request}} (Y)
@@ -21,29 +19,29 @@
               (L) edge node {10\,s} (G);
 
         % --- Output labels ---
-        \node[left=0.8cm of G, align=center, font=\footnotesize] {
-            Veh: \textcolor{green!60!black}{\textbf{G}}\\
-            Ped: \textcolor{red}{\textbf{R}}\\
+        \node[left=0.6cm of G, align=center, font=\scriptsize] {
+            Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
+            Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
             \texttt{10001}
         };
-        \node[right=0.8cm of Y, align=center, font=\footnotesize] {
-            Veh: \textcolor{yellow!70!black}{\textbf{Y}}\\
-            Ped: \textcolor{red}{\textbf{R}}\\
+        \node[right=0.6cm of Y, align=center, font=\scriptsize] {
+            Vehicle: \textcolor{yellow!70!black}{\textbf{YELLOW}}\\[1pt]
+            Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
             \texttt{01001}
         };
-        \node[right=0.8cm of R, align=center, font=\footnotesize] {
-            Veh: \textcolor{red}{\textbf{R}}\\
-            Ped: \textcolor{green!60!black}{\textbf{G}}\\
+        \node[right=0.6cm of R, align=center, font=\scriptsize] {
+            Vehicle: \textcolor{red}{\textbf{RED}}\\[1pt]
+            Pedestrian: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
             \texttt{00110}
         };
-        \node[left=0.8cm of L, align=center, font=\footnotesize] {
-            Veh: \textcolor{green!60!black}{\textbf{G}}\\
-            Ped: \textcolor{red}{\textbf{R}}\\
-            \texttt{10001}\\
+        \node[left=0.6cm of L, align=center, font=\scriptsize] {
+            Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
+            Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
+            \texttt{10001}\\[1pt]
             {\tiny (ignores \texttt{request})}
         };
 
     \end{tikzpicture}
-    \caption{Improved TLC state diagram with lockout state \texttt{L}. After completing a pedestrian crossing, the FSM holds vehicle GREEN for 10\,s in state \texttt{L}, ignoring requests, before returning to \texttt{G}. \texttt{reset} returns to \texttt{G} from any state.}
+    \caption{Improved TLC with lockout state \texttt{L}. After state \texttt{R}, the FSM holds vehicle GREEN for 10\,s in \texttt{L}, ignoring requests. \texttt{reset} returns to \texttt{G} from any state.}
     \label{fig:state-diagram-lock}
 \end{figure}

@@ -13,6 +13,7 @@
 %for state diagrams
 \usepackage{tikz}
 \usepackage{booktabs} % nicer table rules with built-in spacing
+\usepackage{float}    % [H] placement for figures
 \usetikzlibrary{automata, positioning, arrows.meta}
 
 % Remove vertical space between list items globally
@@ -232,23 +233,14 @@ Compared to the basic design, the changes in Listing~\ref{lst:tlc-lock} are mini
 
 \subsection{Testing}
 
-The lockout behaviour was verified in simulation (Icarus Verilog, 16/16 assertions passing) with the following key tests:
-\begin{itemize}
-    \item Full cycle \texttt{G}$\to$\texttt{Y}$\to$\texttt{R}$\to$\texttt{L}$\to$\texttt{G} with correct outputs at each transition.
-    \item \texttt{request} held low during state \texttt{L}: the FSM remains in \texttt{L} until the 10\,s lockout expires, confirming the request is ignored.
-    \item Asynchronous reset from state \texttt{L} returns to \texttt{G} immediately.
-\end{itemize}
+The same test cases from previously were repeated for the improved design, all passing. An additional test verified the lockout: \texttt{request} was held low throughout state \texttt{L}, and the FSM correctly remained in \texttt{L} until the 10\,s timeout expired before returning to \texttt{G}. The improved circuit was also compiled, programmed onto the board via JTAG, and tested on-hardware with the same results.
 
 %========================================================================================
 % SECTION: Conclusions
 %========================================================================================
 \section{Conclusions}
 
-%TODO: Brief conclusions for each main result:
-%TODO:   - Did the basic TLC circuit behave correctly against Table 1?
-%TODO:   - Were the resource usage figures as expected for the circuit complexity?
-%TODO:   - Did the improved circuit successfully prevent lane blocking?
-%TODO:   - Any observations about FPGA design methodology, Verilog vs schematic entry, or JTAG?
+Both the basic and improved TLC designs were successfully implemented on the Cyclone V FPGA, with all state transitions and timing verified on-board. The lockout state prevented continuous requests from blocking the vehicle lane, and fitted within the existing 2-bit encoding. Verilog behavioural entry made the improvement straightforward compared to a schematic redesign.
 
 %========================================================================================
 % APPENDIX
@@ -257,7 +249,7 @@ The lockout behaviour was verified in simulation (Icarus Verilog, 16/16 assertio
 \section{Appendix}\label{sec:appendix}
 
 \subsection{Compilation Report}
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/compilation_report.png}
     \caption{Quartus Prime Compiler Flow Summary for the basic TLC design.}
@@ -265,7 +257,7 @@ The lockout behaviour was verified in simulation (Icarus Verilog, 16/16 assertio
 \end{figure}
 
 \subsection{Board Photo}
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{images/fpga_board.jpg}
     \caption{DE1-SoC board in state \texttt{G}: LEDR8 (vehicle GREEN) and LEDR0 (pedestrian RED) are lit.}
