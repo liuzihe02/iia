@@ -120,11 +120,14 @@ The outputs of each state and the transitions to the next states are summarised 
 
 \lstinputlisting[style=verilog, caption={Basic traffic light controller.}, label={lst:tlc}]{tlc.v}
 
-%TODO: Explain key design choices:
-%TODO:   - 50 MHz clock divided via 29-bit counter (250M cycles = 5s, 500M cycles = 10s)
-%TODO:   - 2-bit state encoding: G=0, Y=1, R=2
-%TODO:   - Active-low reset (negedge) -- matches DE1-SoC push-buttons
-%TODO:   - 5-bit output vector mapping: {veh_G, veh_Y, veh_R, ped_G, ped_R}
+The Verilog code in Listing~\ref{lst:tlc} implements the FSM from Section~1. Key design choices made are:
+
+\begin{itemize}
+    \item \textbf{Clock division.} The DE1-SoC provides a 50\,MHz clock, but the TLC requires delays on the order of seconds. Rather than a separate clock divider module, a 29-bit counter (\texttt{count}) is used directly.
+    \item \textbf{State encoding.} The three states are encoded with 2 bits (\texttt{G}=0, \texttt{Y}=1, \texttt{R}=2). A \texttt{default} case catches the unused encoding (3) and returns to state \texttt{G}.
+    \item \textbf{Active-low inputs.} The DE1-SoC push-buttons output 0 when pressed. The reset is handled via \texttt{negedge reset} in the sensitivity list for asynchronous behaviour, and \texttt{request} is checked against \texttt{1'b0}.
+    \item \textbf{Output mapping.} A combinational \texttt{always @(*)} block maps each state to a 5-bit output vector \texttt{[4:0]} = \texttt{\{veh\_G, veh\_Y, veh\_R, ped\_G, ped\_R\}}.
+\end{itemize}
 
 %========================================================================================
 % SECTION: Compilation Results
