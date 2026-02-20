@@ -14,34 +14,34 @@
 
         % --- Transitions ---
         \path (G) edge node {\texttt{request}} (Y)
-              (Y) edge node {5\,s} (R)
-              (R) edge node {10\,s} (L)
-              (L) edge node {10\,s} (G);
+        (Y) edge node {5\,s} (R)
+        (R) edge node {10\,s} (L)
+        (L) edge node {10\,s} (G);
 
         % --- Output labels ---
         \node[left=0.6cm of G, align=center, font=\scriptsize] {
             Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
             Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
-            \texttt{10001}
+            \texttt{output = 10001}
         };
         \node[right=0.6cm of Y, align=center, font=\scriptsize] {
             Vehicle: \textcolor{yellow!70!black}{\textbf{YELLOW}}\\[1pt]
             Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
-            \texttt{01001}
+            \texttt{output = 01001}
         };
         \node[right=0.6cm of R, align=center, font=\scriptsize] {
             Vehicle: \textcolor{red}{\textbf{RED}}\\[1pt]
             Pedestrian: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
-            \texttt{00110}
+            \texttt{output = 00110}
         };
         \node[left=0.6cm of L, align=center, font=\scriptsize] {
-            Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
-            Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
-            \texttt{10001}\\[1pt]
-            {\tiny (ignores \texttt{request})}
+        Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
+        Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
+        \texttt{output = 10001}\\[1pt]
+        {\tiny (ignores \texttt{request})}
         };
 
     \end{tikzpicture}
-    \caption{Improved TLC with lockout state \texttt{L}. After state \texttt{R}, the FSM holds vehicle GREEN for 10\,s in \texttt{L}, ignoring requests. \texttt{reset} returns to \texttt{G} from any state.}
+    \caption{Improved TLC with lockout state \texttt{L}. Output bits as in Figure~\ref{fig:state-diagram}. After state \texttt{R}, the FSM holds vehicle GREEN for 10\,s in \texttt{L}, ignoring requests. \texttt{reset} returns to \texttt{G} from any state.}
     \label{fig:state-diagram-lock}
 \end{figure}

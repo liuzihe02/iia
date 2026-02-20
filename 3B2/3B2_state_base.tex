@@ -13,28 +13,28 @@
 
         % --- Transitions ---
         \path (G) edge [bend left=25]  node {\texttt{request}} (Y)
-              (Y) edge [bend left=25]  node {5\,s} (R);
+        (Y) edge [bend left=25]  node {5\,s} (R);
         \draw[->] (R.south west) .. controls +(0,-1.2) and +(0,-1.2) ..
-            node[below, pos=0.5] {10\,s} (G.south east);
+        node[below, pos=0.5] {10\,s} (G.south east);
 
         % --- Output labels ---
         \node[below=1.2cm of G, align=center, font=\scriptsize] {
             Vehicle: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
             Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
-            \texttt{10001}
+            \texttt{output = 10001}
         };
         \node[below=1.2cm of Y, align=center, font=\scriptsize] {
             Vehicle: \textcolor{yellow!70!black}{\textbf{YELLOW}}\\[1pt]
             Pedestrian: \textcolor{red}{\textbf{RED}}\\[1pt]
-            \texttt{01001}
+            \texttt{output = 01001}
         };
         \node[below=1.2cm of R, align=center, font=\scriptsize] {
             Vehicle: \textcolor{red}{\textbf{RED}}\\[1pt]
             Pedestrian: \textcolor{green!60!black}{\textbf{GREEN}}\\[1pt]
-            \texttt{00110}
+            \texttt{output = 00110}
         };
 
     \end{tikzpicture}
-    \caption{State diagram for the basic TLC FSM. \texttt{reset} (active LOW, asynchronous) returns to state \texttt{G} from any state.}
+    \caption{State diagram for the basic TLC FSM. The five outputs are grouped into a single vector \texttt{output[4:0]} = \texttt{\{veh\_G, veh\_Y, veh\_R, ped\_G, ped\_R\}}. \texttt{reset} (active LOW, asynchronous) returns to state \texttt{G} from any state.}
     \label{fig:state-diagram}
 \end{figure}

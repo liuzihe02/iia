@@ -119,6 +119,8 @@ The outputs of each state and the transitions to the next states are summarised 
 %========================================================================================
 % SECTION: Verilog Implementation
 %========================================================================================
+\newpage
+
 \section{Verilog Implementation}
 
 \lstinputlisting[style=verilog, caption={Basic traffic light controller.}, label={lst:tlc}]{tlc.v}
@@ -128,7 +130,7 @@ The Verilog code in Listing~\ref{lst:tlc} implements the FSM from Section~1. Key
 \begin{itemize}
     \item \textbf{Clock division.} The DE1-SoC provides a 50\,MHz clock, but the TLC requires delays on the order of seconds. Rather than a separate clock divider module, a 29-bit counter (\texttt{count}) is used directly.
     \item \textbf{State encoding.} The three states are encoded with 2 bits (\texttt{G}=0, \texttt{Y}=1, \texttt{R}=2). A \texttt{default} case catches the unused encoding (3) and returns to state \texttt{G}.
-    \item \textbf{Active-low inputs.} The DE1-SoC push-buttons output 0 when pressed. The reset is handled via \texttt{negedge reset} in the sensitivity list for asynchronous behaviour, and \texttt{request} is checked against \texttt{1'b0}.
+    \item \textbf{Active-low inputs.} The push-buttons output 0 when pressed. The reset is handled via \texttt{negedge reset} in the sensitivity list for asynchronous behaviour, and \texttt{request} is checked against \texttt{1'b0}.
     \item \textbf{Output mapping.} A combinational \texttt{always @(*)} block maps each state to a 5-bit output vector \texttt{[4:0]} = \texttt{\{veh\_G, veh\_Y, veh\_R, ped\_G, ped\_R\}}.
 \end{itemize}
 
@@ -154,7 +156,7 @@ The design was compiled in Quartus Prime 25.1 Lite Edition targeting the Cyclone
     \end{tabular}
 \end{table}
 
-The 32 registers break down as follows: the 2-bit \texttt{state} register, the 29-bit \texttt{count} register, and 1 synchroniser flip-flop for the \texttt{request} input. The 27 Adaptive Logic Modules (ALMs) house the counter increment, ad state transition logic. The 8 pins match the 3 inputs (\texttt{clk}, \texttt{request}, \texttt{reset}) and 5 outputs (\texttt{output[4:0]}).
+The 32 registers break down as follows: the 2-bit \texttt{state} register, the 29-bit \texttt{count} register, and 1 synchroniser flip-flop for the \texttt{request} input. The 27 Adaptive Logic Modules (ALMs) house the counter increment and state transition logic. The 8 pins match the 3 inputs (\texttt{clk}, \texttt{request}, \texttt{reset}) and 5 outputs (\texttt{output[4:0]}).
 
 %========================================================================================
 % SECTION: Pin Assignment
@@ -240,7 +242,7 @@ The same test cases from previously were repeated for the improved design, all p
 %========================================================================================
 \section{Conclusions}
 
-Both the basic and improved TLC designs were successfully implemented on the Cyclone V FPGA, with all state transitions and timing verified on-board. The lockout state prevented continuous requests from blocking the vehicle lane, and fitted within the existing 2-bit encoding. Verilog behavioural entry made the improvement straightforward compared to a schematic redesign.
+Both the basic and improved TLC designs were implemented on the Cyclone V FPGA, with all state transitions and timing verified on-board. The lockout state prevented continuous requests from blocking the vehicle lane, and fitted within the existing 2-bit encoding. Verilog behavioural entry made the improvement straightforward compared to a schematic redesign. Overall, the FPGA platform proved well-suited for rapid prototyping of digital control logic: design changes required only re-writing a few lines of Verilog and recompiling, with no hardware modifications. This flexibility, combined with the low resource usage (27 ALMs for the full controller), makes FPGAs a practical choice for deploying custom timing-critical controllers.
 
 %========================================================================================
 % APPENDIX
@@ -249,22 +251,29 @@ Both the basic and improved TLC designs were successfully implemented on the Cyc
 \section{Appendix}\label{sec:appendix}
 
 \subsection{Compilation Report}
+\vspace{-0.5em}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{images/compilation_report.png}
+    \includegraphics[width=0.4\textwidth]{images/compilation_report.png}
+    \vspace{-0.5em}
     \caption{Quartus Prime Compiler Flow Summary for the basic TLC design.}
     \label{fig:compilation-report}
 \end{figure}
 
+\vspace{-1em}
 \subsection{Board Photo}
+\vspace{-0.5em}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{images/fpga_board.jpg}
+    \includegraphics[width=0.4\textwidth]{images/fpga_board.jpg}
+    \vspace{-0.5em}
     \caption{DE1-SoC board in state \texttt{G}: LEDR8 (vehicle GREEN) and LEDR0 (pedestrian RED) are lit.}
     \label{fig:board-stateG}
 \end{figure}
 
+\vspace{-1em}
 \subsection{Testbench}
-\lstinputlisting[style=verilog, caption={Testbench for the basic TLC.}, label={lst:tb}]{tlc_tb.v}
+\vspace{-0.5em}
+\lstinputlisting[style=verilog, caption={Testbench Verilog code for the basic TLC.}, label={lst:tb}]{tlc_tb.v}
 
 \end{document}
