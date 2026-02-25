@@ -1,6 +1,8 @@
 //this is a git-tracked file!
 //denotes how we want to auto-compile the files in this repo
 {
+  //modify this accordingly
+  "python.defaultInterpreterPath": "/home/flowingpurplecrane/miniforge3/envs/iia-all/bin/python",
   "markdown.validate.enabled": true,
   // LaTeX Workshop - Auto compile on file save
   "latex-workshop.latex.autoBuild.run": "onSave",

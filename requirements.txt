@@ -1,3 +1,4 @@
+#should be using central conda environment yml to manage iia-all repos, put here just for note
 numpy
 matplotlib
 scipy
