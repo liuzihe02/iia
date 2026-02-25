@@ -8,9 +8,23 @@
 \geometry{verbose,tmargin=3cm,bmargin=3cm,lmargin=2.5cm,rmargin=2.5cm}
 \usepackage{textcomp}
 \usepackage{amstext}
+\usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{comment}
 
 \makeatletter
+
+\begin{comment}
+First make sure uve read the relevant files: this latex doc, coursework.pdf, coursework.ipynb, code.py
+
+This latex document details all the lab report for 3F8 inference
+Try to always include core mathematics where relevant, make sure notations are consistent throughout
+Instructions are in coursework.pdf, make sure to answer the questions comprehensively in this latex doc
+The relevant ipynb file is coursework.ipynb and code.py in the /3F8 folder, but try to make sure outputs are cleared before further processing to save tokens
+LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng 2A\3F8\handout4-classification-slides.pdf" if needed
+
+\end{comment}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
 %% Because html converters don't know tabularnewline
@@ -49,8 +63,13 @@
 In this exercise we have to consider the logistic classication model
 (aka logistic regression) and derive the gradients of the log-likelihood
 given a vector of binary labels $\mathbf{y}$ and a matrix of input
-features $\mathbf{X}$. The gradient of the log-likelihood can be
-writen as
+features $\mathbf{X}$. The log-likelihood is
+\[
+    \mathcal{L}(\beta)=\sum_{n=1}^{N}\left[y^{(n)}\log\sigma(\beta^{T}\tilde{x}^{(n)})+(1-y^{(n)})\log\left(1-\sigma(\beta^{T}\tilde{x}^{(n)})\right)\right],
+\]
+where $\sigma(a)=1/(1+e^{-a})$ is the logistic function and $\tilde{x}^{(n)}=(1,x^{(n)})^{T}$
+are the bias-augmented inputs. The gradient of the log-likelihood can be
+written as
 \[
     \frac{\partial\mathcal{L}(\beta)}{\partial\beta}=\text{(to be completed)}\,.
 \]
