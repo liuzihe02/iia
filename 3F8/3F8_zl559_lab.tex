@@ -9,6 +9,7 @@
 \usepackage{textcomp}
 \usepackage{amstext}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{comment}
 
@@ -21,6 +22,8 @@ This latex document details all the lab report for 3F8 inference
 Try to always include core mathematics where relevant, make sure notations are consistent throughout
 Instructions are in coursework.pdf, make sure to answer the questions comprehensively in this latex doc
 The relevant ipynb file is coursework.ipynb and code.py in the /3F8 folder, but try to make sure outputs are cleared before further processing to save tokens
+Make sure all vectors are bolded
+Make sure all math is explained comprehensively and clearly
 LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng 2A\3F8\handout4-classification-slides.pdf" if needed
 
 \end{comment}
@@ -58,44 +61,140 @@ LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng 2A\3F8\h
     \item What novel follow-up will the rest of your report present?
 \end{enumerate}
 
-\section{Exercise a)\label{sec:Exercise-a}}
+\section{Exercise a): Gradients of Log-Likelihood\label{sec:Exercise-a}}
 
-In this exercise we have to consider the logistic classication model
-(aka logistic regression) and derive the gradients of the log-likelihood
+In this exercise we consider the logistic classification model
+(aka logistic regression) and derive the gradient of the log-likelihood
+with respect to the parameter vector $\boldsymbol{\beta}$,
 given a vector of binary labels $\mathbf{y}$ and a matrix of input
-features $\mathbf{X}$. The log-likelihood is
+features $\mathbf{X}$. The probability of
+a positive class label is given by the logistic (sigmoid) function
+$\sigma(a) = 1/(1+e^{-a})$ applied to the activations:
 \[
-    \mathcal{L}(\beta)=\sum_{n=1}^{N}\left[y^{(n)}\log\sigma(\beta^{T}\tilde{x}^{(n)})+(1-y^{(n)})\log\left(1-\sigma(\beta^{T}\tilde{x}^{(n)})\right)\right],
+    P(y^{(n)} = 1 \mid \tilde{\mathbf{x}}^{(n)})
+    = \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\,,
+    \qquad
+    P(y^{(n)} = 0 \mid \tilde{\mathbf{x}}^{(n)})
+    = 1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})
+    = \sigma(-\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}),
 \]
-where $\sigma(a)=1/(1+e^{-a})$ is the logistic function and $\tilde{x}^{(n)}=(1,x^{(n)})^{T}$
-are the bias-augmented inputs. The gradient of the log-likelihood can be
-written as
+where $\tilde{\mathbf{x}}^{(n)} = (1, \mathbf{x}^{(n)})^{T}$ are the bias-augmented
+inputs, so that $\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}
+    = \beta_0 + \sum_{d=1}^{D}\beta_d x_d^{(n)}$.
+These two cases can be written compactly as a single Bernoulli likelihood:
 \[
-    \frac{\partial\mathcal{L}(\beta)}{\partial\beta}=\text{(to be completed)}\,.
+    P(y^{(n)} \mid \tilde{\mathbf{x}}^{(n)}, \boldsymbol{\beta})
+    = \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})^{y^{(n)}}
+    \left(1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)^{1 - y^{(n)}}
 \]
+
+Assuming $N$ datapoints are independent and identically distributed,
+the likelihood of the full dataset is:
+\[
+    P(\mathbf{y} \mid \mathbf{X}, \boldsymbol{\beta})
+    = \prod_{n=1}^{N}
+    \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})^{y^{(n)}}
+    \left(1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)^{1 - y^{(n)}}
+\]
+
+Giving the log-likelihood
+$\mathcal{L}(\boldsymbol{\beta}) = \log P(\mathbf{y} \mid \mathbf{X}, \boldsymbol{\beta})$ of:
+\[
+    \mathcal{L}(\boldsymbol{\beta})
+    = \sum_{n=1}^{N}\left[
+    y^{(n)}\log\sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})
+    + (1-y^{(n)})\log\left(1-\sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)
+    \right]
+\]
+
+Note the derivative of the logistic function:
+\[
+    \frac{d\sigma(a)}{da}
+    = \frac{e^{-a}}{(1+e^{-a})^{2}}
+    = \frac{1}{1+e^{-a}} \cdot \frac{e^{-a}}{1+e^{-a}}
+    = \sigma(a)\left(1 - \sigma(a)\right)
+\]
+
+Let $a^{(n)} = \boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}$, so that
+$\frac{\partial a^{(n)}}{\partial \boldsymbol{\beta}} = \tilde{\mathbf{x}}^{(n)}$. Then our derivatives are
+\[
+    \frac{\partial}{\partial\boldsymbol{\beta}}\left[y^{(n)}\log\sigma(a^{(n)})\right]
+    = y^{(n)} \cdot \frac{1}{\sigma(a^{(n)})}
+    \cdot \underbrace{\frac{d\sigma}{da}}_{\sigma(1-\sigma)}
+    \cdot \underbrace{\frac{\partial a^{(n)}}{\partial \boldsymbol{\beta}}}_{\tilde{\mathbf{x}}^{(n)}}
+    = y^{(n)}\left(1 - \sigma(a^{(n)})\right)\tilde{\mathbf{x}}^{(n)}
+\]
+\[
+    \frac{\partial}{\partial\boldsymbol{\beta}}\left[(1-y^{(n)})\log(1 - \sigma(a^{(n)}))\right]
+    = (1 - y^{(n)}) \cdot \frac{-\sigma(a^{(n)})(1-\sigma(a^{(n)}))}{1 - \sigma(a^{(n)})}
+    \cdot \tilde{\mathbf{x}}^{(n)}
+    = -(1-y^{(n)})\sigma(a^{(n)})\tilde{\mathbf{x}}^{(n)}
+\]
+Combining these two contributions for datapoint $n$:
+\begin{align*}
+     & y^{(n)}(1 - \sigma(a^{(n)}))\tilde{\mathbf{x}}^{(n)}
+    - (1 - y^{(n)})\sigma(a^{(n)})\tilde{\mathbf{x}}^{(n)}
+    = \left(y^{(n)} - \sigma(a^{(n)})\right)\tilde{\mathbf{x}}^{(n)}.
+\end{align*}
+Summing over all $N$ datapoints,
+\[
+    \boxed{\frac{\partial\mathcal{L}(\boldsymbol{\beta})}{\partial\boldsymbol{\beta}}
+        = \sum_{n=1}^{N}\left(y^{(n)}
+        - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)\tilde{\mathbf{x}}^{(n)}
+        = \tilde{\mathbf{X}}^{T}\left(\mathbf{y} - \boldsymbol{\sigma}\right),}
+\]
+where $\tilde{\mathbf{X}}$ is the $N \times (D+1)$ matrix whose $n$-th row
+is $(\tilde{\mathbf{x}}^{(n)})^{T}$, and $\boldsymbol{\sigma}$ is the
+$N$-dimensional vector with entries
+$\sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})$.
+The vectorised form follows because the sum
+$\sum_n (\cdot)\tilde{\mathbf{x}}^{(n)}$ is equivalent to the matrix product
+$\tilde{\mathbf{X}}^T$ applied to the residual vector
+$(\mathbf{y} - \boldsymbol{\sigma})$.
 
 
 \section{Exercise b)}
 
-In this exercise we are asked to write pseudocode to estimate the
-parameters $\beta$ using gradient ascent of the log-likelihood. Our
-code should be vectorised. The pseudocode to estimate the parameters
-$\beta$ is shown below:
+In this exercise we write vectorised pseudocode to estimate the
+parameters $\boldsymbol{\beta}$ using gradient ascent of the log-likelihood.
+The update rule is
+\[
+    \boldsymbol{\beta}^{(\text{new})}
+    = \boldsymbol{\beta}^{(\text{old})}
+    + \eta \frac{\partial\mathcal{L}(\boldsymbol{\beta}^{(\text{old})})}{\partial\boldsymbol{\beta}}
+    = \boldsymbol{\beta}^{(\text{old})}
+    + \eta\, \tilde{\mathbf{X}}^{T}\left(\mathbf{y}
+    - \boldsymbol{\sigma}^{(\text{old})}\right),
+\]
+where $\boldsymbol{\sigma}^{(\text{old})}$ is the vector of predictions
+$\sigma(\boldsymbol{\beta}^{(\text{old})T}\tilde{\mathbf{x}}^{(n)})$
+under the current parameters.
+The pseudocode is as follows:
 \begin{verbatim}
 Function estimate_parameters:
 
-   Input:  feature matrix X, labels y
-   Output: vector of coefficients b
-	
-   Code:
+   Input:  feature matrix X (N x D), labels y (N x 1),
+           learning rate eta, number of iterations T
+   Output: vector of coefficients b ((D+1) x 1)
 
-      ...
-      (to be completed)
-      ...
+   Code:
+      X_tilde = [ones(N,1), X]        % augment with bias column
+      b = randn(D+1, 1)               % initialise randomly
+
+      for t = 1 to T:
+          sigma = 1 / (1 + exp(-X_tilde * b))   % predictions (N x 1)
+          grad = X_tilde^T * (y - sigma)         % gradient ((D+1) x 1)
+          b = b + eta * grad                     % gradient ascent step
 
       return b
 \end{verbatim}
-The learning rate parameter $\eta$ is chosen...
+The learning rate $\eta$ should be chosen small enough that the log-likelihood
+increases monotonically (i.e.\ the optimisation does not diverge), but large
+enough that convergence is achieved within a reasonable number of iterations.
+In practice, one can start with a small value (e.g.\ $\eta = 0.01$) and
+increase it until the learning curve begins to oscillate, then reduce slightly.
+The number of iterations $T$ should be large enough for the log-likelihood to
+plateau.
 
 \section{Exercise c)}
 
