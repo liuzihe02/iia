@@ -48,28 +48,37 @@ LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng2A\3F8\ha
 \author{Zihe Liu}
 \maketitle
 \begin{abstract}
-    This is the abstract.
-
-    Try for 1-2 sentences on each of: motive (what it\textquoteright s
-    about), method (what was
-
-    done), key results and conclusions (the main outcomes).
-
-    \textbullet{} Don\textquoteright t exceed 3 sentences on any one.
-
-    \textbullet{} Write this last, when you know what it should say!
+    We implement a logistic classifier and apply it to a binary
+    classification dataset with non-linearly separable classes.
+    We derive the gradient of the log-likelihood, train the model
+    using gradient ascent, and evaluate performance via log-likelihoods
+    and confusion matrices. We then improve the classifier by expanding
+    the inputs through Gaussian radial basis functions (RBFs) and
+    investigate how the RBF width $l$ governs the bias--variance
+    trade-off. The best-performing model ($l = 0.1$) achieves a test
+    log-likelihood of $-0.35$, a substantial improvement over the
+    linear baseline ($-0.66$).
 \end{abstract}
 
 \section*{Introduction}
-\begin{enumerate}
-    \item What is the problem and why is it interesting?
-    \item What novel follow-up will the rest of your report present?
-\end{enumerate}
+
+Classification is a fundamental task in machine learning: given
+labelled training data, the goal is to learn a mapping from inputs to
+discrete class labels that generalises to unseen data. Logistic
+regression is a simple yet principled approach that models class
+probabilities via the sigmoid function applied to a linear combination
+of input features, yielding a linear decision boundary. However, many
+real-world datasets are not linearly separable.
+
+In this report, we first derive and implement the logistic classifier,
+then demonstrate its limitations on a non-linearly separable dataset.
+We subsequently introduce a non-linear feature expansion using Gaussian
+radial basis functions (RBFs) and investigate how the RBF width
+parameter $l$ affects model learning and performance.
 
 \section*{Exercise a): Gradients of Log-Likelihood\label{sec:Exercise-a}}
 
-In this exercise we consider the logistic classification model
-(aka logistic regression) and derive the gradient of the log-likelihood
+We derive the gradient of the log-likelihood
 with respect to the parameter vector $\boldsymbol{\beta}$,
 given a vector of binary labels $\mathbf{y}$ and a matrix of input
 features $\mathbf{X}$. The probability of
@@ -81,7 +90,6 @@ $\sigma(a) = 1/(1+e^{-a})$ applied to the activations:
     \qquad
     P(y^{(n)} = 0 \mid \tilde{\mathbf{x}}^{(n)})
     = 1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})
-    = \sigma(-\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}),
 \]
 where $\tilde{\mathbf{x}}^{(n)} = (1, \mathbf{x}^{(n)})^{T}$ are the bias-augmented
 inputs, so that $\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}
@@ -121,14 +129,14 @@ Combining these two contributions for datapoint $n$:
 \begin{align*}
      & y^{(n)}(1 - \sigma(a^{(n)}))\tilde{\mathbf{x}}^{(n)}
     - (1 - y^{(n)})\sigma(a^{(n)})\tilde{\mathbf{x}}^{(n)}
-    = \left(y^{(n)} - \sigma(a^{(n)})\right)\tilde{\mathbf{x}}^{(n)}.
+    = \left(y^{(n)} - \sigma(a^{(n)})\right)\tilde{\mathbf{x}}^{(n)}
 \end{align*}
 Summing over all $N$ datapoints,
 \[
     \boxed{\frac{\partial\mathcal{L}(\boldsymbol{\beta})}{\partial\boldsymbol{\beta}}
         = \sum_{n=1}^{N}\left(y^{(n)}
         - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)\tilde{\mathbf{x}}^{(n)}
-        = \tilde{\mathbf{X}}^{T}\left(\mathbf{y} - \boldsymbol{\sigma}\right),}
+        = \tilde{\mathbf{X}}^{T}\left(\mathbf{y} - \boldsymbol{\sigma}\right)}
 \]
 where $\tilde{\mathbf{X}}$ is the $N \times (D+1)$ matrix whose $n$-th row
 is $(\tilde{\mathbf{x}}^{(n)})^{T}$, and $\boldsymbol{\sigma}$ is the
@@ -178,8 +186,6 @@ Function estimate_parameters:
 The learning rate $\eta$ should be chosen small enough that the log-likelihood
 increases roughly monotonically, but large
 enough that convergence is achieved within a reasonable number of iterations.
-In practice, one can start with a small value (e.g.\ $\eta = 0.01$) and
-increase it until the learning curve begins to oscillate, then reduce slightly.
 The number of iterations $T$ should be large enough for the log-likelihood to
 plateau.
 
@@ -187,8 +193,7 @@ plateau.
 
 The dataset consists of $N = 1000$ datapoints with two-dimensional input
 features $\mathbf{x}^{(n)} \in \mathbb{R}^2$ and binary class labels
-$y^{(n)} \in \{0, 1\}$. The dataset is visualised in
-Figure~\ref{fig:data_visualisation}.
+$y^{(n)} \in \{0, 1\}$. From Figure~\ref{fig:data_visualisation}, we observe that Class 2 (blue) is concentrated in the upper and lower area of the input space, while Class 1 (red) is interspersed  between the 2 blue regions. The two classes overlap significantly, particularly around the boundaries, and no single straight line can cleanly separate them. A linear classifier produces a decision boundary of the form $\boldsymbol{\beta}^T \tilde{\mathbf{x}} = 0$, which is a straight line in 2D. Given the non-linear arrangement of the classes, such a linear boundary would inevitably misclassify a substantial portion of the data. A non-linear decision boundary would be needed to capture the true class structure more accurately.
 
 \begin{figure}[h]
     \begin{centering}
@@ -199,7 +204,7 @@ Figure~\ref{fig:data_visualisation}.
         \label{fig:data_visualisation}}
 \end{figure}
 
-From Figure~\ref{fig:data_visualisation}, we observe that Class 2 (blue) is concentrated in the upper and lower area of the input space, while Class 1 (red) is interspersed  between the 2 blue regions. The two classes overlap significantly, particularly around the boundaries, and no single straight line can cleanly separate them. A linear classifier produces a decision boundary of the form $\boldsymbol{\beta}^T \tilde{\mathbf{x}} = 0$, which is a straight line in 2D. Given the non-linear arrangement of the classes, such a linear boundary would inevitably misclassify a substantial portion of the data. A non-linear decision boundary would be needed to capture the true class structure more accurately.
+
 
 
 \section*{Exercise d) Training the Linear Classifier}
@@ -234,8 +239,7 @@ predictive probabilities overlaid on the data. The contours are parallel straigh
 $P(y=1)$) from the lower region. However, as anticipated in Exercise c),
 a linear boundary cannot capture the non-linear class structure: many
 red (Class 1) and blue (Class 2) points lie on the wrong side of the
-decision boundary. This motivates the non-linear feature expansion in
-later exercises.
+decision boundary.
 
 \begin{figure}[h]
     \begin{centering}
@@ -249,7 +253,7 @@ later exercises.
 \section*{Exercise e) Log-Likelihoods and Confusion Matrix}
 
 The final average training and test log-likelihoods are shown in
-Table~\ref{tab:average_ll}. The test log-likelihood ($-0.6550$) is
+Table~\ref{tab:average_ll}. The test log-likelihood ($-0.6551$) is
 slightly lower than the training log-likelihood ($-0.6161$), which is
 expected since the model was fitted to the training data. The small gap
 between them confirms the absence of significant overfitting.
@@ -274,7 +278,7 @@ for this dataset.
             \begin{tabular}{c|c}
                 \textbf{Avg. Train ll} & \textbf{Avg. Test ll}\tabularnewline
                 \hline
-                $-0.6161$              & $-0.6550$\tabularnewline
+                $-0.6161$              & $-0.6551$\tabularnewline
                 \hline
             \end{tabular}
             \par\end{center}
@@ -374,32 +378,27 @@ and thereby governs the bias--variance trade-off:
     \item \textbf{Small $l$ (e.g.\ $l = 0.01$):}
           Each $\phi_m$ is extremely narrow -- essentially non-zero only
           at its own centre. The feature matrix approximates the identity,
-          so the model cannot interpolate between training points.
+          so the model cannot interpolate between training points (generalize beyond train set).
           The contours confirm this: predictions are highly localised spikes,
-          and both log-likelihoods are near $-\ln 2 \approx -0.693$
-          (random guessing).
+          and both test and train log-likelihoods are near $-\ln 2 \approx -0.693$, basically random guessing. Overfitting has clearly occurred.
 
     \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
           Basis functions overlap enough for neighbouring points to share
           information, yet remain localised enough to capture non-linear
-          structure. The contours show structured probability regions
+          structure. The contours show structured decision regions
           matching the true class distribution. Train/test log-likelihoods
           ($-0.2433$/$-0.3537$) are a substantial improvement over both
           the linear classifier and $l = 0.01$.
 
     \item \textbf{Large $l$ (e.g.\ $l = 1$):}
-          Broad basis functions produce highly correlated features
-          (approaching a constant as $l \to \infty$), reducing effective
-          dimensionality. The contours are smooth and capture large-scale
-          class structure well. Train/test log-likelihoods
+          Broad basis functions produce simpler (closer to linear) decision areas, where the contours are smooth and capture large-scale class structure well. Train/test log-likelihoods
           ($-0.3676$/$-0.4143$) show a small gap, indicating good
           generalisation. If $l$ is too large the model underfits.
 \end{itemize}
 
 Overall, increasing $l$ from $0.01$ to $1.0$ transitions the model
-from overly localised (underfitting due to feature sparsity) through
-well-structured non-linear boundaries to smooth, well-generalising
-predictions.
+from overly localised (overfitting to training data) through
+well-structured non-linear boundaries to smooth, close to linear decision boundaries.
 
 \subsubsection*{Impact on the learning rate $\eta$}
 
@@ -407,7 +406,7 @@ For small $l$, the feature matrix approximates the identity with
 small gradient magnitudes, so a moderate $\eta$ suffices. For
 intermediate $l$, features overlap and gradient magnitudes grow, so a
 larger $\eta$ speeds convergence. For large $l$, features are highly
-correlated with large magnitudes, demanding a smaller $\eta$ to avoid
+correlated with large gradient magnitudes, demanding a smaller $\eta$ to avoid
 divergence. Figure~\ref{fig:osc} demonstrates this: using
 $\eta = 0.0005$ ($10\times$ larger) for $l = 1.0$ causes severe
 oscillations as the gradient steps overshoot the optimum each iteration.
@@ -419,7 +418,6 @@ oscillations as the gradient steps overshoot the optimum each iteration.
     \caption{Train (left) and test (right) log-likelihood for $l = 1.0$ with $\eta = 0.0005$,
         demonstrating oscillations from an excessively large learning rate.\label{fig:osc}}
 \end{figure}
-
 
 \section*{Exercise g) Comparison of Results}
 
@@ -509,19 +507,25 @@ class structure. The $l = 1.0$ model has the best true positive rate
 ($0.875$) but a higher false positive rate ($0.21$), as its smooth
 features lack resolution for finer boundaries. The $l = 0.01$ model
 performs near random guessing (test ll $-0.6927$), with a confusion
-matrix biased toward $\hat{y} = 0$ (TP rate only $0.08$) because the
-narrow basis functions produce predictions near $0.5$ for test points.
-
-Compared to the linear classifier, all RBF models reduce the false
+matrix biased toward $\hat{y} = 0$ (true positive rate only $0.08$) because the
+narrow basis functions mean test points almost always lie outside any decision boundaries - the model never predicts confidently for any class. Compared to the linear classifier, all RBF models reduce the false
 positive rate ($0.38$ for linear). However, only $l = 0.1$ and $l = 1.0$
 maintain a high true positive rate, confirming that an appropriately
 chosen RBF width substantially improves classification.
 
 
-\section{Conclusions}
-\begin{enumerate}
-    \item Draw together the most important results and their consequences.
-    \item List any reservations or limitations.
-\end{enumerate}
+\section*{Conclusions}
+
+The linear logistic classifier achieves a test log-likelihood of
+$-0.6551$, only marginally better than random guessing ($-\ln 2
+    \approx -0.693$), confirming its inability to model the non-linear
+class structure. Expanding the inputs with Gaussian RBFs yields substantial improvements:
+$l = 0.1$ achieves the best test log-likelihood ($-0.3537$) with
+balanced classification accuracy, while $l = 1.0$ achieves the
+highest true positive rate at the cost of more false positives.
+The RBF width $l$ controls the bias--variance trade-off: too small
+gives overly localised features that fail to generalise, while too
+large smooths away fine-grained class structure. Limitations include the lack of regularisation (which could mitigate overfitting for small $l$), and that the learning rates
+were chosen by manual tuning rather than a systematic search.
 
 \end{document}
