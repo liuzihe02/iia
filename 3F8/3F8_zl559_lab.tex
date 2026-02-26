@@ -5,13 +5,17 @@
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
 \usepackage{geometry}
-\geometry{verbose,tmargin=1.5cm,bmargin=3cm,lmargin=2.5cm,rmargin=2.5cm}
+\geometry{verbose,tmargin=2cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
 \usepackage{textcomp}
 \usepackage{amstext}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{comment}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{2.4ex plus 0.7ex minus 0.2ex}{1.6ex plus 0.2ex}
+\titlespacing*{\subsection}{0pt}{2.3ex plus 0.7ex minus 0.2ex}{1.0ex plus 0.1ex}
+\titlespacing*{\subsubsection}{0pt}{1.8ex plus 0.5ex minus 0.2ex}{0.7ex plus 0.1ex}
 
 \makeatletter
 
@@ -88,36 +92,18 @@ These two cases can be written compactly as a single Bernoulli likelihood:
     = \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})^{y^{(n)}}
     \left(1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)^{1 - y^{(n)}}
 \]
-
-Assuming $N$ datapoints are independent and identically distributed,
-the likelihood of the full dataset is:
-\[
-    P(\mathbf{y} \mid \mathbf{X}, \boldsymbol{\beta})
-    = \prod_{n=1}^{N}
-    \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})^{y^{(n)}}
-    \left(1 - \sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)^{1 - y^{(n)}}
-\]
-
-Giving the log-likelihood
-$\mathcal{L}(\boldsymbol{\beta}) = \log P(\mathbf{y} \mid \mathbf{X}, \boldsymbol{\beta})$ of:
+Assuming the $N$ datapoints are independent and identically distributed,
+the dataset log-likelihood is:
 \[
     \mathcal{L}(\boldsymbol{\beta})
+    = \log P(\mathbf{y} \mid \mathbf{X}, \boldsymbol{\beta})
     = \sum_{n=1}^{N}\left[
     y^{(n)}\log\sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})
     + (1-y^{(n)})\log\left(1-\sigma(\boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)})\right)
     \right]
 \]
-
-Note the derivative of the logistic function:
-\[
-    \frac{d\sigma(a)}{da}
-    = \frac{e^{-a}}{(1+e^{-a})^{2}}
-    = \frac{1}{1+e^{-a}} \cdot \frac{e^{-a}}{1+e^{-a}}
-    = \sigma(a)\left(1 - \sigma(a)\right)
-\]
-
 Let $a^{(n)} = \boldsymbol{\beta}^{T}\tilde{\mathbf{x}}^{(n)}$, so that
-$\frac{\partial a^{(n)}}{\partial \boldsymbol{\beta}} = \tilde{\mathbf{x}}^{(n)}$. Then our derivatives are
+$\frac{\partial a^{(n)}}{\partial \boldsymbol{\beta}} = \tilde{\mathbf{x}}^{(n)}$. Noting the derivative of the logistic function $\frac{d\sigma(a)}{da} = \sigma(a)\left(1 - \sigma(a)\right)$,
 \[
     \frac{\partial}{\partial\boldsymbol{\beta}}\left[y^{(n)}\log\sigma(a^{(n)})\right]
     = y^{(n)} \cdot \frac{1}{\sigma(a^{(n)})}
@@ -206,7 +192,7 @@ Figure~\ref{fig:data_visualisation}.
 
 \begin{figure}[h]
     \begin{centering}
-        \includegraphics[width=0.3\paperwidth]{figures/data_visualisation.png}
+        \includegraphics[width=0.25\paperwidth]{figures/data_visualisation.png}
         \par\end{centering}
     \caption{Visualisation of the dataset in the $(X_1, X_2)$ input space.
         Red points are Class 1 ($y=0$) and blue points are Class 2 ($y=1$).
@@ -230,7 +216,7 @@ the optimisation proceeds is shown in Figure~\ref{fig:learning_curves}.
 
 \begin{figure}[h]
     \begin{centering}
-        \includegraphics[width=0.25\paperwidth]{figures/ll_train_linear.png}\hspace{1cm}\includegraphics[width=0.25\paperwidth]{figures/ll_test_linear.png}
+        \includegraphics[width=0.2\paperwidth]{figures/ll_train_linear.png}\hspace{1cm}\includegraphics[width=0.2\paperwidth]{figures/ll_test_linear.png}
         \par\end{centering}
     \caption{Learning curves showing the average log-likelihood per datapoint
         on the training (left) and test (right) datasets.\label{fig:learning_curves}}
@@ -253,7 +239,7 @@ later exercises.
 
 \begin{figure}[h]
     \begin{centering}
-        \includegraphics[width=0.3\paperwidth]{figures/contours_linear.png}
+        \includegraphics[width=0.25\paperwidth]{figures/contours_linear.png}
         \par\end{centering}
     \caption{Contours of the class predictive probabilities for the
         linear logistic classifier.\label{fig:contours_linear}}
@@ -359,15 +345,15 @@ increases roughly monotonically without oscillation; Figure~\ref{fig:rbf_all} di
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_0.01.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_0.01.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_0.01.png}\\[-0.1cm]
-    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_0.1.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_0.1.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_0.1.png}\\[-0.1cm]
-    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_1.0.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_1.0.png}\hspace{0.2cm}
-    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_1.0.png}
+    \includegraphics[width=0.23\textwidth]{figures/ll_train_rbf_0.01.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/ll_test_rbf_0.01.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/contours_rbf_0.01.png}\\[-0.1cm]
+    \includegraphics[width=0.23\textwidth]{figures/ll_train_rbf_0.1.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/ll_test_rbf_0.1.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/contours_rbf_0.1.png}\\[-0.1cm]
+    \includegraphics[width=0.23\textwidth]{figures/ll_train_rbf_1.0.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/ll_test_rbf_1.0.png}\hspace{0cm}
+    \includegraphics[width=0.23\textwidth]{figures/contours_rbf_1.0.png}
     \caption{Train log-likelihood (left), test log-likelihood (middle),
         and predictive contours (right).
         \textbf{Top:} $l = 0.01$, $\eta = 0.0001$.
@@ -386,58 +372,28 @@ and thereby governs the bias--variance trade-off:
 
 \begin{itemize}
     \item \textbf{Small $l$ (e.g.\ $l = 0.01$):}
-          Each basis function $\phi_m$ is extremely narrow --
-          it is essentially non-zero only very close to its centre
-          $\mathbf{x}^{(m)}$. The feature matrix becomes approximately
-          the identity (each training point activates only its own basis
-          function), so the model memorises the training labels but
-          cannot generalise to unseen points that lie between training
-          centres. This leads to \emph{overfitting}: strong training
-          performance but poor test performance.
-
-          \subitem The decision boundaries are extremely narrow
-          and the contour plot shows highly localised, spiky predictive
-          probabilities centred on \textit{individual} training points, with no smooth
-          interpolation between them. Both training and test log-likelihood values are
-          close to $-\ln 2 \approx -0.693$, indicating poor performance: the
-          features are so localised that the model essentially treats each
-          training point independently and fails to learn any useful global
-          structure.
+          Each $\phi_m$ is extremely narrow -- essentially non-zero only
+          at its own centre. The feature matrix approximates the identity,
+          so the model cannot interpolate between training points.
+          The contours confirm this: predictions are highly localised spikes,
+          and both log-likelihoods are near $-\ln 2 \approx -0.693$
+          (random guessing).
 
     \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
-          The basis functions overlap sufficiently for neighbouring
-          training points to share information, yet remain localised
-          enough to capture non-linear class structure. This typically
-          yields the best trade-off between fitting the training data
-          and generalising to the test data.
-
-          Experimentally, the basis functions overlap sufficiently
-          for the classifier to learn a meaningful non-linear decision boundary.
-          The contour plot shows structured probability regions that follow the
-          true class distribution -- high $P(y=1)$ in the upper and lower regions
-          where Class 2 (blue) points concentrate, and high $P(y=0)$ in the
-          central band where Class 1 (red) points dominate. The final train and test
-          log-likelihoods are $-0.2433$ and $-0.3537$, respectively -- a
-          substantial improvement over both the linear classifier and $l = 0.01$.
-
+          Basis functions overlap enough for neighbouring points to share
+          information, yet remain localised enough to capture non-linear
+          structure. The contours show structured probability regions
+          matching the true class distribution. Train/test log-likelihoods
+          ($-0.2433$/$-0.3537$) are a substantial improvement over both
+          the linear classifier and $l = 0.01$.
 
     \item \textbf{Large $l$ (e.g.\ $l = 1$):}
-          Each basis function $\phi_m$ is broad and responds
-          substantially to many datapoints. The $N_{\text{train}}$
-          features become highly correlated (approaching a constant
-          vector as $l \to \infty$), so the effective dimensionality
-          of the feature space is reduced. The model captures smooth,
-          large-scale structure in the data. If $l$ is \emph{too} large
-          the model loses the ability to capture fine-grained class
-          boundaries and \emph{underfits}.
-
-          \subitem For $l = 1.0$ (bottom row), the broad basis functions produce smooth
-          contours that capture the large-scale class structure well. The contour
-          plot shows an elliptical decision boundary roughly separating the
-          two classes. The final train and test log-likelihoods are $-0.3676$
-          and $-0.4143$, respectively. The small gap between training and test
-          log-likelihoods indicates that the smooth model generalises well
-          without overfitting.
+          Broad basis functions produce highly correlated features
+          (approaching a constant as $l \to \infty$), reducing effective
+          dimensionality. The contours are smooth and capture large-scale
+          class structure well. Train/test log-likelihoods
+          ($-0.3676$/$-0.4143$) show a small gap, indicating good
+          generalisation. If $l$ is too large the model underfits.
 \end{itemize}
 
 Overall, increasing $l$ from $0.01$ to $1.0$ transitions the model
@@ -447,15 +403,14 @@ predictions.
 
 \subsubsection*{Impact on the learning rate $\eta$}
 
-For small $l$, the feature
-matrix $\tilde{\mathbf{X}}_{\text{RBF}}$ is approximately the identity, but the gradients have limited magnitude
-due to sparse activations, so a moderate learning rate suffices. For intermediate $l$, the features are more correlated and the gradient magnitudes grow (each training point contributes to many
-basis functions simultaneously), so a larger learning rate can be used to speed convergence without instability.
-For large $l$, the feature matrix is near-singular with very large feature values (all basis functions are close to 1),
-producing large gradient magnitudes that demand a smaller learning rate to avoid divergence. Figure~\ref{fig:osc}
-demonstrates this: using $\eta = 0.0005$ (10$\times$ larger) for $l = 1.0$ causes severe oscillations -- the
-large gradient steps overshoot the optimum on each iteration, causing the log-likelihood to swing wildly rather
-than converge monotonically.
+For small $l$, the feature matrix approximates the identity with
+small gradient magnitudes, so a moderate $\eta$ suffices. For
+intermediate $l$, features overlap and gradient magnitudes grow, so a
+larger $\eta$ speeds convergence. For large $l$, features are highly
+correlated with large magnitudes, demanding a smaller $\eta$ to avoid
+divergence. Figure~\ref{fig:osc} demonstrates this: using
+$\eta = 0.0005$ ($10\times$ larger) for $l = 1.0$ causes severe
+oscillations as the gradient steps overshoot the optimum each iteration.
 
 \begin{figure}[h]
     \centering
@@ -547,34 +502,20 @@ Tables~\ref{tab:conf_linear}--\ref{tab:conf_l_1}.
     \end{minipage}
 \end{table}
 
-The RBF expansion with $l = 0.1$ achieves the best test log-likelihood
-($-0.3537$), a large improvement over the linear model ($-0.6551$).
-Its confusion matrix shows both high true negative rate ($0.93$) and
-high true positive rate ($0.79$), meaning it correctly classifies the
-majority of both classes. This reflects the ability of intermediate-width
-RBFs to capture the non-linear class structure visible in the data.
+The $l = 0.1$ model achieves the best test log-likelihood ($-0.3537$
+vs.\ $-0.6551$ linear) with both high true negative ($0.93$) and true
+positive ($0.79$) rates, reflecting its ability to capture non-linear
+class structure. The $l = 1.0$ model has the best true positive rate
+($0.875$) but a higher false positive rate ($0.21$), as its smooth
+features lack resolution for finer boundaries. The $l = 0.01$ model
+performs near random guessing (test ll $-0.6927$), with a confusion
+matrix biased toward $\hat{y} = 0$ (TP rate only $0.08$) because the
+narrow basis functions produce predictions near $0.5$ for test points.
 
-The $l = 1.0$ model has a slightly worse test log-likelihood ($-0.4143$)
-but the best true positive rate ($0.875$), at the cost of a higher
-false positive rate ($0.21$). The smooth, broad basis functions capture
-the large-scale separation between classes but lack the resolution
-to model finer boundaries, leading to more class-0 points being
-misclassified as class-1.
-
-The $l = 0.01$ model performs poorly: its test log-likelihood ($-0.6927$)
-is close to that of random guessing ($-\ln 2 \approx -0.693$). Its
-confusion matrix is heavily biased toward predicting $\hat{y} = 0$
-(true negative rate $0.96$ but true positive rate only $0.08$),
-because the extremely narrow basis functions produce predictions near
-$0.5$ for most test points, and the threshold $\tau = 0.5$ then
-assigns nearly all predictions to class 0.
-
-Compared to the linear classifier, all three RBF models reduce the
-false positive rate (the linear model has $0.38$). However, only
-$l = 0.1$ and $l = 1.0$ simultaneously maintain a high true positive
-rate, confirming that a non-linear feature expansion with an
-appropriately chosen width substantially improves classification on
-this dataset.
+Compared to the linear classifier, all RBF models reduce the false
+positive rate ($0.38$ for linear). However, only $l = 0.1$ and $l = 1.0$
+maintain a high true positive rate, confirming that an appropriately
+chosen RBF width substantially improves classification.
 
 
 \section{Conclusions}
