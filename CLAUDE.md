@@ -40,3 +40,4 @@ SHORT_COURSEWORK
   - In VSCode, this should be very easy to do as there should already be a default `clear all outputs` button. If you see a very large `ipynb` file with alot of unneccessary data, please stop the session and prompt the user
 - ALWAYS write simple, clear and concise code with appropriate documentation (don't overdo)
 - PDFLatex cannot handle unicode characters, so NEVER have any emojis and NEVER have weird unicode characters
+- ALWAYS try to make minimal edits to existing ipynb notebooks, especially if they contain reusable functions - try to reuse them as much as possible making small modifications

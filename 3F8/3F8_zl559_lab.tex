@@ -24,7 +24,8 @@ Instructions are in coursework.pdf, make sure to answer the questions comprehens
 The relevant ipynb file is coursework.ipynb and code.py in the /3F8 folder, but try to make sure outputs are cleared before further processing to save tokens
 Make sure all vectors are bolded
 Make sure all math is explained comprehensively and clearly
-LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng 2A\3F8\handout4-classification-slides.pdf" if needed
+ALWAYS try to make minimal edits to existing ipynb notebooks, especially if they contain reusable functions - try to reuse them as much as possible making small modifications
+LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng2A\3F8\handout4-classification-slides.pdf" if needed
 
 \end{comment}
 
@@ -205,7 +206,7 @@ Figure~\ref{fig:data_visualisation}.
 
 \begin{figure}[h]
     \begin{centering}
-        \includegraphics[width=0.4\paperwidth]{figures/data_visualisation.png}
+        \includegraphics[width=0.3\paperwidth]{figures/data_visualisation.png}
         \par\end{centering}
     \caption{Visualisation of the dataset in the $(X_1, X_2)$ input space.
         Red points are Class 1 ($y=0$) and blue points are Class 2 ($y=1$).
@@ -215,40 +216,48 @@ Figure~\ref{fig:data_visualisation}.
 From Figure~\ref{fig:data_visualisation}, we observe that Class 2 (blue) is concentrated in the upper and lower area of the input space, while Class 1 (red) is interspersed  between the 2 blue regions. The two classes overlap significantly, particularly around the boundaries, and no single straight line can cleanly separate them. A linear classifier produces a decision boundary of the form $\boldsymbol{\beta}^T \tilde{\mathbf{x}} = 0$, which is a straight line in 2D. Given the non-linear arrangement of the classes, such a linear boundary would inevitably misclassify a substantial portion of the data. A non-linear decision boundary would be needed to capture the true class structure more accurately.
 
 
-\section{Exercise d)}
+\section*{Exercise d) Training the Linear Classifier}
 
-In this exercise we split the data randomly into training and test
-sets with 800 and 200 data points, respectively. The pseudocode from
-exercise a) is transformed into python code as follows:
+The data is split randomly into training ($N_{\text{train}} = 800$)
+and test ($N_{\text{test}} = 200$) sets. Gradient ascent is implemented as:
 \begin{verbatim}
-#
-# Python code to be included
-#
+sigmoid_value = predict(X_tilde_train, w)
+w = w + alpha * np.dot(X_tilde_train.T, y_train - sigmoid_value)
 \end{verbatim}
-We then train the classifier using this code. We fixed the learning
-rate parameter to be $\eta=...$ . The average log-likelihood on the
-training and test sets as the optimisation proceeds are shown in Figure
-\ref{fig:learning_curves}. By looking at these plots we conclude
-that ...
+We train the classifier with learning rate $\eta = 0.001$ for $T = 100$
+iterations. The average log-likelihood on the training and test sets as
+the optimisation proceeds is shown in Figure~\ref{fig:learning_curves}.
 
-Figure \ref{fig:learning_curves} displays the visualisation of the
-contours of the class predictive probabilities on top of the data.
-This figure shows that...
+\begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width=0.25\paperwidth]{figures/ll_train_linear.png}\hspace{1cm}\includegraphics[width=0.25\paperwidth]{figures/ll_test_linear.png}
+        \par\end{centering}
+    \caption{Learning curves showing the average log-likelihood per datapoint
+        on the training (left) and test (right) datasets.\label{fig:learning_curves}}
+\end{figure}
 
-% \begin{figure}
-%     \begin{centering}
-%         \includegraphics[width=0.3\paperwidth]{place_holder_figure}\hspace{1cm}\includegraphics[width=0.3\paperwidth]{place_holder_figure}
-%         \par\end{centering}
-%     \caption{Learning curves showing the average log-likelihood on the training
-%         (left) and test (right) datasets.\label{fig:learning_curves} }
-% \end{figure}
+Both curves increase monotonically and plateau after approximately 20
+iterations, indicating that the optimisation has converged and
+$\eta = 0.001$ is an appropriate learning rate.
+The training and test curves follow a similar trajectory, suggesting
+there is no overfitting -- as expected for a model with only $D+1 = 3$
+parameters fitting 800 datapoints.
 
-% \begin{figure}
-%     \begin{centering}
-%         \includegraphics[width=0.3\paperwidth]{place_holder_figure}
-%         \par\end{centering}
-%     \caption{Visualisation of the contours of the class predictive probabilities.\label{fig:data_visualisation-1} }
-% \end{figure}
+Figure~\ref{fig:contours_linear} displays the contours of the
+predictive probabilities overlaid on the data. The contours are parallel straight lines, confirming the linear nature of the decision boundary. The $0.5$ contour (the decision boundary) runs roughly diagonally, separating the upper region (higher
+$P(y=1)$) from the lower region. However, as anticipated in Exercise c),
+a linear boundary cannot capture the non-linear class structure: many
+red (Class 1) and blue (Class 2) points lie on the wrong side of the
+decision boundary. This motivates the non-linear feature expansion in
+later exercises.
+
+\begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width=0.3\paperwidth]{figures/contours_linear.png}
+        \par\end{centering}
+    \caption{Contours of the class predictive probabilities for the
+        linear logistic classifier.\label{fig:contours_linear}}
+\end{figure}
 
 
 \section{Exercise e)}
