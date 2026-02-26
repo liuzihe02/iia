@@ -352,7 +352,7 @@ $(D+1)$-dimensional space.
 
 We train the logistic classifier with RBF features for three widths
 $l \in \{0.01, 0.1, 1\}$, using learning rates
-$\eta \in \{0.0001, 0.0005, 0.0001\}$ and $T = 500$ gradient ascent
+$\eta \in \{0.0001, 0.001, 0.00005\}$ and $T = 500$ gradient ascent
 steps for each, respectively.
 The learning rates were chosen so that the log-likelihood
 increases roughly monotonically without oscillation; Figure~\ref{fig:rbf_all} displays our results.
@@ -370,9 +370,9 @@ increases roughly monotonically without oscillation; Figure~\ref{fig:rbf_all} di
     \includegraphics[width=0.27\textwidth]{figures/contours_rbf_1.0.png}
     \caption{Train log-likelihood (left), test log-likelihood (middle),
         and predictive contours (right).
-        \textbf{Top row:} $l = 0.01$, $\eta = 0.0001$, $T = 500$.
-        \textbf{Middle row:} $l = 0.1$, $\eta = 0.0005$, $T = 500$.
-        \textbf{Bottom row:} $l = 1.0$, $\eta = 0.0001$, $T = 500$.
+        \textbf{Top:} $l = 0.01$, $\eta = 0.0001$.
+        \textbf{Mid:} $l = 0.1$, $\eta = 0.001$.
+        \textbf{Bot:} $l = 1.0$, $\eta = 0.00005$.
         All $T = 500$.
         \label{fig:rbf_all}}
 \end{figure}
@@ -417,7 +417,7 @@ and thereby governs the bias--variance trade-off:
           true class distribution -- high $P(y=1)$ in the upper and lower regions
           where Class 2 (blue) points concentrate, and high $P(y=0)$ in the
           central band where Class 1 (red) points dominate. The final train and test
-          log-likelihoods are $-0.3361$ and $-0.3914$, respectively -- a
+          log-likelihoods are $-0.2433$ and $-0.3537$, respectively -- a
           substantial improvement over both the linear classifier and $l = 0.01$.
 
 
@@ -434,10 +434,10 @@ and thereby governs the bias--variance trade-off:
           \subitem For $l = 1.0$ (bottom row), the broad basis functions produce smooth
           contours that capture the large-scale class structure well. The contour
           plot shows an elliptical decision boundary roughly separating the
-          two classes. The final train and test log-likelihoods are $-0.2701$
-          and $-0.2900$, respectively -- the best among the three settings. The
-          small gap between training and test log-likelihoods indicates that
-          the smooth model generalises well without overfitting.
+          two classes. The final train and test log-likelihoods are $-0.3676$
+          and $-0.4143$, respectively. The small gap between training and test
+          log-likelihoods indicates that the smooth model generalises well
+          without overfitting.
 \end{itemize}
 
 Overall, increasing $l$ from $0.01$ to $1.0$ transitions the model
@@ -452,102 +452,129 @@ matrix $\tilde{\mathbf{X}}_{\text{RBF}}$ is approximately the identity, but the 
 due to sparse activations, so a moderate learning rate suffices. For intermediate $l$, the features are more correlated and the gradient magnitudes grow (each training point contributes to many
 basis functions simultaneously), so a larger learning rate can be used to speed convergence without instability.
 For large $l$, the feature matrix is near-singular with very large feature values (all basis functions are close to 1),
-producing large gradient magnitudes that demand a smaller learning rate to avoid divergence. [show stuff on oscillations...]
+producing large gradient magnitudes that demand a smaller learning rate to avoid divergence. Figure~\ref{fig:osc}
+demonstrates this: using $\eta = 0.0005$ (10$\times$ larger) for $l = 1.0$ causes severe oscillations -- the
+large gradient steps overshoot the optimum on each iteration, causing the log-likelihood to swing wildly rather
+than converge monotonically.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_1.0_osc.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_1.0_osc.png}
+    \caption{Train (left) and test (right) log-likelihood for $l = 1.0$ with $\eta = 0.0005$,
+        demonstrating oscillations from an excessively large learning rate.\label{fig:osc}}
+\end{figure}
 
 
-\section{Exercise g)}
+\section*{Exercise g) Comparison of Results}
 
-The final final training and test log-likelihoods per datapoint obtained
-for each setting of $l=\{0.01,0.1,1\}$ are shown in tables \ref{tab:avg_ll_l_001},
-\ref{tab:avg_ll_l_01} and \ref{tab:avg_ll_l_1}. These results indicate
-that... The 2 \texttimes{} 2 confusion matrices for the three models
-trained with $l=\{0.01,0.1,1\}$ are show in tables \ref{tab:conf_l_001},
-\ref{tab:conf_l_01} and \ref{tab:conf_l_1}. After analysing these
-matrices, we can say that... When we compare these results to those
-obtained using the original inputs we conclude that...
+The final training and test log-likelihoods per datapoint for all four
+models (linear and RBF with $l \in \{0.01, 0.1, 1\}$) are summarised
+in Table~\ref{tab:all_ll}. The corresponding confusion matrices on the
+test set (threshold $\tau = 0.5$) are shown in
+Tables~\ref{tab:conf_linear}--\ref{tab:conf_l_1}.
 
-\begin{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|c|c}
+        \textbf{Model} & \textbf{Avg. Train ll} & \textbf{Avg. Test ll} \\
+        \hline
+        Linear         & $-0.6161$              & $-0.6551$             \\
+        RBF $l=0.01$   & $-0.7907$              & $-0.6927$             \\
+        RBF $l=0.1$    & $-0.2433$              & $-0.3537$             \\
+        RBF $l=1.0$    & $-0.3676$              & $-0.4143$             \\
+    \end{tabular}
+    \caption{Average log-likelihoods per datapoint for all models.\label{tab:all_ll}}
+\end{table}
+
+\begin{table}[h]
     \centering{}%
-    \begin{minipage}[t]{0.3\textwidth}%
+    \begin{minipage}[t]{0.24\textwidth}%
         \begin{center}
-            \begin{tabular}{c|c}
-                \textbf{Avg. Train ll} & \textbf{Avg. Test ll}\tabularnewline
-                \hline
-                -                      & -\tabularnewline
-                \hline
-            \end{tabular}\caption{Results for $l=0.01$\label{tab:avg_ll_l_001}}
-            \par\end{center}%
-    \end{minipage}\hspace{0.5cm}%
-    \begin{minipage}[t]{0.3\textwidth}%
+            \begin{tabular}{cc|c|c}
+                    & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\hat{y}$} \tabularnewline
+                    &                      & 0                                             & 1\tabularnewline
+                \cline{2-4}
+                $y$ & 0                    & 0.6154                                        & 0.3846\tabularnewline
+                \cline{2-4}
+                    & 1                    & 0.2812                                        & 0.7188\tabularnewline
+                \cline{2-4}
+            \end{tabular}
+            \par\end{center}
+        \caption{Conf. matrix, linear.\label{tab:conf_linear}}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{0.24\textwidth}%
         \begin{center}
-            \begin{tabular}{c|c}
-                \textbf{Avg. Train ll} & \textbf{Avg. Test ll}\tabularnewline
-                \hline
-                -                      & -\tabularnewline
-                \hline
-            \end{tabular}\caption{Results for $l=0.1$\label{tab:avg_ll_l_01}}
-            \par\end{center}%
-    \end{minipage}\hspace{0.5cm}%
-    \begin{minipage}[t]{0.3\textwidth}%
+            \begin{tabular}{cc|c|c}
+                    & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\hat{y}$} \tabularnewline
+                    &                      & 0                                             & 1\tabularnewline
+                \cline{2-4}
+                $y$ & 0                    & 0.9615                                        & 0.0385\tabularnewline
+                \cline{2-4}
+                    & 1                    & 0.9167                                        & 0.0833\tabularnewline
+                \cline{2-4}
+            \end{tabular}
+            \par\end{center}
+        \caption{Conf. matrix, $l=0.01$.\label{tab:conf_l_001}}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{0.24\textwidth}%
         \begin{center}
-            \begin{tabular}{c|c}
-                \textbf{Avg. Train ll} & \textbf{Avg. Test ll}\tabularnewline
-                \hline
-                -                      & -\tabularnewline
-                \hline
-            \end{tabular}\caption{Results for $l=1$\label{tab:avg_ll_l_1}}
-            \par\end{center}%
+            \begin{tabular}{cc|c|c}
+                    & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\hat{y}$} \tabularnewline
+                    &                      & 0                                             & 1\tabularnewline
+                \cline{2-4}
+                $y$ & 0                    & 0.9327                                        & 0.0673\tabularnewline
+                \cline{2-4}
+                    & 1                    & 0.2083                                        & 0.7917\tabularnewline
+                \cline{2-4}
+            \end{tabular}
+            \par\end{center}
+        \caption{Conf. matrix, $l=0.1$.\label{tab:conf_l_01}}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{0.24\textwidth}%
+        \begin{center}
+            \begin{tabular}{cc|c|c}
+                    & \multicolumn{1}{c}{} & \multicolumn{2}{c}{$\hat{y}$} \tabularnewline
+                    &                      & 0                                             & 1\tabularnewline
+                \cline{2-4}
+                $y$ & 0                    & 0.7885                                        & 0.2115\tabularnewline
+                \cline{2-4}
+                    & 1                    & 0.1250                                        & 0.8750\tabularnewline
+                \cline{2-4}
+            \end{tabular}
+            \par\end{center}
+        \caption{Conf. matrix, $l=1$.\label{tab:conf_l_1}}
     \end{minipage}
 \end{table}
 
-\begin{table}
-    \centering{}%
-    \begin{minipage}[t]{0.33\textwidth}%
-        \begin{center}
-            \begin{tabular}{cc|c|c}
-                    & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\hat{y}$} & \tabularnewline
-                    &                      & 0                             & 1\tabularnewline
-                \cline{2-4}
-                $y$ & 0                    & -                             & -\tabularnewline
-                \cline{2-4}
-                    & 1                    & -                             & -\tabularnewline
-                \cline{2-4}
-            \end{tabular}
-            \par\end{center}
-        \caption{Conf. matrix $l=0.01$.\label{tab:conf_l_001}}
-        %
-    \end{minipage}%
-    \begin{minipage}[t]{0.33\textwidth}%
-        \begin{center}
-            \begin{tabular}{cc|c|c}
-                    & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\hat{y}$} & \tabularnewline
-                    &                      & 0                             & 1\tabularnewline
-                \cline{2-4}
-                $y$ & 0                    & -                             & -\tabularnewline
-                \cline{2-4}
-                    & 1                    & -                             & -\tabularnewline
-                \cline{2-4}
-            \end{tabular}
-            \par\end{center}
-        \caption{Conf. matrix $l=0.1$.\label{tab:conf_l_01}}
-        %
-    \end{minipage}%
-    \begin{minipage}[t]{0.33\textwidth}%
-        \begin{center}
-            \begin{tabular}{cc|c|c}
-                    & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\hat{y}$} & \tabularnewline
-                    &                      & 0                             & 1\tabularnewline
-                \cline{2-4}
-                $y$ & 0                    & -                             & -\tabularnewline
-                \cline{2-4}
-                    & 1                    & -                             & -\tabularnewline
-                \cline{2-4}
-            \end{tabular}
-            \par\end{center}
-        \caption{Conf. matrix $l=1$.\label{tab:conf_l_1}}
-        %
-    \end{minipage}
-\end{table}
+The RBF expansion with $l = 0.1$ achieves the best test log-likelihood
+($-0.3537$), a large improvement over the linear model ($-0.6551$).
+Its confusion matrix shows both high true negative rate ($0.93$) and
+high true positive rate ($0.79$), meaning it correctly classifies the
+majority of both classes. This reflects the ability of intermediate-width
+RBFs to capture the non-linear class structure visible in the data.
+
+The $l = 1.0$ model has a slightly worse test log-likelihood ($-0.4143$)
+but the best true positive rate ($0.875$), at the cost of a higher
+false positive rate ($0.21$). The smooth, broad basis functions capture
+the large-scale separation between classes but lack the resolution
+to model finer boundaries, leading to more class-0 points being
+misclassified as class-1.
+
+The $l = 0.01$ model performs poorly: its test log-likelihood ($-0.6927$)
+is close to that of random guessing ($-\ln 2 \approx -0.693$). Its
+confusion matrix is heavily biased toward predicting $\hat{y} = 0$
+(true negative rate $0.96$ but true positive rate only $0.08$),
+because the extremely narrow basis functions produce predictions near
+$0.5$ for most test points, and the threshold $\tau = 0.5$ then
+assigns nearly all predictions to class 0.
+
+Compared to the linear classifier, all three RBF models reduce the
+false positive rate (the linear model has $0.38$). However, only
+$l = 0.1$ and $l = 1.0$ simultaneously maintain a high true positive
+rate, confirming that a non-linear feature expansion with an
+appropriately chosen width substantially improves classification on
+this dataset.
 
 
 \section{Conclusions}
