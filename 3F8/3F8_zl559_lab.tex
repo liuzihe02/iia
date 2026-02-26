@@ -363,69 +363,14 @@ non-linear, the resulting decision boundary
 $\boldsymbol{\beta}^T \tilde{\mathbf{x}}_{\text{RBF}} = 0$ is a
 non-linear surface in the original input space.
 
-\subsection*{Role of the width $l$}
-
-The width $l$ controls the \emph{smoothness} of the feature expansion
-and thereby governs the bias--variance trade-off:
-
-\begin{itemize}
-    \item \textbf{Small $l$ (e.g.\ $l = 0.01$):}
-          Each basis function $\phi_m$ is extremely narrow --
-          it is essentially non-zero only very close to its centre
-          $\mathbf{x}^{(m)}$. The feature matrix becomes approximately
-          the identity (each training point activates only its own basis
-          function), so the model memorises the training labels but
-          cannot generalise to unseen points that lie between training
-          centres. This leads to \emph{overfitting}: strong training
-          performance but poor test performance.
-
-    \item \textbf{Large $l$ (e.g.\ $l = 1$):}
-          Each basis function $\phi_m$ is broad and responds
-          substantially to many datapoints. The $N_{\text{train}}$
-          features become highly correlated (approaching a constant
-          vector as $l \to \infty$), so the effective dimensionality
-          of the feature space is reduced. The model captures smooth,
-          large-scale structure in the data. If $l$ is \emph{too} large
-          the model loses the ability to capture fine-grained class
-          boundaries and \emph{underfits}.
-
-    \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
-          The basis functions overlap sufficiently for neighbouring
-          training points to share information, yet remain localised
-          enough to capture non-linear class structure. This typically
-          yields the best trade-off between fitting the training data
-          and generalising to the test data.
-\end{itemize}
-
-\subsection*{Impact on the learning rate $\eta$}
-
-The magnitude of the feature vectors
-$\tilde{\mathbf{x}}_{\text{RBF}}^{(n)}$ and the conditioning of
-the feature matrix both change with $l$. For small $l$, the feature
-matrix $\tilde{\mathbf{X}}_{\text{RBF}}$ is approximately the identity
-and is well-conditioned, but the gradients have limited magnitude
-due to sparse activations, so a moderate learning rate suffices.
-For intermediate $l$, the features are more correlated and the
-gradient magnitudes grow (each training point contributes to many
-basis functions simultaneously), so a larger learning rate can be
-used to speed convergence without instability.
-For large $l$, the feature matrix is near-singular
-with very large feature values (all basis functions are close to 1),
-producing large gradient magnitudes that demand a smaller learning
-rate to avoid divergence.
-
-\subsection*{Experimental setup and results}
+\subsection*{Experimental Results}
 
 We train the logistic classifier with RBF features for three widths
 $l \in \{0.01, 0.1, 1\}$, using learning rates
 $\eta \in \{0.0001, 0.0005, 0.0001\}$ and $T = 500$ gradient ascent
 steps for each, respectively.
 The learning rates were chosen so that the log-likelihood
-increases roughly monotonically without oscillation; however, they
-have not been exhaustively optimised and further tuning may yield
-improvements. Figure~\ref{fig:rbf_all} displays the training
-log-likelihood, test log-likelihood, and predictive probability
-contours for each setting of $l$.
+increases roughly monotonically without oscillation; Figure~\ref{fig:rbf_all} displays our results.
 
 \begin{figure}[h]
     \begin{centering}
@@ -496,6 +441,49 @@ predictions. The learning rates have not been exhaustively tuned, and
 particularly for $l = 0.1$ and $l = 1.0$ the learning curves suggest
 that convergence has not been fully reached, so further tuning of
 $\eta$ and $T$ could improve results.
+
+\subsubsection*{Role of the width $l$}
+
+The width $l$ controls the \emph{smoothness} of the feature expansion
+and thereby governs the bias--variance trade-off:
+
+\begin{itemize}
+    \item \textbf{Small $l$ (e.g.\ $l = 0.01$):}
+          Each basis function $\phi_m$ is extremely narrow --
+          it is essentially non-zero only very close to its centre
+          $\mathbf{x}^{(m)}$. The feature matrix becomes approximately
+          the identity (each training point activates only its own basis
+          function), so the model memorises the training labels but
+          cannot generalise to unseen points that lie between training
+          centres. This leads to \emph{overfitting}: strong training
+          performance but poor test performance.
+
+    \item \textbf{Large $l$ (e.g.\ $l = 1$):}
+          Each basis function $\phi_m$ is broad and responds
+          substantially to many datapoints. The $N_{\text{train}}$
+          features become highly correlated (approaching a constant
+          vector as $l \to \infty$), so the effective dimensionality
+          of the feature space is reduced. The model captures smooth,
+          large-scale structure in the data. If $l$ is \emph{too} large
+          the model loses the ability to capture fine-grained class
+          boundaries and \emph{underfits}.
+
+    \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
+          The basis functions overlap sufficiently for neighbouring
+          training points to share information, yet remain localised
+          enough to capture non-linear class structure. This typically
+          yields the best trade-off between fitting the training data
+          and generalising to the test data.
+\end{itemize}
+
+\subsubsection*{Impact on the learning rate $\eta$}
+
+For small $l$, the feature
+matrix $\tilde{\mathbf{X}}_{\text{RBF}}$ is approximately the identity, but the gradients have limited magnitude
+due to sparse activations, so a moderate learning rate suffices. For intermediate $l$, the features are more correlated and the gradient magnitudes grow (each training point contributes to many
+basis functions simultaneously), so a larger learning rate can be used to speed convergence without instability.
+For large $l$, the feature matrix is near-singular with very large feature values (all basis functions are close to 1),
+producing large gradient magnitudes that demand a smaller learning rate to avoid divergence.
 
 
 \section{Exercise g)}
