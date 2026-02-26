@@ -55,13 +55,13 @@ LLM tips: you can refer to the logistic regression notes "C:\FUTURE\Eng 2A\3F8\h
     \textbullet{} Write this last, when you know what it should say!
 \end{abstract}
 
-\section{Introduction}
+\section*{Introduction}
 \begin{enumerate}
     \item What is the problem and why is it interesting?
     \item What novel follow-up will the rest of your report present?
 \end{enumerate}
 
-\section{Exercise a): Gradients of Log-Likelihood\label{sec:Exercise-a}}
+\section*{Exercise a): Gradients of Log-Likelihood\label{sec:Exercise-a}}
 
 In this exercise we consider the logistic classification model
 (aka logistic regression) and derive the gradient of the log-likelihood
@@ -153,7 +153,7 @@ $\tilde{\mathbf{X}}^T$ applied to the residual vector
 $(\mathbf{y} - \boldsymbol{\sigma})$.
 
 
-\section{Exercise b)}
+\section*{Exercise b) Vectorized Gradient Ascent}
 
 In this exercise we write vectorised pseudocode to estimate the
 parameters $\boldsymbol{\beta}$ using gradient ascent of the log-likelihood.
@@ -161,7 +161,7 @@ The update rule is
 \[
     \boldsymbol{\beta}^{(\text{new})}
     = \boldsymbol{\beta}^{(\text{old})}
-    + \eta \frac{\partial\mathcal{L}(\boldsymbol{\beta}^{(\text{old})})}{\partial\boldsymbol{\beta}}
+    + \eta \left.\frac{\partial\mathcal{L}(\boldsymbol{\beta})}{\partial\boldsymbol{\beta}}\right|_{\boldsymbol{\beta}=\boldsymbol{\beta}^{(\text{old})}}
     = \boldsymbol{\beta}^{(\text{old})}
     + \eta\, \tilde{\mathbf{X}}^{T}\left(\mathbf{y}
     - \boldsymbol{\sigma}^{(\text{old})}\right),
@@ -189,26 +189,30 @@ Function estimate_parameters:
       return b
 \end{verbatim}
 The learning rate $\eta$ should be chosen small enough that the log-likelihood
-increases monotonically (i.e.\ the optimisation does not diverge), but large
+increases roughly monotonically, but large
 enough that convergence is achieved within a reasonable number of iterations.
 In practice, one can start with a small value (e.g.\ $\eta = 0.01$) and
 increase it until the learning curve begins to oscillate, then reduce slightly.
 The number of iterations $T$ should be large enough for the log-likelihood to
 plateau.
 
-\section{Exercise c)}
+\section*{Exercise c) Data Visualisation}
 
-In this exercise we visualise the dataset in the two-dimensional input
-space displaying each datapoint's class label. The dataset is visualised
-in Figure \ref{fig:data_visualisation}. By analising Figure \ref{fig:data_visualisation}
-we conclude that a linear classifier...
+The dataset consists of $N = 1000$ datapoints with two-dimensional input
+features $\mathbf{x}^{(n)} \in \mathbb{R}^2$ and binary class labels
+$y^{(n)} \in \{0, 1\}$. The dataset is visualised in
+Figure~\ref{fig:data_visualisation}.
 
-% \begin{figure}
-%     \begin{centering}
-%         \includegraphics[width=0.3\paperwidth]{place_holder_figure}
-%         \par\end{centering}
-%     \caption{Visualisation of the data.\label{fig:data_visualisation} }
-% \end{figure}
+\begin{figure}[h]
+    \begin{centering}
+        \includegraphics[width=0.4\paperwidth]{figures/data_visualisation.png}
+        \par\end{centering}
+    \caption{Visualisation of the dataset in the $(X_1, X_2)$ input space.
+        Red points are Class 1 ($y=0$) and blue points are Class 2 ($y=1$).
+        \label{fig:data_visualisation}}
+\end{figure}
+
+From Figure~\ref{fig:data_visualisation}, we observe that Class 2 (blue) is concentrated in the upper and lower area of the input space, while Class 1 (red) is interspersed  between the 2 blue regions. The two classes overlap significantly, particularly around the boundaries, and no single straight line can cleanly separate them. A linear classifier produces a decision boundary of the form $\boldsymbol{\beta}^T \tilde{\mathbf{x}} = 0$, which is a straight line in 2D. Given the non-linear arrangement of the classes, such a linear boundary would inevitably misclassify a substantial portion of the data. A non-linear decision boundary would be needed to capture the true class structure more accurately.
 
 
 \section{Exercise d)}
