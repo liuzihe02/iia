@@ -5,7 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
 \usepackage{geometry}
-\geometry{verbose,tmargin=3cm,bmargin=3cm,lmargin=2.5cm,rmargin=2.5cm}
+\geometry{verbose,tmargin=1.5cm,bmargin=3cm,lmargin=2.5cm,rmargin=2.5cm}
 \usepackage{textcomp}
 \usepackage{amstext}
 \usepackage{amsmath}
@@ -344,24 +344,9 @@ RBFs. Intuitively, $\phi_m(\mathbf{x}^{(n)})$ measures how close
 $\mathbf{x}^{(n)}$ is to the $m$-th training centre: it equals $1$ when
 $\mathbf{x}^{(n)} = \mathbf{x}^{(m)}$ and decays to $0$ as the
 Euclidean distance $\|\mathbf{x}^{(n)} - \mathbf{x}^{(m)}\|$ grows
-relative to $l$.
-
-The logistic classifier is now applied in this
+relative to $l$. The logistic classifier is now applied in this
 $(N_{\text{train}}+1)$-dimensional feature space rather than the original
-$(D+1)$-dimensional space:
-\[
-    P(y^{(n)} = 1 \mid \mathbf{x}^{(n)})
-    = \sigma\!\left(\boldsymbol{\beta}^T
-    \tilde{\mathbf{x}}^{(n)}_{\text{RBF}}\right)
-    = \sigma\!\left(\beta_0
-    + \sum_{m=1}^{N_{\text{train}}} \beta_m\,
-    \phi_m(\mathbf{x}^{(n)})\right).
-\]
-Because the mapping $\mathbf{x} \mapsto
-    (\phi_1(\mathbf{x}), \ldots, \phi_{N_{\text{train}}}(\mathbf{x}))$ is
-non-linear, the resulting decision boundary
-$\boldsymbol{\beta}^T \tilde{\mathbf{x}}_{\text{RBF}} = 0$ is a
-non-linear surface in the original input space.
+$(D+1)$-dimensional space.
 
 \subsection*{Experimental Results}
 
@@ -373,74 +358,26 @@ The learning rates were chosen so that the log-likelihood
 increases roughly monotonically without oscillation; Figure~\ref{fig:rbf_all} displays our results.
 
 \begin{figure}[h]
-    \begin{centering}
-        % Row 1: l = 0.01
-        \includegraphics[width=0.30\textwidth]{figures/ll_train_rbf_0.01.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/ll_test_rbf_0.01.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/contours_rbf_0.01.png}\\[0.3cm]
-        % Row 2: l = 0.1
-        \includegraphics[width=0.30\textwidth]{figures/ll_train_rbf_0.1.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/ll_test_rbf_0.1.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/contours_rbf_0.1.png}\\[0.3cm]
-        % Row 3: l = 1.0
-        \includegraphics[width=0.30\textwidth]{figures/ll_train_rbf_1.0.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/ll_test_rbf_1.0.png}\hfill
-        \includegraphics[width=0.30\textwidth]{figures/contours_rbf_1.0.png}
-        \par\end{centering}
-    \caption{Training log-likelihood (left), test log-likelihood (middle),
-        and predictive probability contours (right) for the RBF-expanded
-        logistic classifier.
+    \centering
+    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_0.01.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_0.01.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_0.01.png}\\[-0.1cm]
+    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_0.1.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_0.1.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_0.1.png}\\[-0.1cm]
+    \includegraphics[width=0.27\textwidth]{figures/ll_train_rbf_1.0.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/ll_test_rbf_1.0.png}\hspace{0.2cm}
+    \includegraphics[width=0.27\textwidth]{figures/contours_rbf_1.0.png}
+    \caption{Train log-likelihood (left), test log-likelihood (middle),
+        and predictive contours (right).
         \textbf{Top row:} $l = 0.01$, $\eta = 0.0001$, $T = 500$.
         \textbf{Middle row:} $l = 0.1$, $\eta = 0.0005$, $T = 500$.
         \textbf{Bottom row:} $l = 1.0$, $\eta = 0.0001$, $T = 500$.
+        All $T = 500$.
         \label{fig:rbf_all}}
 \end{figure}
 
 \subsection*{Discussion of results}
-
-For $l = 0.01$ (top row), the basis functions are extremely narrow
-and the contour plot shows highly localised, spiky predictive
-probabilities centred on individual training points, with no smooth
-interpolation between them. The training log-likelihood converges to
-$-0.8017$ and the test log-likelihood to $-0.7015$. Both values are
-close to $-\ln 2 \approx -0.693$, indicating poor performance: the
-features are so localised that the model essentially treats each
-training point independently and fails to learn any useful global
-structure. Interestingly the test log-likelihood is slightly better
-than the training log-likelihood, which occurs because the near-identity
-feature matrix makes gradient ascent slow on the 800 training
-parameters, while the sparse test features produce predictions close to
-$0.5$ (the log-likelihood of a coin flip), and the model has not
-yet had enough iterations to memorise the training data.
-
-For $l = 0.1$ (middle row), the basis functions overlap sufficiently
-for the classifier to learn a meaningful non-linear decision boundary.
-The contour plot shows structured probability regions that follow the
-true class distribution -- high $P(y=1)$ in the upper and lower regions
-where Class 2 (blue) points concentrate, and high $P(y=0)$ in the
-central band where Class 1 (red) points dominate. The learning curves
-are still rising at 500 steps, indicating that the optimisation has
-not fully converged and additional iterations (or a larger learning
-rate) could further improve performance. The final train and test
-log-likelihoods are $-0.3361$ and $-0.3914$, respectively -- a
-substantial improvement over both the linear classifier and $l = 0.01$.
-
-For $l = 1.0$ (bottom row), the broad basis functions produce smooth
-contours that capture the large-scale class structure well. The contour
-plot shows an elliptical decision boundary roughly separating the
-two classes. The learning curves also suggest the optimisation has not
-fully converged. The final train and test log-likelihoods are $-0.2701$
-and $-0.2900$, respectively -- the best among the three settings. The
-small gap between training and test log-likelihoods indicates that
-the smooth model generalises well without overfitting.
-
-Overall, increasing $l$ from $0.01$ to $1.0$ transitions the model
-from overly localised (underfitting due to feature sparsity) through
-well-structured non-linear boundaries to smooth, well-generalising
-predictions. The learning rates have not been exhaustively tuned, and
-particularly for $l = 0.1$ and $l = 1.0$ the learning curves suggest
-that convergence has not been fully reached, so further tuning of
-$\eta$ and $T$ could improve results.
 
 \subsubsection*{Role of the width $l$}
 
@@ -458,6 +395,32 @@ and thereby governs the bias--variance trade-off:
           centres. This leads to \emph{overfitting}: strong training
           performance but poor test performance.
 
+          \subitem The decision boundaries are extremely narrow
+          and the contour plot shows highly localised, spiky predictive
+          probabilities centred on \textit{individual} training points, with no smooth
+          interpolation between them. Both training and test log-likelihood values are
+          close to $-\ln 2 \approx -0.693$, indicating poor performance: the
+          features are so localised that the model essentially treats each
+          training point independently and fails to learn any useful global
+          structure.
+
+    \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
+          The basis functions overlap sufficiently for neighbouring
+          training points to share information, yet remain localised
+          enough to capture non-linear class structure. This typically
+          yields the best trade-off between fitting the training data
+          and generalising to the test data.
+
+          Experimentally, the basis functions overlap sufficiently
+          for the classifier to learn a meaningful non-linear decision boundary.
+          The contour plot shows structured probability regions that follow the
+          true class distribution -- high $P(y=1)$ in the upper and lower regions
+          where Class 2 (blue) points concentrate, and high $P(y=0)$ in the
+          central band where Class 1 (red) points dominate. The final train and test
+          log-likelihoods are $-0.3361$ and $-0.3914$, respectively -- a
+          substantial improvement over both the linear classifier and $l = 0.01$.
+
+
     \item \textbf{Large $l$ (e.g.\ $l = 1$):}
           Each basis function $\phi_m$ is broad and responds
           substantially to many datapoints. The $N_{\text{train}}$
@@ -468,13 +431,19 @@ and thereby governs the bias--variance trade-off:
           the model loses the ability to capture fine-grained class
           boundaries and \emph{underfits}.
 
-    \item \textbf{Intermediate $l$ (e.g.\ $l = 0.1$):}
-          The basis functions overlap sufficiently for neighbouring
-          training points to share information, yet remain localised
-          enough to capture non-linear class structure. This typically
-          yields the best trade-off between fitting the training data
-          and generalising to the test data.
+          \subitem For $l = 1.0$ (bottom row), the broad basis functions produce smooth
+          contours that capture the large-scale class structure well. The contour
+          plot shows an elliptical decision boundary roughly separating the
+          two classes. The final train and test log-likelihoods are $-0.2701$
+          and $-0.2900$, respectively -- the best among the three settings. The
+          small gap between training and test log-likelihoods indicates that
+          the smooth model generalises well without overfitting.
 \end{itemize}
+
+Overall, increasing $l$ from $0.01$ to $1.0$ transitions the model
+from overly localised (underfitting due to feature sparsity) through
+well-structured non-linear boundaries to smooth, well-generalising
+predictions.
 
 \subsubsection*{Impact on the learning rate $\eta$}
 
@@ -483,7 +452,7 @@ matrix $\tilde{\mathbf{X}}_{\text{RBF}}$ is approximately the identity, but the 
 due to sparse activations, so a moderate learning rate suffices. For intermediate $l$, the features are more correlated and the gradient magnitudes grow (each training point contributes to many
 basis functions simultaneously), so a larger learning rate can be used to speed convergence without instability.
 For large $l$, the feature matrix is near-singular with very large feature values (all basis functions are close to 1),
-producing large gradient magnitudes that demand a smaller learning rate to avoid divergence.
+producing large gradient magnitudes that demand a smaller learning rate to avoid divergence. [show stuff on oscillations...]
 
 
 \section{Exercise g)}
