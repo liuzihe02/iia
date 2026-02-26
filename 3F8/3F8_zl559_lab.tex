@@ -218,7 +218,7 @@ From Figure~\ref{fig:data_visualisation}, we observe that Class 2 (blue) is conc
 
 \section*{Exercise d) Training the Linear Classifier}
 
-The data is split randomly into training ($N_{\text{train}} = 800$)
+The data is split randomly\footnote{A fixed random seed of 1 was used for reproducibility.} into training ($N_{\text{train}} = 800$)
 and test ($N_{\text{test}} = 200$) sets. Gradient ascent is implemented as:
 \begin{verbatim}
 sigmoid_value = predict(X_tilde_train, w)
@@ -260,25 +260,40 @@ later exercises.
 \end{figure}
 
 
-\section{Exercise e)}
+\section*{Exercise e) Log-Likelihoods and Confusion Matrix}
 
-The final average training and test log-likelihoods are shown in Table
-\ref{tab:average_ll}. These results indicate that... The 2x2 confusion
-matrices on the and test set is shown in Table \ref{tab:confusion_test}.
-By analising this table, we conclude that...
+The final average training and test log-likelihoods are shown in
+Table~\ref{tab:average_ll}. The test log-likelihood ($-0.6550$) is
+slightly lower than the training log-likelihood ($-0.6161$), which is
+expected since the model was fitted to the training data. The small gap
+between them confirms the absence of significant overfitting.
+However both values are close to $-\ln 2 \approx -0.693$, which is the
+log-likelihood of a random coin-flip classifier, indicating that the
+linear model offers only a modest improvement over random guessing on
+this non-linearly separable dataset.
 
-\begin{table}
+The $2 \times 2$ confusion matrix on the test set (using threshold
+$\tau = 0.5$) is shown in Table~\ref{tab:confusion_test}.
+The classifier correctly identifies 71.88\% of Class 1 ($y=1$) points
+and 61.54\% of Class 0 ($y=0$) points. However, the error rates are
+substantial: 38.46\% of true Class 0 points are misclassified as
+Class 1, and 28.12\% of true Class 1 points are misclassified as
+Class 0. This confirms that the linear decision boundary is inadequate
+for this dataset.
+
+\begin{table}[h]
     \centering{}%
     \begin{minipage}[t]{0.49\columnwidth}%
         \begin{center}
             \begin{tabular}{c|c}
                 \textbf{Avg. Train ll} & \textbf{Avg. Test ll}\tabularnewline
                 \hline
-                -                      & -\tabularnewline
+                $-0.6161$              & $-0.6550$\tabularnewline
                 \hline
             \end{tabular}
             \par\end{center}
-        \caption{Average training and test log-likelihoods.\label{tab:average_ll}}
+        \caption{Average training and test log-likelihoods for the linear
+            classifier.\label{tab:average_ll}}
         %
     \end{minipage}%
     \begin{minipage}[t]{0.49\columnwidth}%
@@ -287,13 +302,14 @@ By analising this table, we conclude that...
                     & \multicolumn{1}{c}{} & \multicolumn{1}{c}{$\hat{y}$} & \tabularnewline
                     &                      & 0                             & 1\tabularnewline
                 \cline{2-4}
-                $y$ & 0                    & -                             & -\tabularnewline
+                $y$ & 0                    & 0.6154                        & 0.3846\tabularnewline
                 \cline{2-4}
-                    & 1                    & -                             & -\tabularnewline
+                    & 1                    & 0.2812                        & 0.7188\tabularnewline
                 \cline{2-4}
             \end{tabular}
             \par\end{center}
-        \caption{Confusion matrix on the test set.\label{tab:confusion_test}}
+        \caption{Confusion matrix on the test set (fractions conditioned on
+            true label).\label{tab:confusion_test}}
         %
     \end{minipage}
 \end{table}
