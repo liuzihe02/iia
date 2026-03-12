@@ -79,7 +79,7 @@ We use the newsvendor inventory production model for computing the expected prof
         \midrule
         \multicolumn{3}{@{}l}{\textit{Production Capacity}}                                                   \\
         $K_{\mathrm{nom}}$ & Nominal electrolyser capacity                     & 40 t/day                     \\
-        $a$                & Operational availability                          & 85\%                         \\
+        $\alpha$           & Operational availability                          & 85\%                         \\
         $n_d$              & Days per month                                    & 30                           \\
         \midrule
         \multicolumn{3}{@{}l}{\textit{Refuelling Station}}                                                    \\
@@ -100,7 +100,7 @@ We use the newsvendor inventory production model for computing the expected prof
 
 \subsection{Demand Growth and Scenarios}
 
-Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant $\mathrm{CV} = \sigma_t/\mu_t = 0.15$, and annual growth rate of mean demand $g$ gives:
+Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant $\mathrm{CV} = \sigma_t/\mu_t = 0.15$, and annual growth rate of mean demand $g$ ($0.1$ for high growth, and $0.03$ for low growth) gives:
 \begin{equation}
     \mu_t = \mu_0(1+g)^t, \qquad \sigma_t = \mathrm{CV}\cdot\mu_t
     \label{eq:demand_growth}
@@ -177,7 +177,7 @@ Table~\ref{tab:strategy_params} summarises the parameter modifications. All unmo
 
 Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective monthly capacity $\bar{Q}$ is the product of nominal electrolyser throughput, operational availability, and operating days:
 \begin{equation}
-    \bar{Q} = K_{\mathrm{nom}} \cdot a \cdot n_d = 40 \times 0.85 \times 30 = 1020 \text{ t/mo}
+    \bar{Q} = K_{\mathrm{nom}} \cdot \alpha \cdot n_d = 40 \times 0.85 \times 30 = 1020 \text{ t/mo}
     \label{eq:capacity}
 \end{equation}
 All demand is contractually met; shortfalls are covered by spot procurement. Monthly profit:
@@ -216,23 +216,23 @@ The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more
 
 \subsubsection{Expected Profit Components}
 
-For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$ gives closed-form expressions for ELS and ELOI. With $z^* = -0.8416$ and $L(-0.8416) = 0.953$:
+For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$ gives closed-form expressions for ELS and ELOI. With $z^* = -0.8416$ and $L(-0.8416) = 0.953$, this gives the baselines figures:
 \begin{align}
     \mathrm{ELS}  & = \sigma_0 L(z^*) = 150 \times 0.953 = 143.0 \text{ t}       &  & \text{(spot procurement volume)} \\
     \mathrm{ELOI} & = \sigma_0[z^* + L(z^*)] = 150 \times 0.111 = 16.7 \text{ t} &  & \text{(unsold overproduction)}
 \end{align}
 
-Using Eqn ~\eqref{eq:exp_profit}, our expected profit at $t=0$ is:
+Using Eqn ~\eqref{eq:exp_profit}, our expected baseline profit at $t=0$ is:
 \begin{equation}
     \E[\Pi_0] = p\mu - c_p Q^* - c_s\cdot\mathrm{ELS} - c_h\cdot\mathrm{ELOI} = \text{\pounds}1353020 \approx \text{\pounds}1.35\text{M/month}
 \end{equation}
 giving an annual baseline of \textbf{\pounds16.24M}.
 
-\subsubsection{Evolution Under Demand Growth and Capacity Constraints}
+\subsubsection{Profit Evolution Under Various Demand Growth and Investment Strategies}
 
-The unconstrained optimum is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1058 > \bar{Q} = 1020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
+The unconstrained optimal production quantity is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1058 > \bar{Q} = 1020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
 
-Table~\ref{tab:nv_annual} summarises expected annual profit under each strategy, scenario, and year.
+Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ under each strategy $k \in \{S1, S2, S3\}$, scenario $j \in \{\textit{High-Growth+No Competition, High-Growth+Competition, Low-Growth}\}$, and year $t \in \{0,1,2,3,4\}$.
 
 \begin{table}[H]
     \centering
@@ -266,30 +266,30 @@ Key observations from Table~\ref{tab:nv_annual}: (i)~S2 consistently produces hi
 \subsection{Refuelling Station Congestion: M/M/$s$ Queue}
 \label{sec:queueing}
 
-HGVs arrive as a Poisson process ($\lambda = 10$/hr), refuelling times are i.i.d.\ $\mathrm{Exp}(\mu)$ with mean $1/\mu = 12$~min ($\mu = 5$/hr per bay), and there are $s_0 = 3$ bays in parallel (FIFO, infinite buffer). This is an M/M/3 queue.
+HGVs arrive as a Poisson process at rate $\lambda = 10$/hr. Refuelling times are i.i.d.\ $\mathrm{Exp}(\mu)$ with mean $1/\mu = 12$~min ($\mu = 5$/hr per bay), and there are $s_0 = 3$ bays in parallel (FIFO, infinite buffer). This is an M/M/$s$ queue with load $a = \lambda/\mu$ and server utilisation $\rho = \lambda/(s\mu)$. A steady state exists iff $\rho < 1$.
 
-\subsubsection{Baseline Performance}
-
-With $a = \lambda/\mu = 2$ and $\rho = \lambda/(s\mu) = 10/15 = 2/3 < 1$ (stable):
+The idle probability, expected queue length, and queue waiting times are:
 \begin{equation}
-    P_0 = \left[\sum_{n=0}^{2}\frac{2^n}{n!} + \frac{2^3}{3!}\cdot\frac{1}{1-2/3}\right]^{-1} = \left[1 + 2 + 2 + 4\right]^{-1} = \frac{1}{9}
+    P_0 = \left[\sum_{n=0}^{s-1}\frac{a^n}{n!} + \frac{a^s}{s!}\cdot\frac{1}{1-\rho}\right]^{-1}
+    \label{eq:mms_p0}
 \end{equation}
 \begin{equation}
-    L_q = \frac{a^s\,\rho}{s!(1-\rho)^2}P_0 = \frac{8\times(2/3)}{6\times(1/3)^2}\times\frac{1}{9} = \frac{8}{9} \approx 0.889 \text{ vehicles}
+    L_q = \frac{a^s\,\rho}{s!(1-\rho)^2}\,P_0
+    \label{eq:mms_lq}
 \end{equation}
+The remaining performance measures follow from Little's Law ($L = \lambda W$, $L_q = \lambda W_q$) and the decomposition $W = W_q + 1/\mu$, where $W$ and $L$ are the expected system waiting times and system size respectively:
 \begin{equation}
-    W_q = \frac{L_q}{\lambda} = \frac{0.889}{10} = 0.0889 \text{ hr} = \mathbf{5.33 \text{ min}}
+    W_q = \frac{L_q}{\lambda}, \qquad W = W_q + \frac{1}{\mu}, \qquad L = \lambda W
+    \label{eq:mms_little}
 \end{equation}
 
-By Little's Law: $L = \lambda W = 2.89$ vehicles in system, $W = W_q + 1/\mu = 17.3$ min total sojourn.
+\subsubsection{Baseline Performance ($s = 3$)}
 
-\textbf{Finding:} Even at baseline, $W_q = 5.33$ min $> W_q^{\max} = 5$ min. GreenCo is \textit{already} non-compliant with its service-level agreement before any demand growth. The maximum arrival rate compatible with compliance is $\lambda^{\max}_{s=3} = 9.84$/hr, i.e.\ just below the current rate of 10/hr.
+With $a = \lambda/\mu = 2$, $\rho = 2/3 < 1$ (stable), applying Eqns~\eqref{eq:mms_p0}--\eqref{eq:mms_little} gives $P_0 = 1/9$, $L_q = 8/9 \approx 0.889$ vehicles, and $W_q = L_q/\lambda = \mathbf{5.33}$~\textbf{min}. Even at baseline, $W_q = 5.33$ min $> W_q^{\max} = 5$ min. GreenCo is \textit{already} non-compliant with its service level argreements (SLA) before any demand growth. The maximum arrival rate compatible with compliance is $\lambda^{\max}_{s=3} = 9.84$/hr, just below the current rate of 10/hr.
 
-\subsubsection{Impact of Demand Growth}
+\subsubsection{Impact of Hydrogen Demand Growth}
 
-Assuming $\lambda_t = \lambda_0(1+g)^t$, Table~\ref{tab:queueing} shows how $W_q$ evolves. Under either growth scenario with $s=3$, the wait time violates the 5-minute constraint from Year 0 and grows catastrophically---reaching 159.6~min by Y4 under high growth as $\rho \to 1$.
-
-With $s = 5$ bays (Strategy~1), $\rho = 0.40$ at baseline and $W_q$ remains below 1.3~min across the entire 4-year horizon under any growth scenario. The maximum compliant $\lambda$ for $s = 5$ is 19.13/hr, far exceeding any projected arrival rate.
+Assuming $\lambda_t = \lambda_0(1+g)^t$, with HGV arrival rates scaling with mean hydrogen demand growth, Table~\ref{tab:queueing} shows how $W_q$ evolves. Under either growth scenario with $s=3$, the wait time violates the 5-minute constraint from Year 0 and grows catastrophically---reaching 159.6~min by Y4 under high growth as $\rho \to 1$. With $s = 5$ bays (Strategy~1), $\rho = 0.40$ at baseline and $W_q$ remains below 1.3~min across the entire 4-year horizon under any growth scenario. The maximum compliant $\lambda$ for $s = 5$ is 19.13/hr, far exceeding any projected arrival rate.
 
 \begin{table}[H]
     \centering
@@ -298,15 +298,15 @@ With $s = 5$ bays (Strategy~1), $\rho = 0.40$ at baseline and $W_q$ remains belo
     \small
     \begin{tabular}{@{}lrrrrrr@{}}
         \toprule
-                      & \multicolumn{3}{c}{\textbf{High growth}} & \multicolumn{3}{c}{\textbf{Low growth}}                                                                      \\
+                      & \multicolumn{3}{c}{\textbf{High growth} $g_H=0.1$} & \multicolumn{3}{c}{\textbf{Low growth} $g_L=0.03$}                                                                      \\
         \cmidrule(lr){2-4}\cmidrule(lr){5-7}
-        \textbf{Year} & $\lambda$ (/hr)                          & $W_q$, $s{=}3$                          & $W_q$, $s{=}5$ & $\lambda$ (/hr) & $W_q$, $s{=}3$ & $W_q$, $s{=}5$ \\
+        \textbf{Year} & $\lambda$ (/hr)                                    & $W_q$, $s{=}3$                                     & $W_q$, $s{=}5$ & $\lambda$ (/hr) & $W_q$, $s{=}3$ & $W_q$, $s{=}5$ \\
         \midrule
-        0             & 10.00                                    & 5.33*                                   & 0.24           & 10.00           & 5.33*          & 0.24           \\
-        1             & 11.00                                    & 8.13*                                   & 0.36           & 10.30           & 6.04*          & 0.27           \\
-        2             & 12.10                                    & 13.62*                                  & 0.54           & 10.61           & 6.87*          & 0.31           \\
-        3             & 13.31                                    & 28.22*                                  & 0.82           & 10.93           & 7.88*          & 0.35           \\
-        4             & 14.64                                    & 159.63*                                 & 1.27           & 11.26           & 9.10*          & 0.40           \\
+        0             & 10.00                                              & 5.33*                                              & 0.24           & 10.00           & 5.33*          & 0.24           \\
+        1             & 11.00                                              & 8.13*                                              & 0.36           & 10.30           & 6.04*          & 0.27           \\
+        2             & 12.10                                              & 13.62*                                             & 0.54           & 10.61           & 6.87*          & 0.31           \\
+        3             & 13.31                                              & 28.22*                                             & 0.82           & 10.93           & 7.88*          & 0.35           \\
+        4             & 14.64                                              & 159.63*                                            & 1.27           & 11.26           & 9.10*          & 0.40           \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -316,6 +316,8 @@ A fourth bay ($s = 4$) raises the compliant threshold to 14.44/hr, sufficient un
 %========================================================================================
 \section{Strategic Investment Analysis}
 %========================================================================================
+
+
 
 \subsection{Decision Tree and NPV Formulation}
 \label{sec:decision_tree}
