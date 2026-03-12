@@ -100,12 +100,12 @@ We use the newsvendor inventory production model for computing the expected prof
 
 \subsection{Demand Growth and Scenarios}
 
-Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant $\mathrm{CV} = \sigma_t/\mu_t = 0.15$, and annual growth rate of mean demand $g$ ($0.1$ for high growth, and $0.03$ for low growth) gives:
+Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant $\mathrm{CV} = \sigma_t/\mu_t = 0.15$, and annual growth rate of mean demand $g$ ($g_H=0.1$ for high growth, and $g_L=0.03$ for low growth) gives:
 \begin{equation}
     \mu_t = \mu_0(1+g)^t, \qquad \sigma_t = \mathrm{CV}\cdot\mu_t
     \label{eq:demand_growth}
 \end{equation}
-With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}} = 0.85\,\mu_t$. This gives three terminal scenarios:
+With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}} = (1-\delta)\mu_t$. This gives three terminal scenarios:
 
 \begin{table}[H]
     \centering
@@ -114,15 +114,16 @@ With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}}
     \small
     \begin{tabular}{@{}lcccccc@{}}
         \toprule
-                    & \multicolumn{2}{c}{\textbf{High, no comp.} ($p = 0.27$)} & \multicolumn{2}{c}{\textbf{High + comp.} ($p = 0.18$)} & \multicolumn{2}{c}{\textbf{Low growth} ($p = 0.55$)}                                     \\
+        \textbf{Scenario}        & \multicolumn{2}{c}{\textbf{High, no comp.}} & \multicolumn{2}{c}{\textbf{High + comp.}} & \multicolumn{2}{c}{\textbf{Low growth}}                                     \\
+        $\Prob(\text{scenario})$ & \multicolumn{2}{c}{$p_H(1-p_C) = 0.27$}     & \multicolumn{2}{c}{$p_H p_C = 0.18$}      & \multicolumn{2}{c}{$1-p_H = 0.55$}                                          \\
         \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-        \textbf{Yr} & $\mu_t$                                                  & $\sigma_t$                                             & $\mu_t$                                              & $\sigma_t$ & $\mu_t$ & $\sigma_t$ \\
+        \textbf{Yr}              & $\mu_t$                                     & $\sigma_t$                                & $\mu_t$                                 & $\sigma_t$ & $\mu_t$ & $\sigma_t$ \\
         \midrule
-        0           & 1000                                                     & 150                                                    & 1000                                                 & 150        & 1000    & 150        \\
-        1           & 1100                                                     & 165                                                    & 1100                                                 & 165        & 1030    & 155        \\
-        2           & 1210                                                     & 182                                                    & 1210                                                 & 182        & 1061    & 159        \\
-        3           & 1331                                                     & 200                                                    & 1131                                                 & 170        & 1093    & 164        \\
-        4           & 1464                                                     & 220                                                    & 1245                                                 & 187        & 1126    & 169        \\
+        0                        & 1000                                        & 150                                       & 1000                                    & 150        & 1000    & 150        \\
+        1                        & 1100                                        & 165                                       & 1100                                    & 165        & 1030    & 155        \\
+        2                        & 1210                                        & 182                                       & 1210                                    & 182        & 1061    & 159        \\
+        3                        & 1331                                        & 200                                       & 1131                                    & 170        & 1093    & 164        \\
+        4                        & 1464                                        & 220                                       & 1245                                    & 187        & 1126    & 169        \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -175,9 +176,9 @@ Table~\ref{tab:strategy_params} summarises the parameter modifications. All unmo
 \subsection{Monthly Production Decision: Newsvendor Model}
 \label{sec:newsvendor}
 
-Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective monthly capacity $\bar{Q}$ is the product of nominal electrolyser throughput, operational availability, and operating days:
+Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu_t,\sigma_t^2)$ is realised. The effective monthly capacity is:
 \begin{equation}
-    \bar{Q} = K_{\mathrm{nom}} \cdot \alpha \cdot n_d = 40 \times 0.85 \times 30 = 1020 \text{ t/mo}
+    \bar{Q} = K_{\mathrm{nom}} \cdot \alpha \cdot n_d
     \label{eq:capacity}
 \end{equation}
 All demand is contractually met; shortfalls are covered by spot procurement. Monthly profit:
@@ -189,9 +190,9 @@ Taking expectations over demand $D$, we define \textit{expected lost sales} (dem
 \begin{equation}
     \text{ELS}(Q) = \E_D[\max(D-Q,0)], \qquad \text{ELOI}(Q) = \E_D[\max(Q-D,0)]
 \end{equation}
-Since revenue $pD$ is independent of $Q$ (contractual obligation), expected profit is:
+Since revenue $pD$ is independent of $Q$ (contractual obligation), expected monthly profit is:
 \begin{equation}
-    \E_D[\Pi(Q)] = p\mu - c_p Q - c_s\,\text{ELS}(Q) - c_h\,\text{ELOI}(Q)
+    \E[\Pi(Q)] = p\mu_t - c_p Q - c_s\,\text{ELS}(Q) - c_h\,\text{ELOI}(Q)
     \label{eq:exp_profit}
 \end{equation}
 
@@ -203,41 +204,32 @@ Note $\frac{d}{dQ}\text{ELS} = -(1-F(Q))$ and $\frac{d}{dQ}\text{ELOI} = F(Q)$, 
     \label{eq:critical_ratio}
 \end{equation}
 
-This is the \textit{newsvendor critical ratio}. In the standard newsvendor with salvage value $s$, underage and overage costs are $c_u = p - c$ and $c_o = c - s$. Here, because revenue is $Q$-independent, underage costs arise from spot procurement and overage costs from production plus storage with zero salvage (effective $s_{\mathrm{eff}} = -c_h$, giving $c_o = c_p + c_h$):
-\begin{align}
-    c_u & = c_s - c_p = \text{\pounds}700/\text{t}  &  & \text{(extra cost of spot vs own production)} \\
-    c_o & = c_p + c_h = \text{\pounds}2800/\text{t} &  & \text{(production + storage on unsold units)}
-\end{align}
-
-The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more expensive per tonne than underproducing. Therefore $F(Q^*) = c_u/(c_u+c_o) = 700/3500 = 0.20$. For normal demand $Q^* = \mu + z^*\sigma$ where $z^* = \Phi^{-1}(0.20) = -0.8416$. The firm optimally produces \textit{well below} mean demand, covering the shortfall from the relatively cheap spot market. Optimal production quantity at $t=0$ is:
+This is the \textit{newsvendor critical ratio}, where $c_u = c_s - c_p$ is the underage cost (extra cost of spot vs own production) and $c_o = c_p + c_h$ is the overage cost (production + storage on unsold units, with zero salvage). For normal demand $D \sim \mathcal{N}(\mu_t, \sigma_t^2)$, the capacity-constrained optimum at year $t$ is:
 \begin{equation}
-    Q_0^* = \mu_0 + z^*\sigma_0 = 1000 + (-0.8416)(150) \approx 874 \text{ t/month} \quad < \bar{Q} = 1020
+    Q_t^* = \min\bigl(\mu_t + z^*\sigma_t,\;\bar{Q}\bigr), \qquad z^* = \Phi^{-1}\!\left(\frac{c_u}{c_u+c_o}\right)
+    \label{eq:Q_star}
 \end{equation}
+where $\Phi^{-1}$ is the inverse CDF of the standard normal distribution.
 
 \subsubsection{Expected Profit Components}
 
-For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$ gives closed-form expressions for ELS and ELOI. With $z^* = -0.8416$ and $L(-0.8416) = 0.953$, this gives the baselines figures:
+For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$ gives closed-form expressions for ELS and ELOI. Writing $z_t = (Q_t^* - \mu_t)/\sigma_t$:
 \begin{align}
-    \mathrm{ELS}  & = \sigma_0 L(z^*) = 150 \times 0.953 = 143.0 \text{ t}       &  & \text{(spot procurement volume)} \\
-    \mathrm{ELOI} & = \sigma_0[z^* + L(z^*)] = 150 \times 0.111 = 16.7 \text{ t} &  & \text{(unsold overproduction)}
+    \mathrm{ELS}(Q_t^*)  & = \sigma_t\, L(z_t)                &  & \text{(expected spot procurement volume)} \\
+    \mathrm{ELOI}(Q_t^*) & = \sigma_t\bigl[z_t + L(z_t)\bigr] &  & \text{(expected unsold overproduction)}
 \end{align}
-
-Using Eqn ~\eqref{eq:exp_profit}, our expected baseline profit at $t=0$ is:
+The expected annual profit for strategy $k$ in scenario $j$ at year $t$ is:
 \begin{equation}
-    \E[\Pi_0] = p\mu - c_p Q^* - c_s\cdot\mathrm{ELS} - c_h\cdot\mathrm{ELOI} = \text{\pounds}1353020 \approx \text{\pounds}1.35\text{M/month}
+    \E[\Pi_t^{(k,j)}] = 12\Bigl(p\mu_t^{(j)} - c_p^{(k)}\, Q_t^{*(k,j)} - c_s^{(k)}\,\mathrm{ELS}(Q_t^{*(k,j)}) - c_h\,\mathrm{ELOI}(Q_t^{*(k,j)})\Bigr)
+    \label{eq:annual_profit}
 \end{equation}
-giving an annual baseline of \textbf{\pounds16.24M}.
-
-\begin{equation}
-    \E_D[\Pi(Q_t^*)] = p\mu_t - c_p Q_t^* - c_s\,\text{ELS}(Q_t^*) - c_h\,\text{ELOI}(Q_t^*)
-    \label{eq:exp_profit}
-\end{equation}
+where $\mu_t^{(j)}$, $\sigma_t^{(j)}$ come from Table~\ref{tab:demand}, and $c_s^{(k)}$, $c_p^{(k)}$, $\bar{Q}^{(k)}$ are from Table~\ref{tab:strategy_params}.
 
 \subsubsection{Profit Evolution Under Various Demand Growth and Investment Strategies}
 
-The unconstrained optimal production quantity is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1058 > \bar{Q} = 1020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
+When the capacity constraint does not bind, $z_t = z^*$ and $Q_t^*$ scales linearly with $\mu_t$. Once demand growth pushes $\mu_t + z^*\sigma_t > \bar{Q}$, the constraint binds: $Q_t^* = \bar{Q}$, $z_t$ falls below $z^*$, and $\mathrm{ELS}$ grows rapidly as demand outpaces production. Under high growth with base capacity, this occurs from Year~2 onward. This is the principal mechanism forcing emergency spot procurement under Strategies~2 and~3 (before expansion).
 
-Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ under each strategy $k \in \{S1, S2, S3\}$, scenario $j \in \{\textit{High-Growth+No Competition, High-Growth+Competition, Low-Growth}\}$, and year $t \in \{0,1,2,3,4\}$. We recalculate $\E[\Pi_t^{(k,j)}]$ based on the modelling changes made to our parameters: effective capacity $\bar{Q_k}$ under strategy $k$, $sigma_t$, $c_s$ and $c_p$, and revenue cuts etc.
+Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ under each strategy $k \in \{S1, S2, S3\}$, scenario $j \in \{\textit{High-Growth+No Competition, High-Growth+Competition, Low-Growth}\}$, and year $t \in \{0,1,2,3,4\}$. We recalculate $\E[\Pi_t^{(k,j)}]$ using Eqn \ref{eq:annual_profit} based on the modelling changes made to our parameters: effective capacity $\bar{Q}$ under strategy $k$, $\sigma_t$, $c_s$ and $c_p$ etc.
 
 \begin{table}[H]
     \centering
@@ -266,7 +258,7 @@ Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ 
     \end{tabular}
 \end{table}
 
-Key observations from Table~\ref{tab:nv_annual}: (i)~S2 consistently produces higher annual profit than S1 in every scenario and year, despite identical revenue---the reduced spot price (\pounds2900/t) and tighter demand distribution (lower $\sigma$) jointly reduce procurement and storage costs; (ii)~S1's low-growth profits fall sharply in Y2--Y4 due to the \pounds150/t scale-inefficiency penalty; (iii)~S3's Y1--Y2 profits are suppressed by the 10\% revenue reduction, recovering only from Y3 once the Year-1 investment takes effect.
+Key observations: (i)~S2 consistently produces higher annual profit than S1 in every scenario and year, despite identical revenue---the reduced spot price (\pounds2900/t) and tighter demand distribution (lower $\sigma$) jointly reduce procurement and storage costs; (ii)~S1's low-growth profits fall sharply in Y2--Y4 due to the \pounds150/t scale-inefficiency penalty; (iii)~S3's Y1--Y2 profits are suppressed by the 10\% revenue reduction, recovering only from Y3 once the Year-1 investment takes effect.
 
 \subsection{Refuelling Station Congestion: M/M/$s$ Queue}
 \label{sec:queueing}
