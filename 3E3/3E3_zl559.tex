@@ -55,7 +55,7 @@ This report develops an integrated risk analysis. Four models are applied, each 
 
 \subsection{Analytical Models}
 
-Parameters for the newsvendor hygrogen production and refuelling queueing models are shown in Table \ref{tab:params}.
+We use the newsvendor inventory production model for computing the expected profit $\E[\Pi_t]$ and optimal production quantity at year $t$, $Q_t^*$. We also use a M/M/s queueing model to model refuelling service. Our parameters for these models, and demand growth models, are shown in Table \ref{tab:params}. Exact details are explained in section \ref{sec:analysis}.
 
 \begin{table}[H]
     \centering
@@ -67,14 +67,14 @@ Parameters for the newsvendor hygrogen production and refuelling queueing models
         \textbf{Symbol}    & \textbf{Parameter}                                & \textbf{Value}               \\
         \midrule
         \multicolumn{3}{@{}l}{\textit{Demand \& Pricing}}                                                     \\
-        $\mu_0$            & Initial mean monthly demand                       & 1{,}000 t                    \\
+        $\mu_0$            & Initial mean monthly demand                       & 1000 t                       \\
         $\sigma_0$         & Initial demand std.\ deviation                    & 150 t                        \\
         $\mathrm{CV}$      & Coefficient of variation ($\sigma_t/\mu_t$)       & 0.15                         \\
         $\mu_t$            & Year-$t$ mean monthly demand                      & Eqn~\eqref{eq:demand_growth} \\
         $\sigma_t$         & Year-$t$ standard deviation of monthly demand     & Eqn~\eqref{eq:demand_growth} \\
-        $p$                & Selling price                                     & \pounds4{,}000/t             \\
-        $c_p$              & Production cost                                   & \pounds2{,}500/t             \\
-        $c_s$              & Spot market purchase price                        & \pounds3{,}200/t             \\
+        $p$                & Selling price                                     & \pounds4000/t                \\
+        $c_p$              & Production cost                                   & \pounds2500/t                \\
+        $c_s$              & Spot market purchase price                        & \pounds3200/t                \\
         $c_h$              & Storage/handling cost (unsold)                    & \pounds300/t                 \\
         \midrule
         \multicolumn{3}{@{}l}{\textit{Production Capacity}}                                                   \\
@@ -118,49 +118,66 @@ With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}}
         \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
         \textbf{Yr} & $\mu_t$                                                  & $\sigma_t$                                             & $\mu_t$                                              & $\sigma_t$ & $\mu_t$ & $\sigma_t$ \\
         \midrule
-        0           & 1{,}000                                                  & 150                                                    & 1{,}000                                              & 150        & 1{,}000 & 150        \\
-        1           & 1{,}100                                                  & 165                                                    & 1{,}100                                              & 165        & 1{,}030 & 155        \\
-        2           & 1{,}210                                                  & 182                                                    & 1{,}210                                              & 182        & 1{,}061 & 159        \\
-        3           & 1{,}331                                                  & 200                                                    & 1{,}131                                              & 170        & 1{,}093 & 164        \\
-        4           & 1{,}464                                                  & 220                                                    & 1{,}245                                              & 187        & 1{,}126 & 169        \\
+        0           & 1000                                                     & 150                                                    & 1000                                                 & 150        & 1000    & 150        \\
+        1           & 1100                                                     & 165                                                    & 1100                                                 & 165        & 1030    & 155        \\
+        2           & 1210                                                     & 182                                                    & 1210                                                 & 182        & 1061    & 159        \\
+        3           & 1331                                                     & 200                                                    & 1131                                                 & 170        & 1093    & 164        \\
+        4           & 1464                                                     & 220                                                    & 1245                                                 & 187        & 1126    & 169        \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-\subsection{Strategy Parameter Summary}
+\subsection{Investment Strategies}
+\label{sec:strategies}
+
+GreenCo must choose one of three strategies at Year~0 to scale its hydrogen infrastructure over a 4-year horizon. Each strategy modifies a different subset of the newsvendor parameters $(c_s, \sigma_t, \bar{Q})$ and the queueing parameter $s$, creating distinct risk--return profiles.
+
+\textbf{Strategy~1 (Immediate Scale-Up).} Invest \pounds54M upfront (\pounds48M electrolyser expansion + \pounds6M for two additional refuelling bays) to increase capacity from $K_\mathrm{nom} = 40$ to 65~t/day at 95\% availability, giving $\bar{Q}_{S1} = 1852.5$~t/mo, and $s = 5$ bays. No changes to demand uncertainty or spot pricing. The bet is that high capacity eliminates spot procurement: since $\bar{Q}_{S1} \gg \mu_t$ for all $t$, the capacity constraint in the newsvendor never binds. However, the risk is overcapacity under the low growth scenario --- demand utilisation $\mu_t/\bar{Q}_{S1}$ falls below 65\% from Y2, triggering a \pounds150/t scale-inefficiency penalty that inflates $c_p$ to \pounds2650/t.
+
+\textbf{Strategy~2 (Flexibility and Risk Mitigation).} Invest \pounds20M upfront in modular storage, demand-smoothing contracts, and digital forecasting. This does not expand capacity ($\bar{Q}$, $s$ are unaffected), but instead reduces two key newsvendor cost drivers: demand volatility drops by 40\% ($\sigma_t \to 0.6\sigma_t = 0.09\mu_t$), and pre-negotiated contingent contracts lower spot procurement cost to $c_s = \text{\pounds}2900$/t. The reduced $c_s$ shifts the critical ratio from $F(Q^*) = 0.200$ to $F(Q^*) = 0.125$, pushing the optimal production quantity further below the mean; simultaneously, the tighter demand distribution ($\sigma \downarrow$) reduces both $\mathrm{ELS}$ and $\mathrm{ELOI}$, cutting procurement and storage waste. Under high growth, capacity eventually binds ($Q_t^* > \bar{Q}$ from Y3), forcing systematic spot reliance.
+
+\textbf{Strategy~3 (Staged Expansion).} Invest \pounds8M upfront in expandable foundations and grid upgrades, preserving the option to scale later. This is a \textit{real-options} structure: at the end of Y1, after observing demand growth, GreenCo chooses one of two branches:
+\begin{itemize}
+    \item \textit{High growth observed} $\to$ expand nominal capacity $K_\mathrm{nom} = $ 65~t/day at $a=95\%$ availability for \pounds42M (discounted by the pre-installed foundations), matching S1 specifications from Y2 onward.
+    \item \textit{Low growth observed} $\to$ invest \pounds15M in flexibility measures (a reduced version of S2: same $\sigma$ reduction and $c_s = \text{\pounds}2900$/t), matching S2 specifications from Y2 onward.
+\end{itemize}
+The cost of deferral is a 10\% realised revenue reduction in Y1--Y2 under both growth paths. Until the Y1 decision, capacity and parameters remain at baseline.
+
+Table~\ref{tab:strategy_params} summarises the parameter modifications. All unmodified parameters retain their base-case values from Table~\ref{tab:params}.
 
 \begin{table}[H]
     \centering
-    \caption{Strategy-specific parameter modifications (base: $\bar{Q} = 1{,}020$ t/mo, $s = 3$ bays, $c_s = \text{\pounds}3{,}200$/t, $\sigma_t = 0.15\mu_t$).}
+    \caption{Strategy-specific parameter modifications (base: $\bar{Q} = 1020$ t/mo, $s = 3$ bays, $c_s = \text{\pounds}3200$/t, $\sigma_t = 0.15\mu_t$).}
     \label{tab:strategy_params}
     \small
     \begin{tabular}{@{}llll@{}}
         \toprule
-        \textbf{Parameter}      & \textbf{Strategy 1}     & \textbf{Strategy 2} & \textbf{Strategy 3}                \\
+        \textbf{Parameter}       & \textbf{Strategy 1}     & \textbf{Strategy 2} & \textbf{Strategy 3}             \\
         \midrule
-        $I_0$ (Year 0)          & \pounds54M              & \pounds20M          & \pounds8M                          \\
-        $I_1$ (Year 1)          & ---                     & ---                 & \pounds42M (H) / \pounds15M (L)    \\
-        Capacity $\bar{Q}$      & 1{,}852.5 t/mo          & 1{,}020 t/mo        & 1{,}020 $\to$ 1{,}852.5 (H branch) \\
-        Availability            & 95\%                    & 85\%                & 85\% $\to$ 95\% (H branch)         \\
-        Bays $s$                & 5                       & 3                   & 3                                  \\
-        $\sigma_t$              & $0.15\mu_t$             & $0.09\mu_t$         & $0.15\mu_t$                        \\
-        $c_s$                   & \pounds3{,}200/t        & \pounds2{,}900/t    & \pounds3{,}200/t                   \\
-        Revenue                 & 100\%                   & 100\%               & 90\% in Y1--Y2                     \\
-        Low-growth cost penalty & $+$\pounds150/t from Y2 & ---                 & ---                                \\
+        $I_0$ (Year 0)           & \pounds54M              & \pounds20M          & \pounds8M                       \\
+        $I_1$ (Year 1)           & ---                     & ---                 & \pounds42M (H) / \pounds15M (L) \\
+        Capacity $\bar{Q}$       & 1852.5 t/mo             & 1020 t/mo           & 1020 $\to$ 1852.5 (H branch)    \\
+        Availability             & 95\%                    & 85\%                & 85\% $\to$ 95\% (H branch)      \\
+        Bays $s$                 & 5                       & 3                   & 3                               \\
+        $\sigma_t$               & $0.15\mu_t$             & $0.09\mu_t$         & $0.15\mu_t$                     \\
+        $c_s$                    & \pounds3200/t           & \pounds2900/t       & \pounds3200/t                   \\
+        Revenue                  & 100\%                   & 100\%               & 90\% in Y1--Y2                  \\
+        Low-growth $c_p$ penalty & $+$\pounds150/t from Y2 & ---                 & ---                             \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 %========================================================================================
 \section{Operational Risk Analysis}
+\label{sec:analysis}
 %========================================================================================
 
 \subsection{Monthly Production Decision: Newsvendor Model}
 \label{sec:newsvendor}
 
-Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective monthly capacity $\bar{Q}$ is the product of nominal electrolyser throughput, number of bays, operational availability, and operating days:
+Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective monthly capacity $\bar{Q}$ is the product of nominal electrolyser throughput, operational availability, and operating days:
 \begin{equation}
-    \bar{Q} = K_{\mathrm{nom}} \cdot s_0 \cdot a \cdot n_d = 1{,}020 \text{ t/mo}
+    \bar{Q} = K_{\mathrm{nom}} \cdot a \cdot n_d = 40 \times 0.85 \times 30 = 1020 \text{ t/mo}
     \label{eq:capacity}
 \end{equation}
 All demand is contractually met; shortfalls are covered by spot procurement. Monthly profit:
@@ -188,16 +205,14 @@ Note $\frac{d}{dQ}\text{ELS} = -(1-F(Q))$ and $\frac{d}{dQ}\text{ELOI} = F(Q)$, 
 
 This is the \textit{newsvendor critical ratio}. In the standard newsvendor with salvage value $s$, underage and overage costs are $c_u = p - c$ and $c_o = c - s$. Here, because revenue is $Q$-independent, underage costs arise from spot procurement and overage costs from production plus storage with zero salvage (effective $s_{\mathrm{eff}} = -c_h$, giving $c_o = c_p + c_h$):
 \begin{align}
-    c_u & = c_s - c_p = \text{\pounds}700/\text{t}     &  & \text{(extra cost of spot vs own production)} \\
-    c_o & = c_p + c_h = \text{\pounds}2{,}800/\text{t} &  & \text{(production + storage on unsold units)}
+    c_u & = c_s - c_p = \text{\pounds}700/\text{t}  &  & \text{(extra cost of spot vs own production)} \\
+    c_o & = c_p + c_h = \text{\pounds}2800/\text{t} &  & \text{(production + storage on unsold units)}
 \end{align}
 
-The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more expensive per tonne than underproducing. Therefore $F(Q^*) = c_u/(c_u+c_o) = 700/3{,}500 = 0.20$. For normal demand $Q^* = \mu + z^*\sigma$ where $z^* = \Phi^{-1}(0.20) = -0.8416$. The firm optimally produces \textit{well below} mean demand, covering the shortfall from the relatively cheap spot market. Base-case (at $t=0$):
+The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more expensive per tonne than underproducing. Therefore $F(Q^*) = c_u/(c_u+c_o) = 700/3500 = 0.20$. For normal demand $Q^* = \mu + z^*\sigma$ where $z^* = \Phi^{-1}(0.20) = -0.8416$. The firm optimally produces \textit{well below} mean demand, covering the shortfall from the relatively cheap spot market. Optimal production quantity at $t=0$ is:
 \begin{equation}
-    Q_0^* = \mu_0 + z^*\sigma_0 = 1{,}000 + (-0.8416)(150) \approx 874 \text{ t/month} \quad < \bar{Q} = 1{,}020
+    Q_0^* = \mu_0 + z^*\sigma_0 = 1000 + (-0.8416)(150) \approx 874 \text{ t/month} \quad < \bar{Q} = 1020
 \end{equation}
-
-The capacity constraint is not binding at baseline; the unconstrained optimum suffices.
 
 \subsubsection{Expected Profit Components}
 
@@ -209,13 +224,13 @@ For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(
 
 Using Eqn ~\eqref{eq:exp_profit}, our expected profit at $t=0$ is:
 \begin{equation}
-    \E[\Pi_0] = p\mu - c_p Q^* - c_s\cdot\mathrm{ELS} - c_h\cdot\mathrm{ELOI} = \text{\pounds}1{,}353{,}020 \approx \text{\pounds}1.35\text{M/month}
+    \E[\Pi_0] = p\mu - c_p Q^* - c_s\cdot\mathrm{ELS} - c_h\cdot\mathrm{ELOI} = \text{\pounds}1353020 \approx \text{\pounds}1.35\text{M/month}
 \end{equation}
 giving an annual baseline of \textbf{\pounds16.24M}.
 
 \subsubsection{Evolution Under Demand Growth and Capacity Constraints}
 
-The unconstrained optimum is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1{,}058 > \bar{Q} = 1{,}020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
+The unconstrained optimum is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1058 > \bar{Q} = 1020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
 
 Table~\ref{tab:nv_annual} summarises expected annual profit under each strategy, scenario, and year.
 
@@ -246,7 +261,7 @@ Table~\ref{tab:nv_annual} summarises expected annual profit under each strategy,
     \end{tabular}
 \end{table}
 
-Key observations from Table~\ref{tab:nv_annual}: (i)~S2 consistently produces higher annual profit than S1 in every scenario and year, despite identical revenue---the reduced spot price (\pounds2{,}900/t) and tighter demand distribution (lower $\sigma$) jointly reduce procurement and storage costs; (ii)~S1's low-growth profits fall sharply in Y2--Y4 due to the \pounds150/t scale-inefficiency penalty; (iii)~S3's Y1--Y2 profits are suppressed by the 10\% revenue reduction, recovering only from Y3 once the Year-1 investment takes effect.
+Key observations from Table~\ref{tab:nv_annual}: (i)~S2 consistently produces higher annual profit than S1 in every scenario and year, despite identical revenue---the reduced spot price (\pounds2900/t) and tighter demand distribution (lower $\sigma$) jointly reduce procurement and storage costs; (ii)~S1's low-growth profits fall sharply in Y2--Y4 due to the \pounds150/t scale-inefficiency penalty; (iii)~S3's Y1--Y2 profits are suppressed by the 10\% revenue reduction, recovering only from Y3 once the Year-1 investment takes effect.
 
 \subsection{Refuelling Station Congestion: M/M/$s$ Queue}
 \label{sec:queueing}
@@ -421,7 +436,7 @@ where $I_1^{(k,j)}$ is discounted at $t=1$ (paid at end of Year 1). Annual profi
     \end{tabular}
 \end{table}
 
-\textbf{Strategy 2 dominates by a large margin in every scenario.} Its E[NPV] of \pounds46.5M exceeds S1 by \pounds39.9M and S3 by \pounds25.0M. The mechanism is threefold: (i)~much lower capex (\pounds20M vs \pounds54M/\pounds50M equivalent) leaves less invested capital to recover; (ii)~reduced $c_s$ from \pounds3{,}200 to \pounds2{,}900/t lowers the underage penalty, shifting the critical ratio from 0.200 to 0.125 and reducing expected spot procurement costs; (iii)~reduced demand volatility ($\sigma \to 0.6\sigma$) lowers both expected leftover and expected shortfall, simultaneously reducing storage and procurement waste.
+\textbf{Strategy 2 dominates by a large margin in every scenario.} Its E[NPV] of \pounds46.5M exceeds S1 by \pounds39.9M and S3 by \pounds25.0M. The mechanism is threefold: (i)~much lower capex (\pounds20M vs \pounds54M/\pounds50M equivalent) leaves less invested capital to recover; (ii)~reduced $c_s$ from \pounds3200 to \pounds2900/t lowers the underage penalty, shifting the critical ratio from 0.200 to 0.125 and reducing expected spot procurement costs; (iii)~reduced demand volatility ($\sigma \to 0.6\sigma$) lowers both expected leftover and expected shortfall, simultaneously reducing storage and procurement waste.
 
 S1 performs poorly under low growth (NPV $= \pounds0.95$M) due to the combination of high capex and the scale-inefficiency cost penalty. S3's real-options value---the ability to defer the large expansion cost---is insufficient to compensate for the 10\% Y1--Y2 revenue penalty and the fact that Strategy 2 is already cheaper and more profitable in every state.
 
@@ -431,11 +446,11 @@ S1 performs poorly under low growth (NPV $= \pounds0.95$M) due to the combinatio
 
 \subsection{Monte Carlo Simulation Results}
 
-For each of $N = 50{,}000$ simulated paths: (i)~draw growth scenario and competitor entry; (ii)~for each of 48 months draw $D_m \sim \mathcal{N}(\mu_m, \sigma_m^2)$ (clipped at zero); (iii)~compute monthly profit using the capacity-constrained optimal $Q_m^*$; (iv)~aggregate to annual totals and discount. Table~\ref{tab:risk} reports the full risk profile.
+For each of $N = 50000$ simulated paths: (i)~draw growth scenario and competitor entry; (ii)~for each of 48 months draw $D_m \sim \mathcal{N}(\mu_m, \sigma_m^2)$ (clipped at zero); (iii)~compute monthly profit using the capacity-constrained optimal $Q_m^*$; (iv)~aggregate to annual totals and discount. Table~\ref{tab:risk} reports the full risk profile.
 
 \begin{table}[H]
     \centering
-    \caption{Monte Carlo risk measures ($N = 50{,}000$, all values in £M except $\Prob(\mathrm{NPV}<0)$).}
+    \caption{Monte Carlo risk measures ($N = 50000$, all values in £M except $\Prob(\mathrm{NPV}<0)$).}
     \label{tab:risk}
     \small
     \begin{tabular}{@{}lccc@{}}
@@ -494,9 +509,9 @@ Key findings:
 
 \textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest VaR/CVaR. Sensitivity analysis confirms S2 dominates across the full range of plausible parameter values with no breakeven.
 
-The fundamental reason is economic: the newsvendor cost structure (overage cost \pounds2{,}800/t \textit{four times} the underage cost \pounds700/t) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
+The fundamental reason is economic: the newsvendor cost structure (overage cost \pounds2800/t \textit{four times} the underage cost \pounds700/t) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
 
-Under high growth, S2's systematic reliance on spot procurement from Year 3 is a genuine limitation. However, even in this scenario S2 yields NPV = \pounds52.75M (no comp.) or \pounds48.15M (with comp.), both far exceeding S1 and S3. If high growth materialises and spot market prices rise significantly, S2's pre-negotiated contingent contracts at \pounds2{,}900/t provide important downside protection.
+Under high growth, S2's systematic reliance on spot procurement from Year 3 is a genuine limitation. However, even in this scenario S2 yields NPV = \pounds52.75M (no comp.) or \pounds48.15M (with comp.), both far exceeding S1 and S3. If high growth materialises and spot market prices rise significantly, S2's pre-negotiated contingent contracts at \pounds2900/t provide important downside protection.
 
 \subsection{Operational Recommendations}
 
@@ -514,7 +529,7 @@ Under high growth, S2's systematic reliance on spot procurement from Year 3 is a
     \item \textbf{Demand independence:} Monthly demands are assumed i.i.d.\ within each year. Serial correlation (e.g.\ contract ramp-ups) would alter the newsvendor solution and widen the simulated NPV distribution.
     \item \textbf{Risk neutrality:} The analysis maximises E[NPV]. A risk-averse decision-maker would assign additional weight to downside outcomes; this would strengthen the case for S2 (already has zero loss probability) and weaken S1 further.
     \item \textbf{Flaw of averages:} Computing profits at expected demand $\mu_t$ rather than simulating monthly realisations underestimates costs due to the nonlinear capacity-demand interaction (Jensen's inequality). The Monte Carlo simulation explicitly addresses this; the analytical E[NPV] figures are close to but slightly above the simulated means (e.g.\ S2: \pounds46.52M analytical vs \pounds46.54M simulated).
-    \item \textbf{Strategy 2 spot exposure under high growth:} From Year 3 onward under high growth, Strategy 2 relies systematically on spot procurement. If spot market liquidity is limited or prices spike, the pre-negotiated contingent contracts at \pounds2{,}900/t are critical. If these contracts cannot be honoured at scale, S2's advantage would narrow.
+    \item \textbf{Strategy 2 spot exposure under high growth:} From Year 3 onward under high growth, Strategy 2 relies systematically on spot procurement. If spot market liquidity is limited or prices spike, the pre-negotiated contingent contracts at \pounds2900/t are critical. If these contracts cannot be honoured at scale, S2's advantage would narrow.
     \item \textbf{Normal demand assumption:} Negative demand realisations are theoretically possible but negligible in practice ($>6\sigma$ from mean). Demand is truncated at zero in simulation.
     \item \textbf{Queueing model assumptions:} Steady-state M/M/$s$ assumes stationary Poisson arrivals. In practice, HGV arrivals may exhibit time-of-day patterns; a time-varying $\lambda(t)$ model would give a more accurate picture of peak congestion.
 \end{itemize}
