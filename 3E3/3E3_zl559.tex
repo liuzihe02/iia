@@ -228,11 +228,16 @@ Using Eqn ~\eqref{eq:exp_profit}, our expected baseline profit at $t=0$ is:
 \end{equation}
 giving an annual baseline of \textbf{\pounds16.24M}.
 
+\begin{equation}
+    \E_D[\Pi(Q_t^*)] = p\mu_t - c_p Q_t^* - c_s\,\text{ELS}(Q_t^*) - c_h\,\text{ELOI}(Q_t^*)
+    \label{eq:exp_profit}
+\end{equation}
+
 \subsubsection{Profit Evolution Under Various Demand Growth and Investment Strategies}
 
 The unconstrained optimal production quantity is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1058 > \bar{Q} = 1020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
 
-Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ under each strategy $k \in \{S1, S2, S3\}$, scenario $j \in \{\textit{High-Growth+No Competition, High-Growth+Competition, Low-Growth}\}$, and year $t \in \{0,1,2,3,4\}$.
+Table~\ref{tab:nv_annual} summarises expected annual profit $\E[\Pi_t^{(k,j)}]$ under each strategy $k \in \{S1, S2, S3\}$, scenario $j \in \{\textit{High-Growth+No Competition, High-Growth+Competition, Low-Growth}\}$, and year $t \in \{0,1,2,3,4\}$. We recalculate $\E[\Pi_t^{(k,j)}]$ based on the modelling changes made to our parameters: effective capacity $\bar{Q_k}$ under strategy $k$, $sigma_t$, $c_s$ and $c_p$, and revenue cuts etc.
 
 \begin{table}[H]
     \centering
