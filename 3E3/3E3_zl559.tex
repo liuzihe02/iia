@@ -64,42 +64,45 @@ Parameters for the newsvendor hygrogen production and refuelling queueing models
     \footnotesize
     \begin{tabular}{@{}lll@{}}
         \toprule
-        \textbf{Symbol}    & \textbf{Parameter}                                & \textbf{Value}   \\
+        \textbf{Symbol}    & \textbf{Parameter}                                & \textbf{Value}               \\
         \midrule
-        \multicolumn{3}{@{}l}{\textit{Demand \& Pricing}}                                         \\
-        $\mu_0$            & Mean monthly demand                               & 1{,}000 t        \\
-        $\sigma_0$         & Demand std.\ deviation                            & 150 t            \\
-        $p$                & Selling price                                     & \pounds4{,}000/t \\
-        $c_p$              & Production cost                                   & \pounds2{,}500/t \\
-        $c_s$              & Spot market purchase price                        & \pounds3{,}200/t \\
-        $c_h$              & Storage/handling cost (unsold)                    & \pounds300/t     \\
+        \multicolumn{3}{@{}l}{\textit{Demand \& Pricing}}                                                     \\
+        $\mu_0$            & Initial mean monthly demand                       & 1{,}000 t                    \\
+        $\sigma_0$         & Initial demand std.\ deviation                    & 150 t                        \\
+        $\mathrm{CV}$      & Coefficient of variation ($\sigma_t/\mu_t$)       & 0.15                         \\
+        $\mu_t$            & Year-$t$ mean monthly demand                      & Eqn~\eqref{eq:demand_growth} \\
+        $\sigma_t$         & Year-$t$ standard deviation of monthly demand     & Eqn~\eqref{eq:demand_growth} \\
+        $p$                & Selling price                                     & \pounds4{,}000/t             \\
+        $c_p$              & Production cost                                   & \pounds2{,}500/t             \\
+        $c_s$              & Spot market purchase price                        & \pounds3{,}200/t             \\
+        $c_h$              & Storage/handling cost (unsold)                    & \pounds300/t                 \\
         \midrule
-        \multicolumn{3}{@{}l}{\textit{Production Capacity}}                                       \\
-        $K_{\mathrm{nom}}$ & Nominal electrolyser capacity                     & 40 t/day         \\
-        $a$                & Operational availability                          & 85\%             \\
-        $n_d$              & Days per month                                    & 30               \\
+        \multicolumn{3}{@{}l}{\textit{Production Capacity}}                                                   \\
+        $K_{\mathrm{nom}}$ & Nominal electrolyser capacity                     & 40 t/day                     \\
+        $a$                & Operational availability                          & 85\%                         \\
+        $n_d$              & Days per month                                    & 30                           \\
         \midrule
-        \multicolumn{3}{@{}l}{\textit{Refuelling Station}}                                        \\
-        $\lambda$          & HGV arrival rate                                  & 10 vehicles/hr   \\
-        $1/\mu$            & Mean refuelling time                              & 12 min           \\
-        $s_0$              & Initial number of bays                            & 3                \\
-        $W_q^{\max}$       & Maximum average queue wait                        & 5 min            \\
+        \multicolumn{3}{@{}l}{\textit{Refuelling Station}}                                                    \\
+        $\lambda$          & HGV arrival rate                                  & 10 vehicles/hr               \\
+        $1/\mu$            & Mean refuelling time                              & 12 min                       \\
+        $s_0$              & Initial number of bays                            & 3                            \\
+        $W_q^{\max}$       & Maximum average queue wait                        & 5 min                        \\
         \midrule
-        \multicolumn{3}{@{}l}{\textit{Growth \& Discounting}}                                     \\
-        $p_H$              & Probability of high growth                        & 0.45             \\
-        $g_H,\,g_L$        & Annual growth rates (mean demand)                 & 10\%, 3\%        \\
-        $p_C$              & Probability of competitor entry (high growth, Y3) & 0.40             \\
-        $\delta$           & Demand reduction from competitor                  & 15\%             \\
-        $r$                & Discount rate                                     & 7\%/yr           \\
+        \multicolumn{3}{@{}l}{\textit{Growth \& Discounting}}                                                 \\
+        $p_H$              & Probability of high growth                        & 0.45                         \\
+        $g_H,\,g_L$        & Annual growth rates (mean demand)                 & 10\%, 3\%                    \\
+        $p_C$              & Probability of competitor entry (high growth, Y3) & 0.40                         \\
+        $\delta$           & Demand reduction from competitor                  & 15\%                         \\
+        $r$                & Discount rate                                     & 7\%/yr                       \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 \subsection{Demand Growth and Scenarios}
 
-Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant coefficient of variation CV~$= 0.15$, and annual growth rate of mean demand $g$ gives:
+Monthly hydrogen demand in year $t$: $D_t \sim \mathcal{N}(\mu_t, \sigma_t^2)$, with constant $\mathrm{CV} = \sigma_t/\mu_t = 0.15$, and annual growth rate of mean demand $g$ gives:
 \begin{equation}
-    \mu_t = \mu_0(1+g)^t, \qquad \sigma_t = 0.15\,\mu_t
+    \mu_t = \mu_0(1+g)^t, \qquad \sigma_t = \mathrm{CV}\cdot\mu_t
     \label{eq:demand_growth}
 \end{equation}
 With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}} = 0.85\,\mu_t$. This gives three terminal scenarios:
@@ -155,56 +158,64 @@ With competitor entry (high growth scenario, $t \geq 3$): $\mu_t^{\mathrm{comp}}
 \subsection{Monthly Production Decision: Newsvendor Model}
 \label{sec:newsvendor}
 
-Each month GreenCo chooses production $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective capacity is $\bar{Q} = 40 \times 0.85 \times 30 = 1{,}020$ t/month. All demand is contractually met; shortfalls are covered by spot procurement. Monthly profit:
+Each month GreenCo chooses production quantity $Q \in [0,\bar{Q}]$ before demand $D \sim \mathcal{N}(\mu,\sigma^2)$ is realised. The effective monthly capacity $\bar{Q}$ is the product of nominal electrolyser throughput, number of bays, operational availability, and operating days:
+\begin{equation}
+    \bar{Q} = K_{\mathrm{nom}} \cdot s_0 \cdot a \cdot n_d = 1{,}020 \text{ t/mo}
+    \label{eq:capacity}
+\end{equation}
+All demand is contractually met; shortfalls are covered by spot procurement. Monthly profit:
 \begin{equation}
     \Pi(Q,D) = \underbrace{pD}_{\text{revenue}} - \underbrace{c_p Q}_{\text{production}} - \underbrace{c_s\max(D-Q,0)}_{\text{spot procurement}} - \underbrace{c_h\max(Q-D,0)}_{\text{storage}}
     \label{eq:profit}
 \end{equation}
+Taking expectations over demand $D$, we define \textit{expected lost sales} (demand unmet by own production) and \textit{expected leftover inventory} (unsold overproduction):
+\begin{equation}
+    \text{ELS}(Q) = \E_D[\max(D-Q,0)], \qquad \text{ELOI}(Q) = \E_D[\max(Q-D,0)]
+\end{equation}
+Since revenue $pD$ is independent of $Q$ (contractual obligation), expected profit is:
+\begin{equation}
+    \E_D[\Pi(Q)] = p\mu - c_p Q - c_s\,\text{ELS}(Q) - c_h\,\text{ELOI}(Q)
+    \label{eq:exp_profit}
+\end{equation}
 
 \subsubsection{Optimal Production Quantity}
 
-Differentiating $\E[\Pi]$ with respect to $Q$ and setting to zero:
+Note $\frac{d}{dQ}\text{ELS} = -(1-F(Q))$ and $\frac{d}{dQ}\text{ELOI} = F(Q)$, where $F$ is the CDF of demand $D$. Setting $d\E[\Pi]/dQ = 0$:
 \begin{equation}
-    \frac{d\E[\Pi]}{dQ} = -c_p + c_s(1-F(Q)) - c_h F(Q) = 0 \quad\Longrightarrow\quad \boxed{F(Q^*) = \frac{c_u}{c_u+c_o}}
+    \frac{d\E[\Pi]}{dQ} = -c_p + c_s\bigl(1-F(Q)\bigr) - c_h F(Q) = 0 \quad\Longrightarrow\quad \boxed{F(Q^*) = \frac{c_s - c_p}{c_s + c_h} = \frac{c_u}{c_u+c_o}}
     \label{eq:critical_ratio}
 \end{equation}
 
-This is the \textit{newsvendor critical ratio}. Because all demand is contractually met, revenue $pD$ is independent of $Q$, so the standard underage cost $c_u = p - c_p$ (lost margin) does not apply. Instead, underage costs arise from spot procurement, and overage costs from production plus storage with zero salvage (effective salvage $s_{\mathrm{eff}} = -c_h$, giving $c_o = c_p - s_{\mathrm{eff}} = c_p + c_h$):
+This is the \textit{newsvendor critical ratio}. In the standard newsvendor with salvage value $s$, underage and overage costs are $c_u = p - c$ and $c_o = c - s$. Here, because revenue is $Q$-independent, underage costs arise from spot procurement and overage costs from production plus storage with zero salvage (effective $s_{\mathrm{eff}} = -c_h$, giving $c_o = c_p + c_h$):
 \begin{align}
-    c_u & = c_s - c_p = 3{,}200 - 2{,}500 = \text{\pounds}700/\text{t} &  & \text{(extra cost of spot vs own production)} \\
-    c_o & = c_p + c_h = 2{,}500 + 300 = \text{\pounds}2{,}800/\text{t} &  & \text{(production + storage on unsold units)}
+    c_u & = c_s - c_p = \text{\pounds}700/\text{t}     &  & \text{(extra cost of spot vs own production)} \\
+    c_o & = c_p + c_h = \text{\pounds}2{,}800/\text{t} &  & \text{(production + storage on unsold units)}
 \end{align}
 
-The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more expensive per tonne than underproducing. Therefore:
+The ratio $c_o/c_u = 4$ is strongly asymmetric: overproducing is four times more expensive per tonne than underproducing. Therefore $F(Q^*) = c_u/(c_u+c_o) = 700/3{,}500 = 0.20$. For normal demand $Q^* = \mu + z^*\sigma$ where $z^* = \Phi^{-1}(0.20) = -0.8416$. The firm optimally produces \textit{well below} mean demand, covering the shortfall from the relatively cheap spot market. Base-case (at $t=0$):
 \begin{equation}
-    F(Q^*) = \frac{700}{700+2{,}800} = 0.20
-\end{equation}
-
-For normal demand $Q^* = \mu + z^*\sigma$ with $\Phi(z^*) = 0.20$, giving $z^* = -0.8416$. The firm optimally produces \textit{well below} mean demand, covering the shortfall from the relatively cheap spot market. Base-case:
-\begin{equation}
-    Q_0^* = 1{,}000 + (-0.842)(150) \approx 874 \text{ t/month} \quad < \bar{Q} = 1{,}020
+    Q_0^* = \mu_0 + z^*\sigma_0 = 1{,}000 + (-0.8416)(150) \approx 874 \text{ t/month} \quad < \bar{Q} = 1{,}020
 \end{equation}
 
 The capacity constraint is not binding at baseline; the unconstrained optimum suffices.
 
 \subsubsection{Expected Profit Components}
 
-Using the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$, with $L(-0.842) = 0.953$:
+For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(z)]$ gives closed-form expressions for ELS and ELOI. With $z^* = -0.8416$ and $L(-0.8416) = 0.953$:
 \begin{align}
-    \mathrm{ELS}  & = \sigma L(z^*) = 150 \times 0.953 = 143.0 \text{ t} &  & \text{(expected spot procurement)}     \\
-    \mathrm{ES}   & = \mu - \mathrm{ELS} = 857.0 \text{ t}               &  & \text{(expected own-production sales)} \\
-    \mathrm{ELOI} & = Q^* - \mathrm{ES} = 16.7 \text{ t}                 &  & \text{(expected leftover inventory)}
+    \mathrm{ELS}  & = \sigma_0 L(z^*) = 150 \times 0.953 = 143.0 \text{ t}       &  & \text{(spot procurement volume)} \\
+    \mathrm{ELOI} & = \sigma_0[z^* + L(z^*)] = 150 \times 0.111 = 16.7 \text{ t} &  & \text{(unsold overproduction)}
 \end{align}
 
-The expected monthly profit is:
+Using Eqn ~\eqref{eq:exp_profit}, our expected profit at $t=0$ is:
 \begin{equation}
     \E[\Pi_0] = p\mu - c_p Q^* - c_s\cdot\mathrm{ELS} - c_h\cdot\mathrm{ELOI} = \text{\pounds}1{,}353{,}020 \approx \text{\pounds}1.35\text{M/month}
 \end{equation}
-giving an annual baseline of \textbf{\pounds16.24M}. Verification: $4{,}000(1{,}000) - 2{,}500(874) - 3{,}200(143) - 300(16.7) = 1{,}353{,}020$.
+giving an annual baseline of \textbf{\pounds16.24M}.
 
 \subsubsection{Evolution Under Demand Growth and Capacity Constraints}
 
-The unconstrained optimum is $Q_t^* = \mu_t(1 + 0.15\,z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1{,}058 > \bar{Q} = 1{,}020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
+The unconstrained optimum is $Q_t^* = \mu_t(1 + \mathrm{CV} \cdot z^*) = 0.874\,\mu_t$. Under high growth, $0.874\,\mu_2 = 1{,}058 > \bar{Q} = 1{,}020$, so \textit{the capacity constraint binds from Year 2 onward} under Strategies 2 and 3 (before expansion). Once binding, $Q_t^* = \bar{Q}$ and ELS grows rapidly as demand outpaces production. This is the principal mechanism forcing emergency spot procurement and limiting profits under Strategies 2 and 3 with high growth.
 
 Table~\ref{tab:nv_annual} summarises expected annual profit under each strategy, scenario, and year.
 
