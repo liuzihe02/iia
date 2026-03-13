@@ -471,35 +471,37 @@ Strategy 3 has zero probability of loss but a distinctly bimodal distribution (s
 \end{figure}
 
 %========================================================================================
-\section{Recommendations}
+\section{Conclusions}
 %========================================================================================
 
-\subsection{Strategic Recommendation: Adopt Strategy 2}
+Our analysis aims to maximise expected NPV while explicitly assessing downside risk exposure and service-level compliance across GreenCo's four-year investment horizon.
 
-\textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest CVaR. S2 dominates in every scenario (Table~\ref{tab:npv}).
+\subsection{Operational Risks}
 
-The fundamental reason is economic: the newsvendor cost structure (overage cost $c_o$ \pounds2800/t \textit{four times} the underage cost $c_u$ \pounds700/t in the standard case) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
+Four risk sources were analysed: (i)~demand volatility, addressed via the newsvendor model and Monte Carlo simulation; (ii)~production capacity constraints, quantified through the capacity-constrained newsvendor under each strategy; (iii)~congestion risk, evaluated with the M/M/$s$ queueing model; and (iv)~long-term investment uncertainty (demand trajectory, competitor entry), structured through the decision tree and scenario analysis. The principal finding is that under GreenCo's cost structure ($c_o \gg c_u$), demand uncertainty---not capacity shortfall---is the dominant driver of profit variability.
 
-Under high growth, S2's systematic reliance on spot procurement from Year 3 is a genuine limitation. However, even in this scenario S2 yields NPV = \pounds52.75M (no comp.) or \pounds48.15M (with comp.), both far exceeding S1 and S3. If high growth materialises and spot market prices rise significantly, S2's pre-negotiated contracts at \pounds2900/t provide important downside protection.
+\subsection{Recommendations}
 
-\subsection{Operational Recommendations}
+The following recommendations enhance resilience, improve performance stability, and support informed long-term investment decisions under uncertainty:
 
 \begin{enumerate}
-    \item \textbf{Production policy:} Implement the newsvendor-optimal schedule $Q_t^* = \min(\mu_t + z^*\sigma_t,\,\bar{Q})$, reviewed annually as demand parameters update. Avoid planning at mean demand as this ignores the asymmetric cost structure and the flaw of averages.
+    \item \textbf{Adopt Strategy 2 (long-term investment decision).} S2 achieves the highest E[NPV] of \pounds46.5M (vs \pounds6.6M for S1, \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest CVaR. It dominates in every scenario (Table~\ref{tab:npv}). The mechanism: lower capex (\pounds20M), reduced spot cost ($c_s = \text{\pounds}2900$/t shifting the critical ratio from 0.200 to 0.125), and reduced demand volatility ($\sigma \to 0.6\sigma$) jointly cut procurement and storage waste. Under high growth, S2 relies on spot procurement from Y3, but pre-negotiated contracts at \pounds2900/t provide downside protection; even in this worst case, S2's NPV (\pounds48--53M) far exceeds alternatives.
 
-    \item \textbf{Refuelling station: add bays immediately.} The current M/M/3 configuration violates the 5-minute SLA at baseline ($W_q = 5.33$ min) and deteriorates rapidly under demand growth. \textit{This is independent of the investment strategy chosen.} Two additional bays ($s = 5$) are required for compliance across the 4-year horizon. With $s = 5$: $W_q = 0.24$ min at baseline, rising to 1.27 min under high growth by Y4. A single additional bay ($s = 4$) is insufficient under high growth (fails by Y4 at $\lambda = 14.64$/hr $> \lambda^{\max}_{s=4} = 14.44$/hr). The cost of non-compliance (contract breach) likely far exceeds the incremental bay installation cost.
+    \item \textbf{Implement newsvendor-optimal production (performance stability).} Set $Q_t^* = \min(\mu_t + z^*\sigma_t,\,\bar{Q})$, reviewed annually. Planning at mean demand ignores the asymmetric cost structure ($c_o \gg c_u$) and the flaw of averages, leading to systematic overproduction and unnecessary cost exposure.
 
-    \item \textbf{Demand monitoring:} Under Strategy 2, the firm should monitor realised demand growth closely. If high growth materialises earlier than expected, activating an option to expand capacity (analogous to S3) at a premium cost may become worthwhile from Year 2 onward.
+    \item \textbf{Add two refuelling bays immediately (service-level compliance).} The current M/M/3 configuration violates the 5-minute SLA at baseline ($W_q = 5.33$ min) and deteriorates rapidly under demand growth. Two additional bays ($s = 5$) are required for compliance across the full horizon ($W_q \leq 1.27$ min). A single bay ($s = 4$) is insufficient under high growth by Y4. This is independent of the investment strategy chosen.
+
+    \item \textbf{Monitor demand and maintain adaptive capacity (resilience).} If high growth materialises earlier than expected, activating an option to expand capacity (analogous to S3) may become worthwhile from Y2. GreenCo should also secure spot contract volumes sufficient to cover projected shortfalls under high growth and establish fallback suppliers to mitigate counterparty risk.
 \end{enumerate}
 
-\subsection{Limitations and Caveats}
+\subsection{Assumptions and Limitations}
 
 \begin{itemize}
-    \item \textbf{Demand independence:} Monthly demands are assumed i.i.d.\ within each year. Serial correlation (e.g.\ contract ramp-ups) would alter the newsvendor solution and widen the simulated NPV distribution.
-    \item \textbf{Risk neutrality:} The analysis maximises E[NPV]. A risk-averse decision-maker would assign additional weight to downside outcomes; though this would strengthen the case for S2 (already has zero loss probability) and weaken S1 further.
-    \item \textbf{Strategy 2 spot exposure under high growth:} From Year 3 onward under high growth, Strategy 2 relies systematically on spot procurement. If spot market liquidity is limited or prices spike, the pre-negotiated contingent contracts at \pounds2900/t are critical. If these contracts cannot be honoured at scale, S2's advantage would narrow.
-    \item \textbf{Normal demand assumption:} Negative demand realisations are theoretically possible but negligible in practice ($>6\sigma$ from mean). Demand is truncated at zero in simulation.
-    \item \textbf{Queueing model assumptions:} Steady-state M/M/$s$ assumes stationary Poisson arrivals. In practice, HGV arrivals may exhibit time-of-day patterns; a time-varying $\lambda(t)$ model would give a more accurate picture of peak congestion.
+    \item \textbf{S3 specification matching:} The coursework does not specify availability or demand parameters for S3's conditional investments. We assume S3's expansion branch matches S1 specifications (95\% availability, 65 t/day) and S3's flexibility branch matches S2 specifications ($\sigma \to 0.6\sigma$, $c_s = \text{\pounds}2900$/t).
+    \item \textbf{Arrival rate scaling:} HGV arrival rate $\lambda_t$ is assumed to scale with mean hydrogen demand growth. This links the queueing and newsvendor models but is not specified in the problem.
+    \item \textbf{Demand independence:} Monthly demands are assumed i.i.d.\ within each year. Serial correlation would alter the newsvendor solution and widen the simulated NPV distribution.
+    \item \textbf{Risk neutrality:} The analysis maximises E[NPV]. A risk-averse decision-maker would weight downside outcomes more heavily, strengthening the case for S2 further.
+    \item \textbf{Queueing model:} Steady-state M/M/$s$ assumes stationary Poisson arrivals. Time-of-day arrival patterns would give a more accurate picture of peak congestion.
 \end{itemize}
 
 \end{document}
