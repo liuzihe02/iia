@@ -220,10 +220,10 @@ For normal demand, the standard normal loss function $L(z) = \phi(z) - z[1-\Phi(
 \end{align}
 The expected annual profit for strategy $k$ in scenario $j$ at year $t$ is:
 \begin{equation}
-    \E[\Pi_t^{(k,j)}] = 12\Bigl(p\mu_t^{(j)} - c_p^{(k)}\, Q_t^{*(k,j)} - c_s^{(k)}\,\mathrm{ELS}(Q_t^{*(k,j)}) - c_h\,\mathrm{ELOI}(Q_t^{*(k,j)})\Bigr)
+    \E[\Pi_t^{(k,j)}] = 12\Bigl(\alpha_t^{(k)}\, p\mu_t^{(j)} - c_p^{(k)}\, Q_t^{*(k,j)} - c_s^{(k)}\,\mathrm{ELS}(Q_t^{*(k,j)}) - c_h\,\mathrm{ELOI}(Q_t^{*(k,j)})\Bigr)
     \label{eq:annual_profit}
 \end{equation}
-where $\mu_t^{(j)}$, $\sigma_t^{(j)}$ come from Table~\ref{tab:demand}, and $c_s^{(k)}$, $c_p^{(k)}$, $\bar{Q}^{(k)}$ are from Table~\ref{tab:strategy_params}.
+where $\alpha_t^{(k)}$ is the revenue realisation factor ($\alpha = 0.9$ for S3 in Y1--Y2 due to deferral costs; $\alpha = 1$ otherwise), $\mu_t^{(j)}$, $\sigma_t^{(j)}$ come from Table~\ref{tab:demand}, and $c_s^{(k)}$, $c_p^{(k)}$, $\bar{Q}^{(k)}$ are from Table~\ref{tab:strategy_params}.
 
 \subsubsection{Profit Evolution Under Various Demand Growth and Investment Strategies}
 
@@ -319,7 +319,7 @@ A fourth bay ($s = 4$) raises the compliant threshold to 14.44/hr, sufficient un
 \subsection{Decision Tree and NPV Formulation}
 \label{sec:decision_tree}
 
-The three strategies are evaluated over a 4-year horizon using a multi-stage decision tree (Figure~\ref{fig:tree}). Strategy~3 has a real-options structure: a second decision node at the end of Y1 lets GreenCo select the expansion or flexibility branch conditional on observed growth. This is solved by \textit{backward induction}.
+The three strategies are evaluated over a 4-year horizon using a multi-stage decision tree (Figure~\ref{fig:tree}). Strategy~3 has a real-options structure: at the end of Y1, GreenCo observes realised demand growth and selects a branch. Solving by \textit{backward induction}: if high growth is observed, expand capacity (\pounds42M, matching S1 from Y2); if low growth, invest in flexibility (\pounds15M, matching S2 from Y2). The tree in Figure~\ref{fig:tree} shows this resolved optimal policy directly.
 
 The NPV for strategy $k$ under scenario $j$ is:
 \begin{equation}
@@ -383,35 +383,29 @@ where $I_1^{(k,j)}$ is discounted at $t=1$ (paid at end of Year 1). Annual profi
             \draw[edge] (s2H) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s2nc);
             \draw[edge] (s2H) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s2c);
 
-            % ── S3: H/L split ─────────────────────────────────────
-            \node[decision] (s3D) at ( 5.2,-4.8) {Y1 Decision};
+            % ── S3: H/L split (Y1 policy resolved by backward induction) ──
+            \node[chance]   (s3H) at ( 5.2,-4.8) {};
             \node[terminal] (s3L) at ( 9.2,-4.8) {};
             \node[right=2pt of s3L] {\pounds30.8M};
-            \draw[edge] (s3) -- node[left,  align=center, xshift=-8pt] {High Growth\\($p_H{=}0.45$)} (s3D);
-            \draw[edge] (s3) -- node[right, align=center, xshift= 8pt] {Low Growth\\($1{-}p_H{=}0.55$)} (s3L);
-            % S3 Y1 Decision -> Expand / Flex
-            \node[chance]   (s3E) at (3.5,-7.2) {};
-            \node[terminal] (s3F) at (7.5,-7.2) {};
-            \node[right=2pt of s3F] {\pounds30.8M};
-            \draw[edge] (s3D) -- node[left,  xshift=-6pt] {Expand Capcity} (s3E);
-            \draw[edge] (s3D) -- node[right, xshift= 6pt] {Invest in Flexibility}   (s3F);
-            % S3 Expand -> nc/c
-            \node[terminal] (s3nc) at (1.8,-9.4) {};
-            \node[terminal] (s3c)  at (5.2,-9.4) {};
+            \draw[edge] (s3) -- node[left,  align=center, xshift=-8pt] {High Growth\\($p_H{=}0.45$)\\{\footnotesize $\to$ Expand Capacity}} (s3H);
+            \draw[edge] (s3) -- node[right, align=center, xshift= 8pt] {Low Growth\\($1{-}p_H{=}0.55$)\\{\footnotesize $\to$ Flexibility}} (s3L);
+            % S3 High -> nc/c
+            \node[terminal] (s3nc) at (3.5,-7.2) {};
+            \node[terminal] (s3c)  at (7.0,-7.2) {};
             \node[right=2pt of s3nc] {\pounds12.4M};
             \node[right=2pt of s3c]  {\pounds7.0M};
-            \draw[edge] (s3E) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s3nc);
-            \draw[edge] (s3E) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s3c);
+            \draw[edge] (s3H) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s3nc);
+            \draw[edge] (s3H) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s3c);
 
             % ── Legend ────────────────────────────────────────────
-            \node[font=\small] at (0,-10.2) {%
+            \node[font=\small] at (0,-8.8) {%
                 $\square$~decision node;\quad
                 $\bigcirc$~chance node;\quad
                 $\triangleright$~terminal (NPV);\quad
                 No Comp.~=~no competitor entry;\quad
                 Comp.~=~competitor enters Y3.};
         \end{tikzpicture}}
-    \caption{Decision tree for the three strategies. Terminal node values are NPVs. S3 has a real-options Y1 Decision node (conditional on observed growth) on the high-growth branch: Expand matches S1 specifications, Flex matches S2 specifications. EMV values (blue) computed by backward induction.}
+    \caption{Decision tree for the three strategies. Terminal node values are NPVs. S3's Y1 decision is resolved by backward induction: if high growth is observed, expand capacity (matching S1 specifications); if low growth, invest in flexibility (matching S2 specifications). EMV values (blue) computed by backward induction.}
     \label{fig:tree}
 \end{figure}
 
@@ -476,7 +470,7 @@ Strategy 3 has zero probability of loss and moderate expected return, but its NP
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{fig_npv_dist.pdf}
-    \caption{Left: Empirical CDF of simulated NPV for each strategy. Right: NPV density overlays (dashed lines = E[NPV]). S2 distribution is tightly concentrated above \pounds40M; S1 has significant left-tail mass below zero.}
+    \caption{Simulated NPV density for each strategy (dashed lines = E[NPV]). S2 is tightly concentrated above \pounds40M; S1 has significant left-tail mass below zero.}
     \label{fig:npv_dist}
 \end{figure}
 
@@ -486,7 +480,7 @@ Strategy 3 has zero probability of loss and moderate expected return, but its NP
 
 \subsection{Strategic Recommendation: Adopt Strategy 2}
 
-\textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest VaR/CVaR. Sensitivity analysis confirms S2 dominates across the full range of plausible parameter values with no breakeven.
+\textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest VaR/CVaR. S2 dominates in every scenario (Table~\ref{tab:npv}), with no crossover point.
 
 The fundamental reason is economic: the newsvendor cost structure (overage cost \pounds2800/t \textit{four times} the underage cost \pounds700/t) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
 
