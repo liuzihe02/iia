@@ -14,7 +14,7 @@
 \usepackage{caption}
 \usepackage{float}
 \usepackage{tikz}
-\usetikzlibrary{trees,shapes,arrows.meta,positioning,calc}
+\usetikzlibrary{trees,shapes,shapes.geometric,arrows.meta,positioning,calc}
 
 \setlist{nosep}
 
@@ -139,7 +139,7 @@ GreenCo must choose one of three strategies at Year~0 to scale its hydrogen infr
 
 \textbf{Strategy~3 (Staged Expansion).} Invest \pounds8M upfront in expandable foundations and grid upgrades, preserving the option to scale later. This is a \textit{real-options} structure: at the end of Y1, after observing demand growth, GreenCo chooses one of two branches:
 \begin{itemize}
-    \item \textit{High growth observed} $\to$ expand nominal capacity $K_\mathrm{nom} = $ 65~t/day at $a=95\%$ availability for \pounds42M (discounted by the pre-installed foundations), matching S1 specifications from Y2 onward.
+    \item \textit{High growth observed} $\to$ expand nominal capacity $K_\mathrm{nom} = $ 65~t/day at $\alpha=95\%$ availability for \pounds42M (discounted by the pre-installed foundations), matching S1 specifications from Y2 onward.
     \item \textit{Low growth observed} $\to$ invest \pounds15M in flexibility measures (a reduced version of S2: same $\sigma$ reduction and $c_s = \text{\pounds}2900$/t), matching S2 specifications from Y2 onward.
 \end{itemize}
 The cost of deferral is a 10\% realised revenue reduction in Y1--Y2 under both growth paths. Until the Y1 decision, capacity and parameters remain at baseline.
@@ -282,7 +282,7 @@ The remaining performance measures follow from Little's Law ($L = \lambda W$, $L
 
 \subsubsection{Baseline Performance ($s = 3$)}
 
-With $a = \lambda/\mu = 2$, $\rho = 2/3 < 1$ (stable), applying Eqns~\eqref{eq:mms_p0}--\eqref{eq:mms_little} gives $P_0 = 1/9$, $L_q = 8/9 \approx 0.889$ vehicles, and $W_q = L_q/\lambda = \mathbf{5.33}$~\textbf{min}. Even at baseline, $W_q = 5.33$ min $> W_q^{\max} = 5$ min. GreenCo is \textit{already} non-compliant with its service level argreements (SLA) before any demand growth. The maximum arrival rate compatible with compliance is $\lambda^{\max}_{s=3} = 9.84$/hr, just below the current rate of 10/hr.
+With $a = \lambda/\mu = 2$, $\rho = 2/3 < 1$ (stable), applying Eqns~\eqref{eq:mms_p0}--\eqref{eq:mms_little} gives $P_0 = 1/9$, $L_q = 8/9 \approx 0.889$ vehicles, and $W_q = L_q/\lambda = \mathbf{5.33}$~\textbf{min}. Even at baseline, $W_q = 5.33$ min $> W_q^{\max} = 5$ min. GreenCo is \textit{already} non-compliant with its service level agreement (SLA) before any demand growth. The maximum arrival rate compatible with compliance is $\lambda^{\max}_{s=3} = 9.84$/hr, just below the current rate of 10/hr.
 
 \subsubsection{Impact of Hydrogen Demand Growth}
 
@@ -330,88 +330,88 @@ where $I_1^{(k,j)}$ is discounted at $t=1$ (paid at end of Year 1). Annual profi
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[
-            font=\footnotesize,
-            dec/.style={rectangle, draw, rounded corners=2pt, align=center,
-                    minimum width=1.4cm, minimum height=0.55cm, inner sep=3pt},
-            ch/.style={circle, draw, minimum size=0.5cm, inner sep=0pt},
-            term/.style={font=\scriptsize, align=left},
-        ]
-        % ── Level 0: Year-0 decision ──────────────────────────
-        \node[dec] (root) at (0,0) {Y0 Decision};
+    \resizebox{0.85\linewidth}{!}{%
+        \begin{tikzpicture}[
+                font=\scriptsize,
+                decision/.style={rectangle, draw, rounded corners=2pt, align=center,
+                        minimum width=1.5cm, minimum height=0.55cm, inner sep=2pt},
+                chance/.style={circle, draw, minimum size=7mm, inner sep=0pt},
+                terminal/.style={isosceles triangle, draw, shape border rotate=-90,
+                        minimum height=5mm, minimum width=3mm, inner sep=1pt},
+                edge/.style={draw, -latex},
+            ]
+            % ── Y0 Decision ───────────────────────────────────────
+            \node[decision] (root) at (0,0) {Y0 Decision};
 
-        % ── Level 1: first-stage chance nodes ─────────────────
-        \node[ch]  (s1)  at (-4.5,-1.8) {};
-        \node[ch]  (s2)  at ( 0,  -1.8) {};
-        \node[ch]  (s3)  at ( 4.5,-1.8) {};
+            % ── Strategy chance nodes (level 1) ───────────────────
+            \node[chance] (s1) at (-7.0,-2.0) {};
+            \node[chance] (s2) at ( 0.0,-2.0) {};
+            \node[chance] (s3) at ( 7.0,-2.0) {};
+            \draw[edge] (root) -- node[above left]  {S1} (s1);
+            \draw[edge] (root) -- node[above, xshift=10pt] {S2} (s2);
+            \draw[edge] (root) -- node[above right] {S3} (s3);
+            % E[NPV] labels placed near S1/S2/S3 branch labels
+            \node[text=blue, font=\scriptsize] at (-4,-1.8) {$\E[\mathrm{NPV}]=\pounds6.6$M};
+            \node[text=blue, font=\scriptsize] at ( 1.2,-1.4) {$\E[\mathrm{NPV}]=\pounds46.5$M};
+            \node[text=blue, font=\scriptsize] at ( 5.5,-1) {$\E[\mathrm{NPV}]=\pounds21.6$M};
 
-        \draw (root) -- node[above left]  {S1} (s1);
-        \draw (root) -- node[above]       {S2} (s2);
-        \draw (root) -- node[above right] {S3} (s3);
+            % ── S1: H/L split ─────────────────────────────────────
+            \node[chance]   (s1H) at (-9.2,-4.8) {};
+            \node[terminal] (s1L) at (-5.2,-4.8) {};
+            \node[right=2pt of s1L] {\pounds0.95M};
+            \draw[edge] (s1) -- node[left,  align=center, xshift=-8pt] {High Growth\\($p_H{=}0.45$)} (s1H);
+            \draw[edge] (s1) -- node[right, align=center, xshift= 8pt] {Low Growth\\($1{-}p_H{=}0.55$)} (s1L);
+            % S1 H -> nc/c
+            \node[terminal] (s1nc) at (-11.0,-7.2) {};
+            \node[terminal] (s1c)  at (-7.8, -7.2) {};
+            \node[right=2pt of s1nc] {\pounds15.6M};
+            \node[right=2pt of s1c]  {\pounds10.3M};
+            \draw[edge] (s1H) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s1nc);
+            \draw[edge] (s1H) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s1c);
 
-        % EMV boxes below each chance node
-        \node[font=\scriptsize, text=blue] at (-4.5,-2.45) {EMV=\pounds6.6M};
-        \node[font=\scriptsize, text=blue] at ( 0,  -2.45) {EMV=\pounds46.5M};
-        \node[font=\scriptsize, text=blue] at ( 4.5,-2.45) {EMV=\pounds21.6M};
+            % ── S2: H/L split ─────────────────────────────────────
+            \node[chance]   (s2H) at (-2.2,-4.8) {};
+            \node[terminal] (s2L) at ( 2.2,-4.8) {};
+            \node[right=2pt of s2L] {\pounds42.9M};
+            \draw[edge] (s2) -- node[left,  align=center, xshift=-8pt] {High Growth\\($p_H{=}0.45$)} (s2H);
+            \draw[edge] (s2) -- node[right, align=center, xshift= 8pt] {Low Growth\\($1{-}p_H{=}0.55$)} (s2L);
+            % S2 H -> nc/c
+            \node[terminal] (s2nc) at (-4.0,-7.2) {};
+            \node[terminal] (s2c)  at (-0.8,-7.2) {};
+            \node[right=2pt of s2nc] {\pounds52.8M};
+            \node[right=2pt of s2c]  {\pounds48.2M};
+            \draw[edge] (s2H) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s2nc);
+            \draw[edge] (s2H) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s2c);
 
-        % ── Level 2: scenario branches ─────────────────────────
-        % S1
-        \node[ch] (s1H) at (-5.8,-4.0) {};
-        \node[ch] (s1L) at (-3.5,-4.0) {};
-        \draw (s1) -- node[left]  {\scriptsize H\,(0.45)} (s1H);
-        \draw (s1) -- node[right] {\scriptsize L\,(0.55)} (s1L);
+            % ── S3: H/L split ─────────────────────────────────────
+            \node[decision] (s3D) at ( 5.2,-4.8) {Y1 Decision};
+            \node[terminal] (s3L) at ( 9.2,-4.8) {};
+            \node[right=2pt of s3L] {\pounds30.8M};
+            \draw[edge] (s3) -- node[left,  align=center, xshift=-8pt] {High Growth\\($p_H{=}0.45$)} (s3D);
+            \draw[edge] (s3) -- node[right, align=center, xshift= 8pt] {Low Growth\\($1{-}p_H{=}0.55$)} (s3L);
+            % S3 Y1 Decision -> Expand / Flex
+            \node[chance]   (s3E) at (3.5,-7.2) {};
+            \node[terminal] (s3F) at (7.5,-7.2) {};
+            \node[right=2pt of s3F] {\pounds30.8M};
+            \draw[edge] (s3D) -- node[left,  xshift=-6pt] {Expand Capcity} (s3E);
+            \draw[edge] (s3D) -- node[right, xshift= 6pt] {Invest in Flexibility}   (s3F);
+            % S3 Expand -> nc/c
+            \node[terminal] (s3nc) at (1.8,-9.4) {};
+            \node[terminal] (s3c)  at (5.2,-9.4) {};
+            \node[right=2pt of s3nc] {\pounds12.4M};
+            \node[right=2pt of s3c]  {\pounds7.0M};
+            \draw[edge] (s3E) -- node[left,  align=center, xshift=-8pt] {No Comp.\\($1{-}p_C{=}0.60$)} (s3nc);
+            \draw[edge] (s3E) -- node[right, align=center, xshift= 8pt] {Comp.\\($p_C{=}0.40$)} (s3c);
 
-        % S2
-        \node[ch] (s2H) at (-1.3,-4.0) {};
-        \node[ch] (s2L) at ( 1.3,-4.0) {};
-        \draw (s2) -- node[left]  {\scriptsize H\,(0.45)} (s2H);
-        \draw (s2) -- node[right] {\scriptsize L\,(0.55)} (s2L);
-
-        % S3 -- note Y1 decision node in high branch
-        \node[dec] (s3D) at ( 4.5,-4.0) {Y1 Decision};
-        \draw (s3)  -- node[above] {\scriptsize H\,(0.45)} (s3D);
-        \node[ch]  (s3L) at ( 6.5,-4.0) {};
-        \draw (s3)  -- node[above] {\scriptsize L\,(0.55)} (s3L);
-
-        % ── Level 3: terminals ─────────────────────────────────
-        % S1 High -> nc / c
-        \node[term] (s1Hnc) at (-6.8,-5.8) {\pounds15.6M};
-        \node[term] (s1Hc)  at (-5.0,-5.8) {\pounds10.3M};
-        \draw (s1H) -- node[left]  {\tiny nc\,(0.60)} (s1Hnc);
-        \draw (s1H) -- node[right] {\tiny c\,(0.40)}  (s1Hc);
-        % S1 Low
-        \node[term] at (-3.5,-5.5) {\pounds0.95M};
-        \draw (s1L) -- ++(0,-1.1);
-
-        % S2 High -> nc / c
-        \node[term] (s2Hnc) at (-2.3,-5.8) {\pounds52.8M};
-        \node[term] (s2Hc)  at (-0.5,-5.8) {\pounds48.2M};
-        \draw (s2H) -- node[left]  {\tiny nc\,(0.60)} (s2Hnc);
-        \draw (s2H) -- node[right] {\tiny c\,(0.40)}  (s2Hc);
-        % S2 Low
-        \node[term] at ( 1.3,-5.5) {\pounds42.9M};
-        \draw (s2L) -- ++(0,-1.1);
-
-        % S3 high branch (expand at Y1)
-        \node[ch] (s3He) at (3.3,-5.8) {};
-        \draw (s3D) -- node[left] {\scriptsize Expand} (s3He);
-        \node[term] at (2.1,-7.2) {\pounds12.4M};
-        \node[term] at (4.1,-7.2) {\pounds7.0M};
-        \draw (s3He) -- node[left]  {\tiny nc} +(-1.0,-1.1);
-        \draw (s3He) -- node[right] {\tiny c}  +(+1.0,-1.1);
-        % S3 low branch (flex at Y1)
-        \node[dec] (s3Df) at (6.5,-5.8) {Flexibility};
-        \draw (s3D) -- node[right] {\scriptsize Flex} (s3Df);
-        \node[term] at (6.5,-7.2) {\pounds30.8M};
-        \draw (s3Df) -- ++(0,-1.0);
-        % S3 L direct
-        \draw (s3L) -- (s3Df);
-
-        % Legend
-        \node[font=\scriptsize] at (0,-8.2)
-        {nc = no competitor entry;\quad c = competitor enters Y3;\quad S3 Y1 decision conditional on observed growth.};
-    \end{tikzpicture}
-    \caption{Simplified decision tree. Terminal values are NPVs under each scenario. H branch of S3 shows two terminals (no comp./comp.). EMV computed by backward induction.}
+            % ── Legend ────────────────────────────────────────────
+            \node[font=\small] at (0,-10.2) {%
+                $\square$~decision node;\quad
+                $\bigcirc$~chance node;\quad
+                $\triangleright$~terminal (NPV);\quad
+                No Comp.~=~no competitor entry;\quad
+                Comp.~=~competitor enters Y3.};
+        \end{tikzpicture}}
+    \caption{Decision tree for the three strategies. Terminal node values are NPVs. S3 has a real-options Y1 Decision node (conditional on observed growth) on the high-growth branch: Expand matches S1 specifications, Flex matches S2 specifications. EMV values (blue) computed by backward induction.}
     \label{fig:tree}
 \end{figure}
 
@@ -475,30 +475,10 @@ Strategy 3 has zero probability of loss and moderate expected return, but its NP
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{fig_npv_dist.pdf}
+    \includegraphics[width=0.5\linewidth]{fig_npv_dist.pdf}
     \caption{Left: Empirical CDF of simulated NPV for each strategy. Right: NPV density overlays (dashed lines = E[NPV]). S2 distribution is tightly concentrated above \pounds40M; S1 has significant left-tail mass below zero.}
     \label{fig:npv_dist}
 \end{figure}
-
-\subsection{Sensitivity Analysis}
-
-Figure~\ref{fig:sensitivity} shows $\E[\mathrm{NPV}]$ as each parameter is varied individually while holding others at their base values.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{fig_sensitivity.pdf}
-    \caption{Sensitivity of $\E[\mathrm{NPV}]$ to: growth probability $p_H$ (top-left), competitor entry probability $p_C$ (top-right), discount rate $r$ (bottom-left), and spot price $c_s$ (bottom-right). Dotted vertical line = base-case value.}
-    \label{fig:sensitivity}
-\end{figure}
-
-Key findings:
-\begin{itemize}
-    \item \textbf{$p_H$ (growth probability):} S2 dominates across the entire range $p_H \in [0.1, 0.9]$ with no crossover. S3 overtakes S1 when $p_H \lesssim 0.65$, consistent with S3's relatively stronger performance under low growth. S1 is only competitive at very high $p_H$ but still never surpasses S2.
-    \item \textbf{$p_C$ (competitor probability):} All strategies decline with $p_C$, but S2 remains far ahead. S1 declines faster because its large capacity expansion is most exposed to demand reduction.
-    \item \textbf{Discount rate $r$:} Higher $r$ penalises all strategies (longer-horizon cash flows are discounted more heavily), but affects S1 most because its capex is largest and front-loaded, while S2's lower capex means less unrecovered investment risk.
-    \item \textbf{Spot market price $c_s$:} As $c_s$ rises, all strategies benefit (higher spot prices increase revenue relative to procurment cost---but note the model holds $p$ fixed). S2's advantage actually \textit{widens} at higher $c_s$, because its pre-negotiated contingent contracts keep $c_s^{S2} = c_s - \text{\pounds}300$ while the others pay the full market rate.
-    \item \textbf{Robustness:} No parameter variation causes the strategy ranking to change. S2's dominance is not an artefact of particular parameter choices---it is structurally robust.
-\end{itemize}
 
 %========================================================================================
 \section{Recommendations}
