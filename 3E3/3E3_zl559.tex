@@ -263,7 +263,7 @@ Key observations: (i)~S2 consistently produces higher annual profit than S1 in e
 \subsection{Refuelling Station Congestion: M/M/$s$ Queue}
 \label{sec:queueing}
 
-HGVs arrive as a Poisson process at rate $\lambda = 10$/hr. Refuelling times are i.i.d.\ $\mathrm{Exp}(\mu)$ with mean $1/\mu = 12$~min ($\mu = 5$/hr per bay), and there are $s_0 = 3$ bays in parallel (FIFO, infinite buffer). This is an M/M/$s$ queue with load $a = \lambda/\mu$ and server utilisation $\rho = \lambda/(s\mu)$. A steady state exists iff $\rho < 1$.
+HGVs arrive as a Poisson process at rate $\lambda = 10$/hr. Refuelling times are i.i.d.\ $\mathrm{Exp}(\mu)$ with mean $1/\mu = 12$~min ($\mu = 5$/hr per bay), and there are $s_0 = 3$ bays in parallel (FIFO, infinite buffer). This is an M/M/$s$ queue with load $a = \lambda/\mu$ and server utilisation $\rho = \lambda/(s\mu)$. A steady state exists if and only if $\rho < 1$.
 
 The idle probability, expected queue length, and queue waiting times are:
 \begin{equation}
@@ -315,18 +315,17 @@ A fourth bay ($s = 4$) raises the compliant threshold to 14.44/hr, sufficient un
 %========================================================================================
 
 
-
 \subsection{Decision Tree and NPV Formulation}
 \label{sec:decision_tree}
 
-The three strategies are evaluated over a 4-year horizon using a multi-stage decision tree (Figure~\ref{fig:tree}). Strategy~3 has a real-options structure: at the end of Y1, GreenCo observes realised demand growth and selects a branch. Solving by \textit{backward induction}: if high growth is observed, expand capacity (\pounds42M, matching S1 from Y2); if low growth, invest in flexibility (\pounds15M, matching S2 from Y2). The tree in Figure~\ref{fig:tree} shows this resolved optimal policy directly.
+The three strategies are evaluated over a 4-year horizon using a multi-stage decision tree (Figure~\ref{fig:tree}). Strategy~3 has a real-options structure: at the end of Y1, GreenCo observes realised demand growth and selects a branch. If high growth is observed, automatically expand capacity (\pounds42M, matching S1 from Y2); if low growth, invest in flexibility (\pounds15M, matching S2 from Y2). The tree in Figure~\ref{fig:tree} shows this resolved optimal policy directly.
 
-The NPV for strategy $k$ under scenario $j$ is:
+The Net Present Value (NPV) discounts future expected profits. The NPV for strategy $k$ under scenario $j$ is:
 \begin{equation}
     \mathrm{NPV}^{(k,j)} = -I_0^{(k)} + \sum_{t=1}^{4}\frac{\E[\Pi_t^{(k,j)}]}{(1+r)^t} - \sum_{t\geq 1}\frac{I_t^{(k,j)}}{(1+r)^t}
     \label{eq:npv}
 \end{equation}
-where $I_1^{(k,j)}$ is discounted at $t=1$ (paid at end of Year 1). Annual profits $\E[\Pi_t^{(k,j)}]$ are from Table~\ref{tab:nv_annual}.
+where $I_0^{(k)}$ is the upfront capital expenditure (Table~\ref{tab:strategy_params}), $I_1^{(k,j)}$ is the conditional Year-1 investment discounted at $t=1$ (applicable S3 only), and annual profits $\E[\Pi_t^{(k,j)}]$ are from Table~\ref{tab:nv_annual}.
 
 \begin{figure}[H]
     \centering
@@ -429,13 +428,9 @@ where $I_1^{(k,j)}$ is discounted at $t=1$ (paid at end of Year 1). Annual profi
     \end{tabular}
 \end{table}
 
-\textbf{Strategy 2 dominates by a large margin in every scenario.} Its E[NPV] of \pounds46.5M exceeds S1 by \pounds39.9M and S3 by \pounds25.0M. The mechanism is threefold: (i)~much lower capex (\pounds20M vs \pounds54M/\pounds50M equivalent) leaves less invested capital to recover; (ii)~reduced $c_s$ from \pounds3200 to \pounds2900/t lowers the underage penalty, shifting the critical ratio from 0.200 to 0.125 and reducing expected spot procurement costs; (iii)~reduced demand volatility ($\sigma \to 0.6\sigma$) lowers both expected leftover and expected shortfall, simultaneously reducing storage and procurement waste.
+\textbf{Strategy 2 dominates by a large margin in every scenario.} Its E[NPV] of \pounds46.5M exceeds S1 by \pounds39.9M and S3 by \pounds25.0M. The mechanism is threefold: (i)~much lower capital expenditure (capex) (\pounds20M vs \pounds54M/\pounds50M equivalent) leaves less invested capital to recover; (ii)~reduced $c_s$ from \pounds3200 to \pounds2900/t lowers the underage penalty, shifting the critical ratio from 0.200 to 0.125 and reducing expected spot procurement costs; (iii)~reduced demand volatility ($\sigma \to 0.6\sigma$) lowers both expected leftover and expected shortfall, simultaneously reducing storage and procurement waste.
 
 S1 performs poorly under low growth (NPV $= \pounds0.95$M) due to the combination of high capex and the scale-inefficiency cost penalty. S3's real-options value---the ability to defer the large expansion cost---is insufficient to compensate for the 10\% Y1--Y2 revenue penalty and the fact that Strategy 2 is already cheaper and more profitable in every state.
-
-%========================================================================================
-\section{Risk Assessment}
-%========================================================================================
 
 \subsection{Monte Carlo Simulation Results}
 
@@ -443,7 +438,7 @@ For each of $N = 50000$ simulated paths: (i)~draw growth scenario and competitor
 
 \begin{table}[H]
     \centering
-    \caption{Monte Carlo risk measures ($N = 50000$, all values in £M except $\Prob(\mathrm{NPV}<0)$).}
+    \caption{Monte Carlo risk measures ($N = 50000$, all values in £M except $\Prob(\mathrm{NPV}<0)$). Conditional Value-at-Risk ($\mathrm{CVaR}_{5\%}$): expected NPV in the worst 5\% of outcomes.}
     \label{tab:risk}
     \small
     \begin{tabular}{@{}lccc@{}}
@@ -452,7 +447,6 @@ For each of $N = 50000$ simulated paths: (i)~draw growth scenario and competitor
         \midrule
         $\E[\mathrm{NPV}]$      & 6.58        & 46.54       & 21.50       \\
         Std.\ deviation         & 6.71        & 4.35        & 10.51       \\
-        $\mathrm{VaR}_{5\%}$    & $-$1.10     & 41.69       & 6.10        \\
         $\mathrm{CVaR}_{5\%}$   & $-$1.97     & 41.19       & 5.01        \\
         $\Prob(\mathrm{NPV}<0)$ & 13.8\%      & 0.0\%       & 0.0\%       \\
         10th percentile         & $-$0.38     & 42.12       & 7.23        \\
@@ -461,16 +455,18 @@ For each of $N = 50000$ simulated paths: (i)~draw growth scenario and competitor
     \end{tabular}
 \end{table}
 
-Strategy 2 is superior on \textit{every} risk dimension simultaneously---it has the highest E[NPV], the \textit{lowest} standard deviation, the highest VaR and CVaR, and zero probability of a net loss. This is a \textbf{stochastic dominance} result: Strategy 2 first-order stochastically dominates S1 and S3 (visible in the CDF plot, Figure~\ref{fig:npv_dist}).
+Each strategy's NPV distribution (Figure~\ref{fig:npv_dist}) is a mixture of three Gaussians, one per terminal scenario weighted by scenario probability (0.27, 0.18, 0.55). Within each scenario, monthly demand randomness produces a Gaussian-shaped NPV cluster; the separation between clusters reflects the scenario-driven differences in annual profits.
 
-Strategy 1 has a 13.8\% probability of a net loss---primarily driven by the low-growth scenario where the \pounds54M capex is not recovered within 4 years. Its NPV distribution has a wide spread (std.\ \pounds6.71M) due to the combination of demand uncertainty and scenario uncertainty.
+Strategy 2 is superior on \textit{every} risk dimension simultaneously---it has the highest E[NPV], the \textit{lowest} standard deviation, the highest CVaR, and zero probability of a net loss. Its three scenario clusters are tightly grouped in the \pounds42--53M range (Figure~\ref{fig:npv_dist}), with little overlap---even the worst-case cluster (low growth) sits above \pounds40M.
 
-Strategy 3 has zero probability of loss and moderate expected return, but its NPV distribution is bimodal (std.\ \pounds10.51M): the high-growth branch yields \pounds12.4M (H, no comp.) or \pounds7.0M (H+comp.) while the low-growth branch yields \pounds30.8M---reflecting that the real option is actually more valuable under \textit{low} growth (where flexibility investment is cheap and high-capacity expansion is avoided).
+Strategy 1 has a 13.8\% probability of a net loss. Its low-growth cluster (weight 0.55) is centred near \pounds1M with left-tail mass crossing zero, while the two high-growth clusters sit around \pounds10--16M. The wide spread (std.\ \pounds6.71M) reflects large inter-scenario separation compounded by within-scenario demand variability.
+
+Strategy 3 has zero probability of loss but a distinctly bimodal distribution (std.\ \pounds10.51M): the dominant low-growth cluster (weight 0.55) sits near \pounds31M, while the two high-growth clusters are compressed around \pounds7--12M. The real option is more valuable under \textit{low} growth---flexibility investment is cheap and the expensive capacity expansion is avoided.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{fig_npv_dist.pdf}
-    \caption{Simulated NPV density for each strategy (dashed lines = E[NPV]). S2 is tightly concentrated above \pounds40M; S1 has significant left-tail mass below zero.}
+    \caption{Simulated NPV density for each strategy (dashed lines = E[NPV]). Each distribution is a mixture of three Gaussian clusters corresponding to the three terminal scenarios. S2's clusters are tightly grouped above \pounds40M; S1's low-growth cluster crosses zero; S3 is bimodal with the dominant low-growth peak near \pounds31M.}
     \label{fig:npv_dist}
 \end{figure}
 
@@ -480,16 +476,16 @@ Strategy 3 has zero probability of loss and moderate expected return, but its NP
 
 \subsection{Strategic Recommendation: Adopt Strategy 2}
 
-\textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest VaR/CVaR. S2 dominates in every scenario (Table~\ref{tab:npv}), with no crossover point.
+\textbf{GreenCo should adopt Strategy 2 (Flexibility and Risk Mitigation).} This recommendation is robust across all metrics: E[NPV] = \pounds46.5M (vs \pounds6.6M for S1 and \pounds21.6M for S3), zero probability of net loss, lowest NPV volatility, and highest CVaR. S2 dominates in every scenario (Table~\ref{tab:npv}).
 
-The fundamental reason is economic: the newsvendor cost structure (overage cost \pounds2800/t \textit{four times} the underage cost \pounds700/t) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
+The fundamental reason is economic: the newsvendor cost structure (overage cost $c_o$ \pounds2800/t \textit{four times} the underage cost $c_u$ \pounds700/t in the standard case) means GreenCo should produce conservatively and rely on spot markets for shortfalls. Adding large electrolyser capacity (S1/S3) exacerbates the overcapacity problem under low growth while providing only marginal benefit under high growth. Strategy 2 instead \textit{reduces demand uncertainty}, which simultaneously reduces both spot procurement waste (lower ELS) and inventory waste (lower ELOI)---addressing the root cause of profit variability rather than throwing capacity at it.
 
-Under high growth, S2's systematic reliance on spot procurement from Year 3 is a genuine limitation. However, even in this scenario S2 yields NPV = \pounds52.75M (no comp.) or \pounds48.15M (with comp.), both far exceeding S1 and S3. If high growth materialises and spot market prices rise significantly, S2's pre-negotiated contingent contracts at \pounds2900/t provide important downside protection.
+Under high growth, S2's systematic reliance on spot procurement from Year 3 is a genuine limitation. However, even in this scenario S2 yields NPV = \pounds52.75M (no comp.) or \pounds48.15M (with comp.), both far exceeding S1 and S3. If high growth materialises and spot market prices rise significantly, S2's pre-negotiated contracts at \pounds2900/t provide important downside protection.
 
 \subsection{Operational Recommendations}
 
 \begin{enumerate}
-    \item \textbf{Production policy:} Implement the newsvendor-optimal schedule $Q_t^* = \min(\mu_t + z^*\sigma_t,\,\bar{Q})$, reviewed annually as demand parameters update. Under Strategy 2, use $z^{*,S2} = \Phi^{-1}(0.125) = -1.150$ (reduced $c_s$ lowers the underage penalty, justifying further underproduction). \textit{Avoid planning at mean demand}---this ignores the asymmetric cost structure and the flaw of averages.
+    \item \textbf{Production policy:} Implement the newsvendor-optimal schedule $Q_t^* = \min(\mu_t + z^*\sigma_t,\,\bar{Q})$, reviewed annually as demand parameters update. Avoid planning at mean demand as this ignores the asymmetric cost structure and the flaw of averages.
 
     \item \textbf{Refuelling station: add bays immediately.} The current M/M/3 configuration violates the 5-minute SLA at baseline ($W_q = 5.33$ min) and deteriorates rapidly under demand growth. \textit{This is independent of the investment strategy chosen.} Two additional bays ($s = 5$) are required for compliance across the 4-year horizon. With $s = 5$: $W_q = 0.24$ min at baseline, rising to 1.27 min under high growth by Y4. A single additional bay ($s = 4$) is insufficient under high growth (fails by Y4 at $\lambda = 14.64$/hr $> \lambda^{\max}_{s=4} = 14.44$/hr). The cost of non-compliance (contract breach) likely far exceeds the incremental bay installation cost.
 
@@ -500,17 +496,10 @@ Under high growth, S2's systematic reliance on spot procurement from Year 3 is a
 
 \begin{itemize}
     \item \textbf{Demand independence:} Monthly demands are assumed i.i.d.\ within each year. Serial correlation (e.g.\ contract ramp-ups) would alter the newsvendor solution and widen the simulated NPV distribution.
-    \item \textbf{Risk neutrality:} The analysis maximises E[NPV]. A risk-averse decision-maker would assign additional weight to downside outcomes; this would strengthen the case for S2 (already has zero loss probability) and weaken S1 further.
-    \item \textbf{Flaw of averages:} Computing profits at expected demand $\mu_t$ rather than simulating monthly realisations underestimates costs due to the nonlinear capacity-demand interaction (Jensen's inequality). The Monte Carlo simulation explicitly addresses this; the analytical E[NPV] figures are close to but slightly above the simulated means (e.g.\ S2: \pounds46.52M analytical vs \pounds46.54M simulated).
+    \item \textbf{Risk neutrality:} The analysis maximises E[NPV]. A risk-averse decision-maker would assign additional weight to downside outcomes; though this would strengthen the case for S2 (already has zero loss probability) and weaken S1 further.
     \item \textbf{Strategy 2 spot exposure under high growth:} From Year 3 onward under high growth, Strategy 2 relies systematically on spot procurement. If spot market liquidity is limited or prices spike, the pre-negotiated contingent contracts at \pounds2900/t are critical. If these contracts cannot be honoured at scale, S2's advantage would narrow.
     \item \textbf{Normal demand assumption:} Negative demand realisations are theoretically possible but negligible in practice ($>6\sigma$ from mean). Demand is truncated at zero in simulation.
     \item \textbf{Queueing model assumptions:} Steady-state M/M/$s$ assumes stationary Poisson arrivals. In practice, HGV arrivals may exhibit time-of-day patterns; a time-varying $\lambda(t)$ model would give a more accurate picture of peak congestion.
 \end{itemize}
-
-%========================================================================================
-\begin{thebibliography}{9}
-    \bibitem{gungor2026}
-    E.~Gungor, \textit{3E3 Modelling Risk: Lecture Notes}, University of Cambridge, Lent 2026.
-\end{thebibliography}
 
 \end{document}
