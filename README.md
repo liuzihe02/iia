@@ -64,3 +64,25 @@ FTRs are designed to enhance technical communication skills. Each requires ~10 h
     * *Example:* If lab is Wednesday, deadline is 4pm on the Wednesday the week after next.
 * **Return Deadline:** Marked reports returned within 15 term days.
 * **Planning:** Any experiment intended for an FTR should be done early enough for the marked report to be returned before the FTR deadline.
+
+## VSCode With MarkDown Preview Enhanced
+
+We'll often be using MPE to render notes in VS Code Markdown. This is very very powerful - it comes with native `mermaid`, `plantuml` and `latex` or `tikz` support too! Along with the default code blocks
+
+```latex {cmd=true hide=true latex_zoom=1.5}
+\documentclass[tikz,border=8pt]{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}
+  ... your TikZ here ...
+\end{tikzpicture}
+\end{document}
+```
+
+See the reference [here](https://shd101wyy.github.io/markdown-preview-enhanced/#/code-chunk)
+
+- cmd=true tells MPE to compile the chunk
+- hide=true hides the source so only the rendered figure appears in preview.
+- Code chunks are not auto-run — place the cursor on the chunk and press Ctrl+Shift+Enter (or Ctrl+Shift+Alt+Enter for all chunks). The rendered SVG is then cached under .crossnote/.
+- Requires a working LaTeX install (pdflatex on PATH) plus pdf2svg for SVG conversion. Configure the engine under Markdown Preview Enhanced: Latex Engine in settings.
+- Standard image embeds (<img src="images/...">) are still used for raster figures (PNG screenshots, lecture slide crops); inline TikZ is reserved for diagrams whose source we want to keep editable alongside the prose.
